@@ -41,7 +41,8 @@ udm:
   name: udm
   replicaCount: 1
   image:
-    name: towards5gs/free5gc-udm
+    name: free5gc/udm
+    tag: v3.3.0
     pullPolicy: Always
   service:
     type: ClusterIP

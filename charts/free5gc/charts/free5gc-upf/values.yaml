@@ -61,7 +61,8 @@ upf:
   name: upf
   replicaCount: 1
   image:
-    name: towards5gs/free5gc-upf
+    name: free5gc/upf
+    tag: v3.3.0
     pullPolicy: Always
   configmap:
     wrapperAdditionalCommands: ""
