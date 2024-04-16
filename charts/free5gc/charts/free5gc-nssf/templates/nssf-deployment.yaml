@@ -61,7 +61,7 @@ spec:
         ports:
         - containerPort: {{ .service.port }}
         command: ["./nssf"]
-        args: ["-c", "../config/nssfcfg.yaml"]
+        args: ["-c", "./config/nssfcfg.yaml"]
         env:
           - name: GIN_MODE
             value: release

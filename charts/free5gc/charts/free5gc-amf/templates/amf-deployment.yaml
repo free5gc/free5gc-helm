@@ -75,7 +75,7 @@ spec:
           protocol: {{ $.Values.global.amf.service.ngap.protocol }}
         {{- end }}
         command: ["./amf"]
-        args: ["-c", "../config/amfcfg.yaml"]
+        args: ["-c", "./config/amfcfg.yaml"]
         env:
           - name: GIN_MODE
             value: release

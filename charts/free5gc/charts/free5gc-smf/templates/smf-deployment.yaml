@@ -75,7 +75,7 @@ spec:
           protocol: UDP
         {{- end }}
         command: ["./smf"]
-        args: ["-c", "../config/smfcfg.yaml", "-u", "../config/uerouting.yaml"]
+        args: ["-c", "./config/smfcfg.yaml", "-u", "./config/uerouting.yaml"]
         env:
           - name: GIN_MODE
             value: release
