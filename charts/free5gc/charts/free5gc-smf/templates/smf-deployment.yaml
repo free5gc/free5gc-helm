@@ -82,6 +82,8 @@ spec:
         volumeMounts:
         - mountPath: {{ .volume.mount }}
           name: {{ include "free5gc-smf.fullname" $ }}-volume
+        - mountPath: {{ .volume.tlsmount }}
+          name: {{ include "free5gc-smf.fullname" $ }}-empty-volume
         resources:
             {{- toYaml .resources | nindent 12 }}
       dnsPolicy: ClusterFirst
@@ -104,4 +106,6 @@ spec:
                 path: smfcfg.yaml
               - key: uerouting.yaml
                 path: uerouting.yaml
+      - name: {{ include "free5gc-smf.fullname" $ }}-empty-volume
+        emptyDir: {}
 {{- end }}

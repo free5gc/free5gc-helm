@@ -68,6 +68,8 @@ spec:
         volumeMounts:
         - mountPath: {{ .volume.mount }}
           name: {{ include "free5gc-ausf.fullname" $ }}-volume
+        - mountPath: {{ .volume.tlsmount }}
+          name: {{ include "free5gc-ausf.fullname" $ }}-empty-volume
         resources:
             {{- toYaml .resources | nindent 12 }}
       dnsPolicy: ClusterFirst
@@ -85,4 +87,6 @@ spec:
           sources:
           - configMap:
               name: {{ include "free5gc-ausf.fullname" $ }}-configmap
+      - name: {{ include "free5gc-ausf.fullname" $ }}-empty-volume
+        emptyDir: {}
 {{- end }}

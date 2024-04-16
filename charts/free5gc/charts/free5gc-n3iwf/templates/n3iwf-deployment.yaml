@@ -75,6 +75,8 @@ spec:
         volumeMounts:
         - mountPath: {{ .volume.mount }}
           name: {{ .volume.name }}
+        - mountPath: {{ .volume.tlsmount }}
+          name: {{ .volume.name }}-empty
         resources:
             {{- toYaml .resources | nindent 12 }}
       dnsPolicy: ClusterFirst
@@ -98,4 +100,6 @@ spec:
               - key: n3iwf-ipsec.sh
                 path: n3iwf-ipsec.sh
                 mode: 0777
+      - name: {{ .volume.name }}-empty
+        emptyDir: {}
 {{- end }}

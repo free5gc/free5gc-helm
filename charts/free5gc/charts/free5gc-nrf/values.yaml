@@ -63,6 +63,7 @@ nrf:
     pullPolicy: Always
   volume:
     mount: /free5gc/config/
+    tlsmount: /free5gc/config/TLS
   podAnnotations: {}
     # additional annotations
   imagePullSecrets: []

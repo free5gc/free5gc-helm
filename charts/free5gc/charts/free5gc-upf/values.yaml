@@ -70,6 +70,7 @@ upf:
     #   echo "123" > /tmp/123
   volume:
     mount: /free5gc/config/
+    tlsmount: /free5gc/config/TLS
 
   # network paramters
   n3if:  # GTP-U

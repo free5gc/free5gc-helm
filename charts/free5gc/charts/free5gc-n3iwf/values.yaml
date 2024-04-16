@@ -57,6 +57,7 @@ n3iwf:
   volume:
     name: n3iwf-volume
     mount: /free5gc/config/
+    tlsmount: /free5gc/config/TLS
   # network paramters
   n2if:  # NGAP
     ipAddress: 10.100.50.251

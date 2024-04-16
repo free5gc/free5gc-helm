@@ -71,6 +71,8 @@ spec:
         volumeMounts:
         - mountPath: {{ .volume.mount }}
           name: {{ include "free5gc-nrf.fullname" $ }}-volume
+        - mountPath: {{ .volume.tlsmount }}
+          name: {{ include "free5gc-nrf.fullname" $ }}-empty-volume
         resources:
             {{- toYaml .resources | nindent 12 }}
         readinessProbe:
@@ -106,4 +108,6 @@ spec:
           sources:
           - configMap:
               name: {{ include "free5gc-nrf.fullname" $ }}-configmap
+      - name: {{ include "free5gc-nrf.fullname" $ }}-empty-volume
+        emptyDir: {}
 {{- end }}
