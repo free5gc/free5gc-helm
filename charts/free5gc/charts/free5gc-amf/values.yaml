@@ -64,7 +64,7 @@ amf:
   replicaCount: 1
   image:
     name: free5gc/amf
-    tag: v3.3.0
+    tag: v3.4.1
     pullPolicy: Always
   service:
     type: ClusterIP
@@ -191,6 +191,11 @@ amf:
         maxRetryTimes: 4 # the max number of retransmission
       # retransmission timer for NAS Registration Accept message
       t3550:
+        enable: true     # true or false
+        expireTime: 6s   # default is 6 seconds
+        maxRetryTimes: 4 # the max number of retransmission
+      # retransmission timer for NAS Configuration Update Command message
+      t3555:
         enable: true     # true or false
         expireTime: 6s   # default is 6 seconds
         maxRetryTimes: 4 # the max number of retransmission

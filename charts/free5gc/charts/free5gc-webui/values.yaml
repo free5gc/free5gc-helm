@@ -25,6 +25,18 @@ global:
       type: ClusterIP
       port: "8000"
       nodePort: "30800"
+  webui: 
+    service:
+      name: webui-nbiling
+      type: ClusterIP
+      port: "2122"
+      nodePort: "32122"
+  cgf:
+    service:
+      name: webui-ncgf
+      type: ClusterIP
+      port: "2121"
+      nodePort: "32121"
   sbi:
     scheme: http
 
@@ -52,7 +64,7 @@ webui:
   replicaCount: 1
   image:
     name: free5gc/webui
-    tag: v3.3.0
+    tag: v3.4.1
     pullPolicy: Always
   service:
     name: webui-service

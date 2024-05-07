@@ -32,3 +32,31 @@ spec:
     project: {{ $.Values.global.projectName }}
     nf: {{ .name }}
 {{- end }}
+---
+{{- with .Values.global}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .webui.service.name }}
+  labels:
+    {{- include "free5gc-webui.labels" $ | nindent 4 }}
+    project: {{ .projectName }}
+    nf: {{ $.Values.webui.name }}
+spec:
+  type: {{ .webui.service.type }}
+  ports:
+    - port: {{ .webui.service.port }}
+      targetPort: {{ .webui.service.port }}
+      nodePort: {{ .webui.service.nodePort }}
+      protocol: TCP
+      name: http
+    - port: {{ .cgf.service.port }}
+      targetPort: {{ .cgf.service.port }}
+      nodePort: {{ .cgf.service.nodePort }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "free5gc-webui.selectorLabels" $ | nindent 4 }}
+    project: {{ .projectName }}
+    nf: {{ $.Values.webui.name }}
+{{- end }}

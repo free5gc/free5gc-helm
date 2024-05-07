@@ -37,7 +37,8 @@ data:
           pem: ./cert/smf.pem
 
       nrfUri: {{ $.Values.global.sbi.scheme }}://{{ $.Values.global.nrf.service.name }}:{{ $.Values.global.nrf.service.port }}
-
+      nrfCertPem: ./cert/nrf.pem # NRF Certificate
+      {{- .configuration.urrConfiguration | nindent 6 }}
       pfcp:
         nodeID: {{ $.Values.global.smf.n4if.ipAddress }}
         listenAddr: {{ $.Values.global.smf.n4if.ipAddress }}

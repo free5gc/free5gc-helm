@@ -59,7 +59,7 @@ nrf:
   replicaCount: 1
   image:
     name: free5gc/nrf
-    tag: v3.3.0
+    tag: v3.4.1
     pullPolicy: Always
   volume:
     mount: /free5gc/config/
@@ -110,6 +110,8 @@ nrf:
     serviceNameList: |-
       - nnrf-nfm
       - nnrf-disc
+    oauthConfiguration: |-
+      oauth: false
     configuration: |-
       DefaultPlmnId:
         mcc: 208

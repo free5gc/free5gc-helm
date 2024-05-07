@@ -37,6 +37,7 @@ data:
           pem: ./cert/ausf.pem
 
       nrfUri: {{ $.Values.global.sbi.scheme }}://{{ $.Values.global.nrf.service.name }}:{{ $.Values.global.nrf.service.port }}
+      nrfCertPem: ./cert/nrf.pem # NRF Certificate
 
       {{- .configuration.configuration | nindent 6 }}
 
