@@ -52,6 +52,8 @@ chf:
   service:
     type: ClusterIP
     port: 80
+  configmap:
+    name: chf-configmap
   volume:
     mount: /free5gc/config/
     tlsmount: /free5gc/config/TLS
@@ -98,4 +100,9 @@ chf:
     #    hosts:
     #      - chart-example.local
   configuration: {}
-    # tmp
+    serviceNameList: |-
+      - nchf-convergedcharging # Nchf_AMPolicyControl service
+    logger: # log output setting
+      enable: true # true or false
+      level: info # how detailed to output, value: trace, debug, info, warn, error, fatal, panic
+      reportCaller: false # enable the caller report or not, value: true or false

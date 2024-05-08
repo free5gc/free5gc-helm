@@ -22,6 +22,8 @@ dependencies:
   condition: deployAmf
 - name: free5gc-ausf
   condition: deployAusf
+- name: free5gc-chf
+  condition: deployChf
 - name: free5gc-n3iwf
   condition: deployN3iwf
 - name: free5gc-nrf

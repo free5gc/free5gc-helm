@@ -1,0 +1,67 @@
+#
+# Software Name : free5gc-compose
+#
+{{- with .Values.chf }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .configmap.name }}
+  labels:
+    app: {{ $.Values.global.projectName }}
+data:
+  chfcfg.yaml: |
+    info:
+      version: 1.0.3
+      description: CHF initial local configuration
+
+    configuration:
+      chfName: CHF # the name of this CHF
+      sbi: # Service-based interface information
+        scheme: {{ $.Values.global.sbi.scheme }} # the protocol for sbi (http or https)
+        registerIPv4: {{ include "free5gc-chf.fullname" $ }}-service # IP used to register to NRF
+        bindingIPv4: 0.0.0.0 # IP used to bind the service
+        port: {{ .service.port }} # port used to bind the service
+        tls: # the local path of TLS key
+          pem: ./cert/chf.pem # CHF TLS Certificate
+          key: ./cert/chf.key # CHF TLS Private key
+
+      nrfUri: {{ $.Values.global.sbi.scheme }}://{{ $.Values.global.nrf.service.name }}:{{ $.Values.global.nrf.service.port }} # a valid URI of NRF
+      nrfCertPem: ./cert/nrf.pem # NRF Certificate
+      serviceNameList: # the SBI services provided by this CHF, refer to TS 32.291
+        {{- .configuration.serviceNameList | nindent 8 }}
+      mongodb: # the mongodb connected by this CHF
+        name: free5gc # name of the mongodb
+        url: mongodb://{{ $.Values.mongodb.service.name }}:{{ $.Values.mongodb.service.port }} # a valid URL of the mongodb
+      
+      quotaValidityTime: 10000
+      volumeLimit: 50000
+      volumeLimitPDU: 10000
+      volumeThresholdRate: 0.8
+
+      cgf:
+        hostIPv4: {{ $.Values.global.webui.service.name }}
+        port: {{ $.Values.global.webui.service.port }}
+        listenPort: {{ $.Values.global.cgf.service.port }}
+        tls:
+          pem: ./cert/chf.pem
+          key: ./cert/chf.key
+        cdrFilePath: /tmp
+      abmfDiameter:
+        protocol: tcp
+        hostIPv4: {{ include "free5gc-chf.fullname" $ }}-service
+        port: 3868
+        tls:
+          pem: ./cert/chf.pem
+          key: ./cert/chf.key
+      rfDiameter:
+        protocol: tcp
+        hostIPv4: {{ include "free5gc-chf.fullname" $ }}-service
+        port: 3869
+        tls:
+          pem: ./cert/chf.pem # CHF TLS Certificate
+          key: ./cert/chf.key # CHF TLS Private key
+
+    logger: # log output setting
+      {{- toYaml .configuration.logger | nindent 6 }}
+
+{{- end }}
