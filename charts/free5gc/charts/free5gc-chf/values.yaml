@@ -99,7 +99,7 @@ chf:
     #  - secretName: chart-example-tls
     #    hosts:
     #      - chart-example.local
-  configuration: {}
+  configuration: 
     serviceNameList: |-
       - nchf-convergedcharging # Nchf_AMPolicyControl service
     logger: # log output setting

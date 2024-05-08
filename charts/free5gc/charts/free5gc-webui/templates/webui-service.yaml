@@ -48,7 +48,7 @@ spec:
     - port: {{ .webui.service.port }}
       targetPort: {{ .webui.service.port }}
       protocol: TCP
-      name: webui-biling
+      name: {{ .webui.service.name }}
   selector:
     {{- include "free5gc-webui.selectorLabels" $ | nindent 4 }}
     project: {{ .projectName }}

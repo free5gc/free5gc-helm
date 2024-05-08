@@ -1,12 +1,13 @@
 #
 # Software Name : free5gc-compose
 #
+{{- with .Values.chf  }}
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "{{ include "free5gc-chf.fullname" . }}-test-connection"
+  name: "{{ include "free5gc-chf.fullname" $ }}-test-connection"
   labels:
-    {{- include "free5gc-chf.labels" . | nindent 4 }}
+    {{- include "free5gc-chf.labels" $ | nindent 4 }}
   annotations:
     "helm.sh/hook": test
 spec:
@@ -14,5 +15,6 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ include "free5gc-chf.fullname" . }}:{{ .Values.service.port }}']
+      args: ['{{ .service.name }}:{{ .service.port }}']
   restartPolicy: Never
+{{- end }}

@@ -19,7 +19,6 @@ metadata:
     nf: {{ .name }}
   annotations:
     {{- toYaml .ingress.annotations | nindent 4 }}
-  {{- end }}
 spec:
   {{- if .ingress.tls }}
   tls:
