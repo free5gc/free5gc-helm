@@ -1,0 +1,18 @@
+#
+# Software Name : free5gc-compose
+#
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "free5gc-chf.fullname" . }}-test-connection"
+  labels:
+    {{- include "free5gc-chf.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "free5gc-chf.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never
