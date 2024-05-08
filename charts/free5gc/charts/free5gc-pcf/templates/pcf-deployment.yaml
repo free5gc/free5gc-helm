@@ -62,13 +62,15 @@ spec:
         ports:
         - containerPort: {{ .service.port }}
         command: ["./pcf"]
-        args: ["-c", "../config/pcfcfg.yaml"]
+        args: ["-c", "./config/pcfcfg.yaml"]
         env:
           - name: GIN_MODE
             value: release
         volumeMounts:
         - mountPath: {{ .volume.mount }}
           name: {{ include "free5gc-pcf.fullname" $ }}-volume
+        - mountPath: {{ .volume.tlsmount }}
+          name: {{ include "free5gc-pcf.fullname" $ }}-empty-volume
         resources:
             {{- toYaml .resources | nindent 12 }}
       dnsPolicy: ClusterFirst
@@ -86,4 +88,6 @@ spec:
           sources:
           - configMap:
               name: {{ include "free5gc-pcf.fullname" $ }}-configmap
+      - name: {{ include "free5gc-pcf.fullname" $ }}-empty-volume
+        emptyDir: {}
 {{- end }}

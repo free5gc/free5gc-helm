@@ -61,13 +61,15 @@ spec:
         ports:
         - containerPort: {{ .service.port }}
         command: ["./nssf"]
-        args: ["-c", "../config/nssfcfg.yaml"]
+        args: ["-c", "./config/nssfcfg.yaml"]
         env:
           - name: GIN_MODE
             value: release
         volumeMounts:
         - mountPath: {{ .volume.mount }}
           name: {{ include "free5gc-nssf.fullname" $ }}-volume
+        - mountPath: {{ .volume.tlsmount }}
+          name: {{ include "free5gc-nssf.fullname" $ }}-empty-volume
         resources:
             {{- toYaml .resources | nindent 12 }}
       dnsPolicy: ClusterFirst
@@ -85,4 +87,6 @@ spec:
           sources:
           - configMap:
               name: {{ include "free5gc-nssf.fullname" $ }}-configmap
+      - name: {{ include "free5gc-nssf.fullname" $ }}-empty-volume
+        emptyDir: {}
 {{- end }}

@@ -61,13 +61,15 @@ spec:
         ports:
         - containerPort: {{ .service.port }}
         command: ["./udm"]
-        args: ["-c", "../config/udmcfg.yaml"]
+        args: ["-c", "./config/udmcfg.yaml"]
         env:
           - name: GIN_MODE
             value: release
         volumeMounts:
         - mountPath: {{ .volume.mount }}
           name: {{ include "free5gc-udm.fullname" $ }}-volume
+        - mountPath: {{ .volume.tlsmount }}
+          name: {{ include "free5gc-udm.fullname" $ }}-empty-volume
         resources:
             {{- toYaml .resources | nindent 12 }}
       dnsPolicy: ClusterFirst
@@ -85,4 +87,6 @@ spec:
           sources:
           - configMap:
               name: {{ include "free5gc-udm.fullname" $ }}-configmap
+      - name: {{ include "free5gc-udm.fullname" $ }}-empty-volume
+        emptyDir: {}
 {{- end }}

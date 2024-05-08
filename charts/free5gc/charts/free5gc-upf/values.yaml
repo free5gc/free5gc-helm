@@ -61,7 +61,8 @@ upf:
   name: upf
   replicaCount: 1
   image:
-    name: towards5gs/free5gc-upf
+    name: free5gc/upf
+    tag: v3.3.0
     pullPolicy: Always
   configmap:
     wrapperAdditionalCommands: ""
@@ -69,6 +70,7 @@ upf:
     #   echo "123" > /tmp/123
   volume:
     mount: /free5gc/config/
+    tlsmount: /free5gc/config/TLS
 
   # network paramters
   n3if:  # GTP-U

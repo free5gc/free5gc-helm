@@ -61,14 +61,16 @@ spec:
             {{- toYaml .securityContext | nindent 12 }}
         ports:
         - containerPort: {{ .service.port }}
-        command: ["./webconsole"]
-        args: ["-c", "../config/webuicfg.yaml"]
+        command: ["./webui"]
+        args: ["-c", "./config/webuicfg.yaml"]
         env:
           - name: GIN_MODE
             value: release
         volumeMounts:
         - mountPath: {{ .volume.mount }}
           name: {{ .volume.name }}
+        - mountPath: {{ .volume.tlsmount }}
+          name: {{ .volume.name }}-empty
         resources:
             {{- toYaml .resources | nindent 12 }}
         readinessProbe:
@@ -104,4 +106,6 @@ spec:
           sources:
           - configMap:
               name: {{ .configmap.name }}
+      - name: {{ .volume.name }}-empty
+        emptyDir: {}
 {{- end }}

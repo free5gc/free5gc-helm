@@ -51,7 +51,8 @@ webui:
   name: webui
   replicaCount: 1
   image:
-    name: towards5gs/free5gc-webui
+    name: free5gc/webui
+    tag: v3.3.0
     pullPolicy: Always
   service:
     name: webui-service
@@ -63,6 +64,7 @@ webui:
   volume:
     name: webui-volume
     mount: /free5gc/config/
+    tlsmount: /free5gc/config/TLS
   podAnnotations: {}
     # additional annotations
   imagePullSecrets: []
