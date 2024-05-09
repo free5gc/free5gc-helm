@@ -1,17 +1,17 @@
-NFs = amf ausf chf nrf nssf pcf smf udm udr n3iwf upf chf udsf
+NFs = amf ausf nrf nssf pcf smf udm udr n3iwf upf
 PREFIX = towards5gs/free5gc
 TAG = 3.3.0
 
-base:
-	docker build -t $(PREFIX)-base:$(TAG) ./free5gc-base --no-cache
+all: $(NFs) webui
 
-nfs:
-	for NF in $(NFs) ; do \
-		docker build -t $(PREFIX)-$$NF:$(TAG) ./free5gc-$$NF --no-cache ; \
-	done
+$(NFs):
+	docker build -t $(PREFIX)-$@:$(TAG) --build-arg NF=$@ --build-arg FREE5GC_VER=v$(TAG) . --no-cache
+
 webui:
-	docker build -t $(PREFIX)-webui:$(TAG) ./free5gc-webui
+	docker build -t $(PREFIX)-webui:$(TAG) -f ./free5gc-webui/Dockerfile .
 
 clean:
-	docker rmi $$(docker images | grep $(PREFIX) | awk '{print $3}')
+	for NF in $(NFs); do \
+		docker rmi $$(docker images | grep $(PREFIX)-$(NF) | awk '{print $1}') ; \
+	done
 
