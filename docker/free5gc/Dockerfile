@@ -1,5 +1,5 @@
 #FROM bitnami/golang:1.14.4 AS builder
-FROM golang:1.18.10-buster AS builder
+FROM golang:1.21.4-buster AS builder
 
 ARG NF FREE5GC_VER
 
