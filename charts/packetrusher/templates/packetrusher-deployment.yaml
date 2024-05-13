@@ -1,0 +1,63 @@
+#
+# Software Name : towards5gs-helm
+# SPDX-FileCopyrightText: Copyright (c) 2021 Orange
+# SPDX-License-Identifier: Apache-2.0
+#
+# This software is distributed under the Apache License 2.0,
+# the text of which is available at todo
+# or see the "LICENSE" file for more details.
+#
+# Author: Abderaouf KHICHANE, Ilhem FAJJARI, Ayoub BOUSSELMI
+# Software description: An open-source project providing Helm charts to deploy 5G components (Core + RAN) on top of Kubernetes
+#
+{{- with .Values.packetrusher }}
+{{- if .enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .name }}
+  labels:
+    app: {{ $.Values.projectName }}
+spec:
+  replicas: {{ .replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ $.Values.projectName }}
+  template:
+    metadata:
+      labels:
+        app: {{ $.Values.projectName }}
+      annotations:
+        {{- if or $.Values.global.n2network.enabled $.Values.global.n3network.enabled}}
+        k8s.v1.cni.cncf.io/networks: '[
+        {{- if $.Values.global.n2network.enabled }}
+            { "name": "{{ $.Values.global.n2network.name }}",
+              "interface": "n2",
+              "ips": [ "{{ .n2if.ipAddress }}/{{ $.Values.global.n2network.cidr }}" ],
+              "gateway": [ "{{ $.Values.global.n2network.gatewayIP }}" ]
+            },
+        {{- end }}
+            { "name": "{{ $.Values.global.n3network.name }}",
+              "interface": "n3",
+              "ips": [ "{{ .n3if.ipAddress }}/{{ $.Values.global.n3network.cidr }}" ],
+              "gateway": [ "{{ $.Values.global.n3network.gatewayIP }}" ]
+            }
+            ]'
+        {{- end }}
+    spec:
+      initContainers:
+      - name: wait-amf
+        {{- with $.Values.initcontainers.sctp_test }}
+        image: {{ .image.name }}:{{ .image.tag }}
+        imagePullPolicy: {{ .image.pullPolicy }}
+        {{- end }}
+        command: ["sh", "-c", "until sctp_test -s -H 0.0.0.0 -P 25000 -h {{ .amf.n2if.ipAddress }} -p {{ .amf.n2if.port }}; do echo waiting for the AMF; sleep 2; done;"]
+      containers:
+      - name: packetrusher
+        image: towards5gs/packetrusher
+        imagePullPolicy: {{ .image.pullPolicy }}
+        env: {{ toYaml .image.env | nindent 8 }}
+
+{{- end }}
+{{- end }}
+        
