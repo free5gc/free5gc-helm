@@ -34,7 +34,7 @@ data:
         port: {{ .service.port }}
       billingServer:
         enable: true
-        hostIPv4: {{ $.Values.global.webui.service.name }}
+        hostIPv4: 0.0.0.0
         listenPort: {{ $.Values.global.webui.service.port }}
         port: {{ $.Values.global.cgf.service.port }}
         tls:

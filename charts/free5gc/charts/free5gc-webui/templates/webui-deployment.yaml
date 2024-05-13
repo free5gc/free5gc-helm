@@ -61,6 +61,7 @@ spec:
             {{- toYaml .securityContext | nindent 12 }}
         ports:
         - containerPort: {{ .service.port }}
+        - containerPort: {{ $.Values.global.webui.service.port }}
         command: ["./webui"]
         args: ["-c", "./config/webuicfg.yaml"]
         env:
