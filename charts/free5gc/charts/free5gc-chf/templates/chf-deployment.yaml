@@ -1,64 +1,84 @@
 #
 # Software Name : free5gc-compose
 #
+{{- with .Values.chf }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "free5gc-chf.fullname" . }}
+  name: {{ include "free5gc-chf.fullname" $ }}-{{ .name }}
   labels:
-    {{- include "free5gc-chf.labels" . | nindent 4 }}
+    {{- include "free5gc-chf.labels" $ | nindent 4 }}
+    project: {{ $.Values.global.projectName }}
+    nf: {{ .name }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  {{- if not .autoscaling.enabled }}
+  replicas: {{ .replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "free5gc-chf.selectorLabels" . | nindent 6 }}
+      {{- include "free5gc-chf.selectorLabels" $ | nindent 6 }}
+      project: {{ $.Values.global.projectName }}
+      nf: {{ .name }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- include "free5gc-chf.chfAnnotations" $ | nindent 8 }}
+        checksum/config: {{ include (print $.Template.BasePath "/chf-configmap.yaml") $ | sha256sum }}
       labels:
-        {{- include "free5gc-chf.selectorLabels" . | nindent 8 }}
+        {{- include "free5gc-chf.selectorLabels" $ | nindent 8 }}
+        project: {{ $.Values.global.projectName }}
+        nf: {{ .name }}
     spec:
-      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      serviceAccountName: {{ include "free5gc-chf.serviceAccountName" . }}
+        {{- toYaml .imagePullSecrets | nindent 8 }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml .podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: wait-nrf
+          {{- with $.Values.initcontainers.curl }}
+          image: {{ .registry }}/{{ .image }}:{{ .tag }}
+          {{- end }}
+          env:
+          - name: DEPENDENCIES
+            value: {{ $.Values.global.sbi.scheme }}://{{ $.Values.global.nrf.service.name }}:{{ $.Values.global.nrf.service.port }}
+          command: ['sh', '-c', 'set -x; for dependency in $DEPENDENCIES; do while [ $(curl --insecure --connect-timeout 1 -s -o /dev/null -w "%{http_code}" $dependency) -ne 200 ]; do echo waiting for dependencies; sleep 1; done; done;']
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ .name }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+            {{- toYaml .securityContext | nindent 12 }}
+          image: {{ .image.name }}:{{ .image.tag | default $.Chart.AppVersion }}
+          imagePullPolicy: {{ .image.pullPolicy }}
+          securityContext:
+            {{- toYaml .securityContext | nindent 12 }}
           ports:
-            - name: http
-              containerPort: 80
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
+            - containerPort: {{ .service.port }}
+          command: ["./chf"]
+          args: ["-c", "./config/chfcfg.yaml"]
+          env:
+            - name: GIN_MODE
+              value: release
+          volumeMounts:
+            - mountPath: {{ .volume.mount }}
+              name: {{ include "free5gc-chf.fullname" $ }}-volume
+            - mountPath: {{ .volume.tlsmount }}
+              name: {{ include "free5gc-chf.fullname" $ }}-empty-volume
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
+            {{- toYaml .resources | nindent 12 }}
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
       nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
+        {{- toYaml .nodeSelector | nindent 8 }}
       affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
+        {{- toYaml .affinity | nindent 8 }}
       tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- toYaml .tolerations | nindent 8 }}
+      
+      volumes:
+        - name: {{ include "free5gc-chf.fullname" $ }}-volume
+          projected:
+            sources:
+            - configMap:
+                name: {{ include "free5gc-chf.fullname" $ }}-configmap
+        - name: {{ include "free5gc-chf.fullname" $ }}-empty-volume
+          emptyDir: {}
+{{- end }}
