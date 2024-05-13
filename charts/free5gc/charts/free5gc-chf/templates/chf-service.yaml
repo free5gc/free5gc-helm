@@ -17,14 +17,6 @@ spec:
       targetPort: {{ .service.port }}
       protocol: TCP
       name: http
-    - port: 3868
-      targetPort: 3868
-      protocol: TCP
-      name: abmf-diameter
-    - port: 3869
-      targetPort: 3869
-      protocol: TCP
-      name: rf-diameter
   selector:
     {{- include "free5gc-chf.selectorLabels" $ | nindent 4 }}
     project: {{ $.Values.global.projectName }}
