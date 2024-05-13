@@ -1,3 +1,6 @@
+#
+# Software Name : free5gc-helm
+#
 {{/*
 Expand the name of the chart.
 */}}
@@ -51,12 +54,12 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Create the name of the service account to use
+CHF Pod Annotations
 */}}
-{{- define "free5gc-chf.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "free5gc-chf.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
+{{- define "free5gc-chf.chfAnnotations" -}}
+{{- with .Values.chf }}
+{{- if .podAnnotations }}
+{{- toYaml .podAnnotations }}
+{{- end }}
 {{- end }}
 {{- end }}
