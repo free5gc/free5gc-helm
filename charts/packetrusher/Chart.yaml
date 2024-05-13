@@ -10,7 +10,7 @@
 # Author: Abderaouf KHICHANE, Ilhem FAJJARI, Ayoub BOUSSELMI, Ian Chen
 # Software description: An open-source project providing Helm charts to deploy 5G components (Core + RAN) on top of Kubernetes
 #
-apiVersion: v1
+apiVersion: v2
 name: packetrusher
 description: A Helm chart to deploy the Packet Rusher
 type: application
