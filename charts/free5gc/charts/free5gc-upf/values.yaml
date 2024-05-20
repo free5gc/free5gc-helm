@@ -140,6 +140,7 @@ upf1:
     #   echo "123" > /tmp/123
   volume:
     mount: /free5gc/config/
+    tlsmount: /free5gc/config/TLS
 
   # network paramters
   n9if:  # GTP-U
@@ -186,6 +187,9 @@ upf1:
       - dnn: internet # Data Network Name
         cidr: 10.1.0.0/17 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
         natifname: n6
+      - dnn: internet # Data Network Name
+        cidr: 10.1.128.0/17 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
+        natifname: n6
 
     logger: # log output setting
       enable: true # true or false
@@ -205,6 +209,7 @@ upf2:
     #   echo "123" > /tmp/123
   volume:
     mount: /free5gc/config/
+    tlsmount: /free5gc/config/TLS
 
   # network paramters
   n9if:  # GTP-U
@@ -251,6 +256,9 @@ upf2:
       - dnn: internet # Data Network Name
         cidr: 10.1.0.0/17 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
         natifname: n6
+      - dnn: internet # Data Network Name
+        cidr: 10.1.128.0/17 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
+        natifname: n6
 
     logger: # log output setting
       enable: true # true or false
@@ -270,6 +278,7 @@ upfb:
     #   echo "123" > /tmp/123
   volume:
     mount: /free5gc/config/
+    tlsmount: /free5gc/config/TLS
 
   # network paramters
   n3if:  # GTP-U
@@ -317,6 +326,9 @@ upfb:
     dnnList: # The DNN list supported by UPF
       - dnn: internet # Data Network Name
         cidr: 10.1.0.0/17 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
+        natifname: n6
+      - dnn: internet # Data Network Name
+        cidr: 10.1.128.0/17 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
         natifname: n6
 
     logger: # log output setting

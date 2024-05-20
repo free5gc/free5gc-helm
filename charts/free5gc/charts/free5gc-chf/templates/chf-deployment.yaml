@@ -54,8 +54,6 @@ spec:
           - containerPort: {{ .service.port }}
         command: ["./chf"]
         args: ["-c", "./config/chfcfg.yaml"]
-        # command: ["sleep"]
-        # args: ["infinity"]
         env:
           - name: GIN_MODE
             value: release
