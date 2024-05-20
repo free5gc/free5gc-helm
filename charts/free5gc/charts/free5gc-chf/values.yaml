@@ -57,6 +57,7 @@ chf:
   volume:
     mount: /free5gc/config/
     tlsmount: /free5gc/config/TLS
+    certmount: /free5gc/nrf-cert
   podAnnotations: {}
     # additional annotations
   imagePullSecrets: []

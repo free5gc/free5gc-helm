@@ -50,6 +50,7 @@ nssf:
   volume:
     mount: /free5gc/config/
     tlsmount: /free5gc/config/TLS
+    certmount: /free5gc/cert
   podAnnotations: {}
     # additional annotations
   imagePullSecrets: []

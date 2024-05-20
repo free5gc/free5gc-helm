@@ -41,6 +41,7 @@ data:
         url: mongodb://{{ $.Values.mongodb.service.name }}:{{ $.Values.mongodb.service.port }} # a valid URL of the mongodb
 
       nrfUri: {{ $.Values.global.sbi.scheme }}://{{ $.Values.global.nrf.service.name }}:{{ $.Values.global.nrf.service.port }}
+      nrfCertPem: cert/nrf.pem
 
       {{- .configuration.configuration | nindent 6 }}
 

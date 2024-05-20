@@ -38,6 +38,7 @@ data:
         url: mongodb://{{ $.Values.mongodb.service.name }}:{{ $.Values.mongodb.service.port }}
 
       nrfUri: {{ $.Values.global.sbi.scheme }}://{{ $.Values.global.nrf.service.name }}:{{ $.Values.global.nrf.service.port }}
+      nrfCertPem: cert/nrf.pem
 
     logger:
       {{- toYaml .configuration.logger | nindent 6 }}

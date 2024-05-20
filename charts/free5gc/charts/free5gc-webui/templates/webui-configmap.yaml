@@ -28,6 +28,7 @@ data:
         name: free5gc
         url: mongodb://{{ $.Values.mongodb.service.name }}:{{ $.Values.mongodb.service.port }}
       nrfUri: {{ $.Values.global.sbi.scheme }}://{{ $.Values.global.nrf.service.name }}:{{ $.Values.global.nrf.service.port }}
+      nrfCertPem: cert/nrf.pem
       webServer:
         scheme: {{ $.Values.global.sbi.scheme }}
         ipv4Address: 0.0.0.0

@@ -43,27 +43,31 @@ spec:
             value: {{ $.Values.global.sbi.scheme }}://{{ $.Values.global.nrf.service.name }}:{{ $.Values.global.nrf.service.port }}
           command: ['sh', '-c', 'set -x; for dependency in $DEPENDENCIES; do while [ $(curl --insecure --connect-timeout 1 -s -o /dev/null -w "%{http_code}" $dependency) -ne 200 ]; do echo waiting for dependencies; sleep 1; done; done;']
       containers:
-        - name: {{ .name }}
-          securityContext:
-            {{- toYaml .securityContext | nindent 12 }}
-          image: {{ .image.name }}:{{ .image.tag | default $.Chart.AppVersion }}
-          imagePullPolicy: {{ .image.pullPolicy }}
-          securityContext:
-            {{- toYaml .securityContext | nindent 12 }}
-          ports:
-            - containerPort: {{ .service.port }}
-          command: ["./chf"]
-          args: ["-c", "./config/chfcfg.yaml"]
-          env:
-            - name: GIN_MODE
-              value: release
-          volumeMounts:
-            - mountPath: {{ .volume.mount }}
-              name: {{ include "free5gc-chf.fullname" $ }}-volume
-            - mountPath: {{ .volume.tlsmount }}
-              name: {{ include "free5gc-chf.fullname" $ }}-empty-volume
-          resources:
-            {{- toYaml .resources | nindent 12 }}
+      - name: {{ .name }}
+        securityContext:
+          {{- toYaml .securityContext | nindent 12 }}
+        image: {{ .image.name }}:{{ .image.tag | default $.Chart.AppVersion }}
+        imagePullPolicy: {{ .image.pullPolicy }}
+        securityContext:
+          {{- toYaml .securityContext | nindent 12 }}
+        ports:
+          - containerPort: {{ .service.port }}
+        command: ["./chf"]
+        args: ["-c", "./config/chfcfg.yaml"]
+        # command: ["sleep"]
+        # args: ["infinity"]
+        env:
+          - name: GIN_MODE
+            value: release
+        volumeMounts:
+          - mountPath: {{ .volume.mount }}
+            name: {{ include "free5gc-chf.fullname" $ }}-volume
+          - mountPath: {{ .volume.tlsmount }}
+            name: {{ include "free5gc-chf.fullname" $ }}-empty-volume
+          - mountPath: {{ .volume.certmount }}
+            name: {{ include "free5gc-chf.fullname" $ }}-cert-pvc
+        resources:
+          {{- toYaml .resources | nindent 12 }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       nodeSelector:
@@ -81,4 +85,7 @@ spec:
                 name: {{ include "free5gc-chf.fullname" $ }}-configmap
         - name: {{ include "free5gc-chf.fullname" $ }}-empty-volume
           emptyDir: {}
+        - name: {{ include "free5gc-chf.fullname" $ }}-cert-pvc
+          persistentVolumeClaim:
+            claimName: cert-pvc
 {{- end }}

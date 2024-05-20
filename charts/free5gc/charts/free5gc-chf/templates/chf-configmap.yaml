@@ -26,7 +26,7 @@ data:
           key: ./cert/chf.key # CHF TLS Private key
 
       nrfUri: {{ $.Values.global.sbi.scheme }}://{{ $.Values.global.nrf.service.name }}:{{ $.Values.global.nrf.service.port }} # a valid URI of NRF
-      nrfCertPem: ./cert/nrf.pem # NRF Certificate
+      nrfCertPem: ./nrf-cert/nrf.pem # NRF Certificate
       serviceNameList: # the SBI services provided by this CHF, refer to TS 32.291
         {{- .configuration.serviceNameList | nindent 8 }}
       mongodb: # the mongodb connected by this CHF
