@@ -5,6 +5,14 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: cert-pvc
+  labels:
+    project: {{ $.Values.global.projectName }}
 spec:
-  accessModes: [ReadOnlyMany]
-  resources: { requests: { storage: 1Mi } }
+  selector:
+    matchLabels: 
+      project: {{ $.Values.global.projectName }}
+  accessModes:
+  - ReadOnlyMany
+  resources:
+    requests:
+      storage: 1Mi
