@@ -38,6 +38,10 @@ data:
         cert:
           key: ./cert/nrf.key
           pem: ./cert/nrf.pem
+        rootcert: # the local path of root CA certs
+          pem: cert/nrf.pem
+          key: cert/nrf.key
+        {{- .configuration.oauthConfiguration | nindent 8 }}
 
       {{- .configuration.configuration | nindent 6 }}
 

@@ -84,6 +84,8 @@ spec:
           name: {{ include "free5gc-smf.fullname" $ }}-volume
         - mountPath: {{ .volume.tlsmount }}
           name: {{ include "free5gc-smf.fullname" $ }}-empty-volume
+        - mountPath: {{ .volume.certmount }}
+          name: {{ include "free5gc-smf.fullname" $ }}-cert-pvc
         resources:
             {{- toYaml .resources | nindent 12 }}
       dnsPolicy: ClusterFirst
@@ -108,4 +110,7 @@ spec:
                 path: uerouting.yaml
       - name: {{ include "free5gc-smf.fullname" $ }}-empty-volume
         emptyDir: {}
+      - name: {{ include "free5gc-smf.fullname" $ }}-cert-pvc
+        persistentVolumeClaim:
+          claimName: cert-pvc
 {{- end }}

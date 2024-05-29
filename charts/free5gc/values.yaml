@@ -91,6 +91,7 @@ global:
 deployMongoDb: true
 deployAmf: true
 deployAusf: true
+deployChf: true
 deployN3iwf: false
 deployNrf: true
 deployNssf: true

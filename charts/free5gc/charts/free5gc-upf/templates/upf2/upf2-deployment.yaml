@@ -74,6 +74,8 @@ spec:
         volumeMounts:
         - mountPath: {{ .volume.mount }}
           name: {{ include "free5gc-upf.fullname" $ }}-{{ .name }}-volume
+        - mountPath: {{ .volume.tlsmount }}
+          name: {{ include "free5gc-upf.fullname" $ }}-{{ .name }}-empty-volume
         resources:
             {{- toYaml .resources | nindent 12 }}
       dnsPolicy: ClusterFirst
@@ -97,5 +99,7 @@ spec:
               - key: wrapper.sh
                 path: wrapper.sh
                 mode: 0777
+      - name: {{ include "free5gc-upf.fullname" $ }}-{{ .name }}-empty-volume
+        emptyDir: {}
 {{- end }}
 {{- end }}

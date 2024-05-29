@@ -30,9 +30,9 @@ global:
 
 initcontainers:
   curl:
-    registry: towards5gs
-    image: initcurl
-    tag: "1.0.0"
+    registry: curlimages
+    image: curl
+    tag: "8.7.1"
   busybox:
     image: busybox
     tag: "1.32.0"
@@ -59,11 +59,12 @@ nrf:
   replicaCount: 1
   image:
     name: free5gc/nrf
-    tag: v3.3.0
+    tag: v3.4.1
     pullPolicy: Always
   volume:
     mount: /free5gc/config/
     tlsmount: /free5gc/config/TLS
+    certmount: /free5gc/cert
   podAnnotations: {}
     # additional annotations
   imagePullSecrets: []
@@ -110,6 +111,8 @@ nrf:
     serviceNameList: |-
       - nnrf-nfm
       - nnrf-disc
+    oauthConfiguration: |-
+      oauth: true
     configuration: |-
       DefaultPlmnId:
         mcc: 208

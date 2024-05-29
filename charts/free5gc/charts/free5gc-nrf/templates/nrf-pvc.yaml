@@ -1,0 +1,18 @@
+#
+# Software Name : free5gc-helm
+#
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cert-pvc
+  labels:
+    project: {{ $.Values.global.projectName }}
+spec:
+  selector:
+    matchLabels: 
+      project: {{ $.Values.global.projectName }}
+  accessModes:
+  - ReadOnlyMany
+  resources:
+    requests:
+      storage: 1Mi

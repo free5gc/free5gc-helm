@@ -61,6 +61,7 @@ spec:
             {{- toYaml .securityContext | nindent 12 }}
         ports:
         - containerPort: {{ .service.port }}
+        - containerPort: {{ $.Values.global.webui.service.port }}
         command: ["./webui"]
         args: ["-c", "./config/webuicfg.yaml"]
         env:
@@ -71,6 +72,8 @@ spec:
           name: {{ .volume.name }}
         - mountPath: {{ .volume.tlsmount }}
           name: {{ .volume.name }}-empty
+        - mountPath: {{ .volume.certmount }}
+          name: {{ include "free5gc-webui.fullname" $ }}-cert-pvc
         resources:
             {{- toYaml .resources | nindent 12 }}
         readinessProbe:
@@ -108,4 +111,7 @@ spec:
               name: {{ .configmap.name }}
       - name: {{ .volume.name }}-empty
         emptyDir: {}
+      - name: {{ include "free5gc-webui.fullname" $ }}-cert-pvc
+        persistentVolumeClaim:
+          claimName: cert-pvc
 {{- end }}

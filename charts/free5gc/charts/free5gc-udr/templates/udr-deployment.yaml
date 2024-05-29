@@ -72,6 +72,8 @@ spec:
           name: {{ include "free5gc-udr.fullname" $ }}-volume
         - mountPath: {{ .volume.tlsmount }}
           name: {{ include "free5gc-udr.fullname" $ }}-empty-volume
+        - mountPath: {{ .volume.certmount }}
+          name: {{ include "free5gc-udr.fullname" $ }}-cert-pvc
         resources:
             {{- toYaml .resources | nindent 12 }}
       dnsPolicy: ClusterFirst
@@ -91,4 +93,7 @@ spec:
               name: {{ include "free5gc-udr.fullname" $ }}-configmap
       - name: {{ include "free5gc-udr.fullname" $ }}-empty-volume
         emptyDir: {}
+      - name: {{ include "free5gc-udr.fullname" $ }}-cert-pvc
+        persistentVolumeClaim:
+          claimName: cert-pvc
 {{- end }}
