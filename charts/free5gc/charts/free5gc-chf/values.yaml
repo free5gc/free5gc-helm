@@ -1,5 +1,5 @@
 #
-# Software Name : free5gc-compose
+# Software Name : free5gc-helm
 #
 nameOverride: ""
 fullnameOverride: ""
