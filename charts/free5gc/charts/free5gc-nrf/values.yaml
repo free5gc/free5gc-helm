@@ -59,7 +59,7 @@ nrf:
   replicaCount: 1
   image:
     name: free5gc/nrf
-    tag: v3.4.1
+    tag: v3.4.2
     pullPolicy: Always
   volume:
     mount: /free5gc/config/

@@ -20,7 +20,7 @@ metadata:
 data:
   webuicfg.yaml: |
     info:
-      version: 1.0.2
+      version: 1.0.3
       description: WEBUI initial local configuration
 
     configuration:
@@ -37,6 +37,10 @@ data:
         enable: true
         hostIPv4: 0.0.0.0
         listenPort: {{ $.Values.global.webui.service.port }}
+        portRange: # passive port range
+          start: 2123
+          end: 2130
+        basePath: /tmp/webconsole
         port: {{ $.Values.global.cgf.service.port }}
         tls:
           pem: ./cert/chf.pem

@@ -64,7 +64,7 @@ amf:
   replicaCount: 1
   image:
     name: free5gc/amf
-    tag: v3.4.1
+    tag: v3.4.2
     pullPolicy: Always
   service:
     type: ClusterIP

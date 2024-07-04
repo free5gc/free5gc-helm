@@ -42,7 +42,7 @@ ausf:
   replicaCount: 1
   image:
     name: free5gc/ausf
-    tag: v3.4.1
+    tag: v3.4.2
     pullPolicy: Always
   service:
     type: ClusterIP
