@@ -30,9 +30,9 @@ global:
 
 initcontainers:
   curl:
-    registry: towards5gs
-    image: initcurl
-    tag: "1.0.0"
+    registry: curlimages
+    image: curl
+    tag: "8.7.1"
   busybox:
     image: busybox
     tag: "1.32.0"
@@ -52,7 +52,7 @@ udr:
   replicaCount: 1
   image:
     name: free5gc/udr
-    tag: v3.3.0
+    tag: v3.4.2
     pullPolicy: Always
   service:
     type: ClusterIP
@@ -60,6 +60,7 @@ udr:
   volume:
     mount: /free5gc/config/
     tlsmount: /free5gc/config/TLS
+    certmount: /free5gc/cert
   podAnnotations: {}
     # additional annotations
   imagePullSecrets: []

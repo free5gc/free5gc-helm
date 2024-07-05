@@ -20,7 +20,7 @@ metadata:
 data:
   udrcfg.yaml: |
     info:
-      version: 1.0.2
+      version: 1.1.0
       description: UDR initial local configuration
 
     configuration:
@@ -32,12 +32,13 @@ data:
         tls:
           key: ./cert/udr.key
           pem: ./cert/udr.pem
-
+      dbConnectorType: mongodb
       mongodb:
         name: free5gc
         url: mongodb://{{ $.Values.mongodb.service.name }}:{{ $.Values.mongodb.service.port }}
 
       nrfUri: {{ $.Values.global.sbi.scheme }}://{{ $.Values.global.nrf.service.name }}:{{ $.Values.global.nrf.service.port }}
+      nrfCertPem: cert/nrf.pem
 
     logger:
       {{- toYaml .configuration.logger | nindent 6 }}

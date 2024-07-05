@@ -48,7 +48,8 @@ gnb:
   name: gnb
   replicaCount: 1
   image:
-    name: towards5gs/ueransim-gnb
+    name: free5gc/ueransim
+    tag: v3.4.2
     pullPolicy: IfNotPresent
   configmap:
     name: gnb-configmap
@@ -103,14 +104,15 @@ ue:
   name: ue
   replicaCount: 1
   image:
-    name: towards5gs/ueransim-ue
+    name: free5gc/ueransim
+    tag: v3.4.2
     pullPolicy: IfNotPresent
   configmap:
     name: ue-configmap
   volume:
     name: ue-volume
     mount: /ueransim/config
-  command: "./nr-ue -c ../config/ue-config.yaml"  # This is the command that will be launched in the UE container
+  command: "./nr-ue -c ./config/ue-config.yaml"  # This is the command that will be launched in the UE container
   # A script that will be run after the UE creation. It may be used to periodically generate traffic
   script: ""
   # script: |-
@@ -132,15 +134,15 @@ ue:
   affinity: {}
 
   configuration: |-
-    supi: "imsi-208930000000003"  # IMSI number
-    mcc: '208' # Mobile Country Code value
-    mnc: '93' # Mobile Network Code value (2 or 3 digits)
+    supi: "imsi-208930000000001"  # IMSI number
+    mcc: "208" # Mobile Country Code value
+    mnc: "93" # Mobile Network Code value (2 or 3 digits)
     key: "8baf473f2f8fd09487cccbd7097c6862" # Operator code (OP or OPC) of the UE
     op: "8e27b6af0e692e750f32667a3b14605d" # This value specifies the OP type and it can be either 'OP' or 'OPC'
     opType: "OPC" # This value specifies the OP type and it can be either 'OP' or 'OPC'
-    amf: '8000' # Authentication Management Field (AMF) value
-    imei: '356938035643803' # IMEI number of the device
-    imeiSv: '4370816125816151'
+    amf: "8000" # Authentication Management Field (AMF) value
+    imei: "356938035643803" # IMEI number of the device
+    imeiSv: "4370816125816151"
     # UAC Access Identities Configuration
     uacAic:
       mps: false
@@ -159,10 +161,17 @@ ue:
         slice:
           sst: 0x01
           sd: 0x010203
+      - type: "IPv4"
+        apn: "internet"
+        slice:
+          sst: 0x01
+          sd: 0x112233
     # Configured NSSAI for this UE by HPLMN
     configured-nssai:
       - sst: 0x01
         sd: 0x010203
+      - sst: 0x01
+        sd: 0x112233
     # Default Configured NSSAI for this UE
     default-nssai:
       - sst: 1
@@ -178,8 +187,8 @@ ue:
       EA3: true
     # Integrity protection maximum data rate for user plane
     integrityMaxRate:
-      uplink: 'full'
-      downlink: 'full'
+      uplink: "full"
+      downlink: "full"
 
   test:
     connectivity:

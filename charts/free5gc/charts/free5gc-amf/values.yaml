@@ -50,9 +50,9 @@ global:
 
 initcontainers:
   curl:
-    registry: towards5gs
-    image: initcurl
-    tag: "1.0.0"
+    registry: curlimages
+    image: curl
+    tag: "8.7.1"
   busybox:
     image: busybox
     tag: "1.32.0"
@@ -64,7 +64,7 @@ amf:
   replicaCount: 1
   image:
     name: free5gc/amf
-    tag: v3.3.0
+    tag: v3.4.2
     pullPolicy: Always
   service:
     type: ClusterIP
@@ -72,6 +72,7 @@ amf:
   volume:
     mount: /free5gc/config/
     tlsmount: /free5gc/config/TLS
+    certmount: /free5gc/cert
   podAnnotations: {}
     # additional annotations
   imagePullSecrets: []
@@ -191,6 +192,11 @@ amf:
         maxRetryTimes: 4 # the max number of retransmission
       # retransmission timer for NAS Registration Accept message
       t3550:
+        enable: true     # true or false
+        expireTime: 6s   # default is 6 seconds
+        maxRetryTimes: 4 # the max number of retransmission
+      # retransmission timer for NAS Configuration Update Command message
+      t3555:
         enable: true     # true or false
         expireTime: 6s   # default is 6 seconds
         maxRetryTimes: 4 # the max number of retransmission

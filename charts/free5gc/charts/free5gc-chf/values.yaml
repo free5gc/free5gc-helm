@@ -1,19 +1,6 @@
 #
-# Software Name : towards5gs-helm
-# SPDX-FileCopyrightText: Copyright (c) 2021 Orange
-# SPDX-License-Identifier: Apache-2.0
+# Software Name : free5gc-helm
 #
-# This software is distributed under the Apache License 2.0,
-# the text of which is available at https://github.com/Orange-OpenSource/towards5gs-helm/blob/main/LICENSE
-# or see the "LICENSE" file for more details.
-#
-# Author: Abderaouf KHICHANE, Ilhem FAJJARI, Ayoub BOUSSELMI, Ian Chen
-# Software description: An open-source project providing Helm charts to deploy 5G components (Core + RAN) on top of Kubernetes
-#
-# Default values for free5gcControlPlane chart.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
 nameOverride: ""
 fullnameOverride: ""
 
@@ -25,6 +12,16 @@ global:
       type: ClusterIP
       port: "8000"
       nodePort: "30800"
+  webui: 
+    service:
+      name: webui-nbiling
+      type: ClusterIP
+      port: "2122"
+  cgf:
+    service:
+      name: webui-ncgf
+      type: ClusterIP
+      port: "2121"
   sbi:
     scheme: http
 
@@ -37,34 +34,30 @@ initcontainers:
     image: busybox
     tag: "1.32.0"
 
-db:
-  enabled: true
 # This section can be used to override the default values in the MongoDB chart (remember MongoDB is a subchart of the free5gcControlplane chart since control plane NFs rely on it.
 mongodb:
-  fullnameOverride: "mongodb"
-  useStatefulSet: true
-  auth:
-    enabled: false
-  persistence:
-    size: 6Gi
-    mountPath: /bitnami/mongodb/data/db/
   service:
     name: mongodb
     type: ClusterIP
     port: 27017
     nodePort: "30017"
 
-nrf:
-  name: nrf
+chf:
+  name: chf
   replicaCount: 1
   image:
-    name: free5gc/nrf
+    name: free5gc/chf
     tag: v3.4.2
     pullPolicy: Always
+  service:
+    type: ClusterIP
+    port: 80
+  configmap:
+    name: chf-configmap
   volume:
     mount: /free5gc/config/
     tlsmount: /free5gc/config/TLS
-    certmount: /free5gc/cert
+    certmount: /free5gc/nrf-cert
   podAnnotations: {}
     # additional annotations
   imagePullSecrets: []
@@ -107,16 +100,9 @@ nrf:
     #  - secretName: chart-example-tls
     #    hosts:
     #      - chart-example.local
-  configuration:
+  configuration: 
     serviceNameList: |-
-      - nnrf-nfm
-      - nnrf-disc
-    oauthConfiguration: |-
-      oauth: true
-    configuration: |-
-      DefaultPlmnId:
-        mcc: 208
-        mnc: 93
+      - nchf-convergedcharging # Nchf_AMPolicyControl service
     logger: # log output setting
       enable: true # true or false
       level: info # how detailed to output, value: trace, debug, info, warn, error, fatal, panic
