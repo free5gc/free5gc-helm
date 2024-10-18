@@ -93,6 +93,7 @@ deployAmf: true
 deployAusf: true
 deployChf: true
 deployN3iwf: false
+deployNef: true
 deployNrf: true
 deployNssf: true
 deployPcf: true
