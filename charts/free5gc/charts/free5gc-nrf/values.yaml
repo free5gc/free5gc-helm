@@ -112,7 +112,7 @@ nrf:
       - nnrf-nfm
       - nnrf-disc
     oauthConfiguration: |-
-      oauth: true
+      oauth: false
     configuration: |-
       DefaultPlmnId:
         mcc: 208

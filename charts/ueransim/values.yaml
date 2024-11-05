@@ -161,17 +161,10 @@ ue:
         slice:
           sst: 0x01
           sd: 0x010203
-      - type: "IPv4"
-        apn: "internet"
-        slice:
-          sst: 0x01
-          sd: 0x112233
     # Configured NSSAI for this UE by HPLMN
     configured-nssai:
       - sst: 0x01
         sd: 0x010203
-      - sst: 0x01
-        sd: 0x112233
     # Default Configured NSSAI for this UE
     default-nssai:
       - sst: 1
