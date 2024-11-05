@@ -17,7 +17,7 @@
 
 global:
   projectName: free5gc
-  userPlaneArchitecture: single  # possible values are "single" and "ulcl"
+  userPlaneArchitecture: ulcl  # possible values are "single" and "ulcl"
   uesubnet: 10.1.0.0/16
 #Global network parametes
   n4network:
@@ -116,10 +116,10 @@ upf:
     dnnList: # The DNN list supported by UPF
       - dnn: internet # Data Network Name
         cidr: 10.1.0.0/17 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
-        natifname: n6
+        # natifname: n6
       - dnn: internet # Data Network Name
         cidr: 10.1.128.0/17 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
-        natifname: n6
+        # natifname: n6
 
     logger: # log output setting
       enable: true # true or false
@@ -186,10 +186,10 @@ upf1:
     dnnList: # The DNN list supported by UPF
       - dnn: internet # Data Network Name
         cidr: 10.1.0.0/17 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
-        natifname: n6
+        # natifname: n6
       - dnn: internet # Data Network Name
         cidr: 10.1.128.0/17 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
-        natifname: n6
+        # natifname: n6
 
     logger: # log output setting
       enable: true # true or false
@@ -255,10 +255,10 @@ upf2:
     dnnList: # The DNN list supported by UPF
       - dnn: internet # Data Network Name
         cidr: 10.1.0.0/17 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
-        natifname: n6
+        # natifname: n6
       - dnn: internet # Data Network Name
         cidr: 10.1.128.0/17 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
-        natifname: n6
+        # natifname: n6
 
     logger: # log output setting
       enable: true # true or false
@@ -326,10 +326,10 @@ upfb:
     dnnList: # The DNN list supported by UPF
       - dnn: internet # Data Network Name
         cidr: 10.1.0.0/17 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
-        natifname: n6
+        # natifname: n6
       - dnn: internet # Data Network Name
         cidr: 10.1.128.0/17 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
-        natifname: n6
+        # natifname: n6
 
     logger: # log output setting
       enable: true # true or false
