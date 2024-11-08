@@ -39,6 +39,7 @@ data:
       volumeThresholdRate: 0.8
 
       cgf:
+        enable: true
         hostIPv4: {{ $.Values.global.webui.service.name }}
         port: {{ $.Values.global.webui.service.port }}
         listenPort: {{ $.Values.global.cgf.service.port }}
