@@ -62,7 +62,7 @@ spec:
 
       containers:
       - name: {{ .name }}
-        image: {{ .image.name }}:{{ .image.tag | default $.Chart.AppVersion }}
+        image: "{{ .image.name }}{{ if .image.tag }}:{{ .image.tag }}{{ else if .image.digest }}@sha256:{{ .image.digest }}{{ else }}:{{ $.Chart.AppVersion }}{{ end }}"
         imagePullPolicy: {{ .image.pullPolicy }}
         securityContext:
             {{- toYaml .securityContext | nindent 12 }}
