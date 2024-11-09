@@ -57,8 +57,7 @@ smf:
   replicaCount: 1
   image:
     name: free5gc/smf
-    tag: ""
-    digest: 4ea04755e1cdddaddcaf700e0062a13c3c7b705b3460e023dfd62acb34ffb2d6
+    tag: v3.4.4
     pullPolicy: Always
   service:
     type: ClusterIP

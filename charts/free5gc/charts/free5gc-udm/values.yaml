@@ -42,7 +42,7 @@ udm:
   replicaCount: 1
   image:
     name: free5gc/udm
-    tag: v3.4.3
+    tag: v3.4.4
     pullPolicy: Always
   service:
     type: ClusterIP
