@@ -37,7 +37,7 @@ nef:
   replicaCount: 1
   image:
     name: free5gc/nef
-    tag: latest
+    tag: v3.4.4
     pullPolicy: Always
   service:
     type: ClusterIP
