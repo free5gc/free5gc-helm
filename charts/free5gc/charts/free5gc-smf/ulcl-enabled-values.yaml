@@ -23,28 +23,14 @@ smf:
             sd: 010203
           dnnInfos: # DNN information list
             - dnn: internet # Data Network Name
+              dnaiList:
+                - mec
               dns: # the IP address of DNS
-                ipv4: 8.8.8.8
-                ipv6: 2001:4860:4860::8888
-        - sNssai:
-            sst: 1
-            sd: 112233
-          dnnInfos: # DNN information list
-            - dnn: internet # Data Network Name
-              dns: # the IP address of DNS
-                ipv4: 8.8.8.8
-                ipv6: 2001:4860:4860::8888
-        - sNssai:
-            sst: 2
-            sd: 112234    
-          dnnInfos:
-            - dnn: internet
-              dns: 
                 ipv4: 8.8.8.8
                 ipv6: 2001:4860:4860::8888
       plmnList: # the list of PLMN IDs that this SMF belongs to (optional, remove this key when unnecessary)
-        - mcc: "208" # Mobile Country Code (3 digits string, digit: 0~9)
-          mnc: "93" # Mobile Network Code (2 or 3 digits string, digit: 0~9)
+        - mcc: 208 # Mobile Country Code (3 digits string, digit: 0~9)
+          mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
       userplaneInformation: # list of userplane information
         upNodes: # information of userplane node (AN or UPF)
           gNB1: # the name of the node
@@ -58,20 +44,19 @@ smf:
                   sd: 010203
                 dnnUpfInfoList:
                   - dnn: internet
-              - sNssai:
-                  sst: 1
-                  sd: 112233
-                dnnUpfInfoList:
-                  - dnn: internet
+                    dnaiList:
+                      - mec
             interfaces:
               - interfaceType: N3
                 endpoints:
                   - 10.100.50.233
-                networkInstance: internet
+                networkInstances: 
+                  - internet
               - interfaceType: N9
                 endpoints:
                   - 10.100.50.225
-                networkInstance: internet
+                networkInstances: 
+                  - internet
           AnchorUPF1:
             type: UPF
             nodeID: 10.100.50.242 # PFCP address
@@ -87,7 +72,8 @@ smf:
               - interfaceType: N9
                 endpoints:
                   - 10.100.50.226 # AnchorUPF1 N9 address
-                networkInstance: internet
+                networkInstances: 
+                  - internet
           AnchorUPF2:
             type: UPF
             nodeID: 10.100.50.243 # PFCP address
@@ -103,7 +89,8 @@ smf:
               - interfaceType: N9
                 endpoints:
                   - 10.100.50.227 # AnchorUPF2 N9 address
-                networkInstance: internet
+                networkInstances: 
+                  - internet
         links:
           - A: gNB1
             B: BranchingUPF
@@ -112,6 +99,12 @@ smf:
           - A: BranchingUPF
             B: AnchorUPF2
       locality: area1 # Name of the location where a set of AMF, SMF and UPFs are located
-      ulcl: true
-
-
+      t3591:
+        enable: true # true or false
+        expireTime: 16s # default is 6 seconds
+        maxRetryTimes: 3 # the max number of retransmission
+      # retransmission timer for pdu session release command
+      t3592:
+        enable: true # true or false
+        expireTime: 16s # default is 6 seconds
+        maxRetryTimes: 3 # the max number of retransmission

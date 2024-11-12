@@ -1,19 +1,6 @@
 #
-# Software Name : towards5gs-helm
-# SPDX-FileCopyrightText: Copyright (c) 2021 Orange
-# SPDX-License-Identifier: Apache-2.0
+# Software Name : free5gc-helm
 #
-# This software is distributed under the Apache License 2.0,
-# the text of which is available at todo
-# or see the "LICENSE" file for more details.
-#
-# Author: Abderaouf KHICHANE, Ilhem FAJJARI, Ayoub BOUSSELMI, Ian Chen
-# Software description: An open-source project providing Helm charts to deploy 5G components (Core + RAN) on top of Kubernetes
-#
-# Default values for free5gcControlPlane chart.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
 nameOverride: ""
 fullnameOverride: ""
 
@@ -25,16 +12,6 @@ global:
       type: ClusterIP
       port: "8000"
       nodePort: "30800"
-  webui: 
-    service:
-      name: webui-nbiling
-      type: ClusterIP
-      port: "2122"
-  cgf:
-    service:
-      name: webui-ncgf
-      type: ClusterIP
-      port: "2121"
   sbi:
     scheme: http
 
@@ -47,8 +24,6 @@ initcontainers:
     image: busybox
     tag: "1.32.0"
 
-db:
-  enabled: false
 # This section can be used to override the default values in the MongoDB chart (remember MongoDB is a subchart of the free5gcControlplane chart since control plane NFs rely on it.
 mongodb:
   service:
@@ -57,22 +32,17 @@ mongodb:
     port: 27017
     nodePort: "30017"
 
-webui:
-  name: webui
+nef:
+  name: nef
   replicaCount: 1
   image:
-    name: free5gc/webui
+    name: free5gc/nef
     tag: v3.4.4
     pullPolicy: Always
   service:
-    name: webui-service
-    type: NodePort
-    port: 5000
-    nodePort: 30500
-  configmap:
-    name: webui-configmap
+    type: ClusterIP
+    port: 80
   volume:
-    name: webui-volume
     mount: /free5gc/config/
     tlsmount: /free5gc/config/TLS
     certmount: /free5gc/cert
@@ -119,9 +89,9 @@ webui:
     #    hosts:
     #      - chart-example.local
   configuration:
-    # the kind of log output
-    # debugLevel: how detailed to output, value: trace, debug, info, warn, error, fatal, panic
-    # ReportCaller: enable the caller report or not, value: true or false
+    serviceList: |-
+        - serviceName: nnef-pfdmanagement # Nnef_PFDManagement Service
+        - serviceName: nnef-oam # OAM service
     logger: # log output setting
       enable: true # true or false
       level: info # how detailed to output, value: trace, debug, info, warn, error, fatal, panic

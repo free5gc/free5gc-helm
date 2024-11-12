@@ -35,7 +35,7 @@ data:
       # The IP list of the N3/N9 interfaces on this UPF
       # If there are multiple connection, set addr to 0.0.0.0 or list all the addresses
       ifList:
-        - addr: {{ .n3if.ipAddress }}
+        - addr: 0.0.0.0
           type: N3
         - addr: {{ .n9if.ipAddress }}
           type: N9
