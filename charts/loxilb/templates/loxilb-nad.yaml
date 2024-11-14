@@ -1,0 +1,44 @@
+#
+# Software Name : Saviah5GC-helm
+# SPDX-FileCopyrightText: Copyright (c) 2023 Saviah
+# SPDX-License-Identifier: Apache-2.0
+#
+# This software is distributed under the Apache License 2.0,
+# the text of which is available at https://github.com/free5gc/free5gc-helm/blob/main/LICENSE
+# or see the "LICENSE" file for more details.
+#
+# Author: Ian Chen
+# Software description: An open-source project providing Helm charts to deploy 5G components (Core + RAN) on top of Kubernetes
+#
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: n2network-lb
+  annotations:
+    k8s.v1.cni.cncf.io/resourceName: intel.com/pci_sriov_net_N2
+spec:
+  config: |-
+    {
+      "cniVersion": "0.3.1",
+      "name": "n2network-lb",
+      "plugins": [
+        {
+          "type": "sriov",
+          "capabilities": { "ips": true },
+          "spoofchk": "off",
+          "trust": "on",
+          "ipam": {
+            "type": "static",
+            "routes": [
+              {
+                "dst": "0.0.0.0/0",
+                "gw": "192.168.1.254"
+              }
+            ]
+          }
+        }, {
+          "capabilities": { "mac": true },
+          "type": "tuning"
+        }
+      ]
+    }
