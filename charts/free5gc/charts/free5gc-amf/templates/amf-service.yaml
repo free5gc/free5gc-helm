@@ -38,11 +38,16 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "free5gc-amf.fullname" $ }}-{{ $.Values.global.amf.service.ngap.name }}
+  annotations:
+    {{- with $.Values.global.amf.service.ngap.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
   labels:
     project: {{ $.Values.global.projectName }}
     nf: {{ .name }}
 spec:
   type: {{ $.Values.global.amf.service.ngap.type }}
+  loadBalancerClass: "loxilb.io/loxilb"
   ports:
     - name: n2
       port: {{ $.Values.global.amf.service.ngap.port }}
