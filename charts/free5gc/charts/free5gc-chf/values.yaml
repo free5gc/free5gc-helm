@@ -47,7 +47,7 @@ chf:
   replicaCount: 1
   image:
     name: free5gc/chf
-    tag: v3.4.4
+    tag: v3.4.5
     pullPolicy: Always
   service:
     type: ClusterIP

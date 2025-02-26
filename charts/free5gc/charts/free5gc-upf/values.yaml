@@ -62,7 +62,7 @@ upf:
   replicaCount: 1
   image:
     name: free5gc/upf
-    tag: v3.4.4
+    tag: v3.4.5
     pullPolicy: Always
   configmap:
     wrapperAdditionalCommands: ""
@@ -132,7 +132,7 @@ upf1:
   replicaCount: 1
   image:
     name: free5gc/upf
-    tag: v3.4.4
+    tag: v3.4.5
     pullPolicy: Always
   configmap:
     wrapperAdditionalCommands: ""
@@ -201,7 +201,7 @@ upf2:
   replicaCount: 1
   image:
     name: free5gc/upf
-    tag: v3.4.4
+    tag: v3.4.5
     pullPolicy: Always
   configmap:
     wrapperAdditionalCommands: ""
@@ -270,7 +270,7 @@ upfb:
   replicaCount: 1
   image:
     name: free5gc/upf
-    tag: v3.4.4
+    tag: v3.4.5
     pullPolicy: Always
   configmap:
     wrapperAdditionalCommands: ""
