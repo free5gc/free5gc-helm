@@ -62,7 +62,7 @@ webui:
   replicaCount: 1
   image:
     name: free5gc/webui
-    tag: v3.4.5
+    tag: v4.0.0
     pullPolicy: Always
   service:
     name: webui-service

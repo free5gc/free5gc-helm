@@ -42,7 +42,7 @@ nssf:
   replicaCount: 1
   image:
     name: free5gc/nssf
-    tag: v3.4.5
+    tag: v4.0.0
     pullPolicy: Always
   service:
     type: ClusterIP
