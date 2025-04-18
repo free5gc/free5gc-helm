@@ -43,6 +43,9 @@ data:
         hostIPv4: {{ $.Values.global.webui.service.name }}
         port: {{ $.Values.global.webui.service.port }}
         listenPort: {{ $.Values.global.cgf.service.port }}
+        passiveTransferPortRange:
+          start: 2123
+          end: 2130
         tls:
           pem: ./cert/chf.pem
           key: ./cert/chf.key
