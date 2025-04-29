@@ -1,0 +1,15 @@
+loxilb:
+  ip: 192.168.1.18
+  image:
+    repository: localhost:32000/loxilb
+    pullPolicy: Always
+    tag: "latest"
+  clientStartCmd:
+    "loxicmd create endpoint 192.168.1.10 --desc=192.168.1.10 --probetype=ping --probeport=38412 --period=5 --retries=3;\
+    loxicmd create endpoint 192.168.1.11 --desc=192.168.1.11 --probetype=ping --probeport=38412 --period=5 --retries=3;\
+    loxicmd create lb 20.20.20.1 --select=priority --monitor --sctp=38412:38412 --endpoints=192.168.1.10:100,192.168.1.11:1 --mode=onearm"
+  resources:
+    limits:
+      intel.com/pci_sriov_net_N2: "1"
+    requests:
+      intel.com/pci_sriov_net_N2: "1"
