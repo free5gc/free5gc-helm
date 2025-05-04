@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ .Release.Name }}-lb
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-app
+  template:
+    metadata:
+      name: {{ .Release.Name }}-lb
+      labels:
+        app: {{ .Release.Name }}-app
+      annotations:
+        k8s.v1.cni.cncf.io/networks: '[ { "name": "{{ .Values.network.n2network.name }}",
+          "interface": "{{ .Values.network.n2network.interface }}", "ips": {{ .Values.network.n2network.ips | toJson }}, "gateway": {{ .Values.network.n2network.gateway | toJson }}
+          }]'
+    spec:
+      dnsPolicy: ClusterFirstWithHostNet
+{{- if .Values.tolerations }}
+      tolerations:
+{{ toYaml .Values.tolerations | indent 8 }}
+{{- end }}
+      containers:
+      - name: {{ .Release.Name }}-app
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: {{ .Values.command | toJson }}
+        ports:
+        - containerPort: 11111
+        securityContext:
+{{ toYaml .Values.securityContext | indent 10 }} 
