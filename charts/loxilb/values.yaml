@@ -1,0 +1,97 @@
+# LoxiLB Configuration
+replicaCount: 1
+
+image:
+  repository: ghcr.io/loxilb-io/loxilb
+  tag: scp2
+  pullPolicy: Always
+
+command:
+  - "/root/loxilb-io/loxilb/loxilb"
+  - "--proxyonlymode"
+
+# Network Configurations
+network:
+  n2network:
+    enabled: true
+    name: n2network-free5gc-helm-free5gc-amf
+    interface: "n2"
+    ips: ["10.100.50.253/29"]
+    gateway: ["10.100.50.254"]
+
+# Security Context
+securityContext:
+  privileged: true
+  capabilities:
+    add:
+      - SYS_ADMIN
+
+# Service account
+serviceAccount:
+  create: true
+  name: loxilb-sa
+
+# LoxiLB Service Configurations
+service:
+  # Egress Service
+  egress:
+    enabled: true
+    name: loxilb-egress-service
+    type: LoadBalancer
+    loadBalancerClass: loxilb.io/loxilb
+    annotations:
+      loxilb.io/egress: "yes"
+      loxilb.io/probetype: "none"
+      loxilb.io/staticIP: "0.0.0.0"
+    ports:
+      - name: loxilb-egress
+        port: 9999
+        targetPort: 9999
+        protocol: TCP
+  
+  # LB Service
+  lb:
+    enabled: true
+    name: loxilb-lb-service
+    clusterIP: None
+    ports:
+      - name: loxilb-app
+        port: 11111
+        targetPort: 11111
+        protocol: TCP
+
+# KubeLoxiLB Configuration
+kubeLoxilb:
+  enabled: true
+  image:
+    repository: ghcr.io/loxilb-io/kube-loxilb
+    tag: latest
+    pullPolicy: Always
+  
+  args:
+    - --cidrPools=defaultPool=10.100.50.253/32
+    - --setRoles=0.0.0.0
+    - --setLBMode=1
+  
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "50Mi"
+    limits:
+      cpu: "100m"
+      memory: "50Mi"
+  
+  securityContext:
+    privileged: true
+    capabilities:
+      add: ["NET_ADMIN", "NET_RAW"]
+
+# Namespace where LoxiLB should be deployed
+namespace: free5gc
+
+# Tolerations for LoxiLB pods
+tolerations:
+  - key: "node-role.kubernetes.io/master"
+    operator: Exists
+  - key: "node-role.kubernetes.io/control-plane"
+    operator: Exists
