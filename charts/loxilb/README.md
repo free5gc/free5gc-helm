@@ -9,7 +9,7 @@ based on https://goldenrod-town-d4b.notion.site/Install-free5gc-with-LoxiLB-NGAP
 - UE distribution across stateless AMFs
 - Seamless handovers across multiple AMFs
 - High availability with automatic failover
-- Support for Free5GC integration
+- Support for free5GC integration
 
 ## Prerequisites
 
@@ -56,16 +56,16 @@ helm install loxilb . -n free5gc
 
 For more configuration options, see the [values.yaml](values.yaml) file.
 
-## Use with Free5GC
+## Use with free5GC
 
-LoxiLB works as a load balancer in front of multiple AMFs in a Free5GC deployment to ensure high availability and seamless failover for NGAP connections from gNB. To use with Free5GC:
+LoxiLB works as a load balancer in front of multiple AMFs in a free5GC deployment to ensure high availability and seamless failover for NGAP connections from gNB. To use with free5GC:
 
-1. Deploy Free5GC with AMF service type set to LoadBalancer
+1. Deploy free5GC with AMF service type set to LoadBalancer
 2. Add the appropriate annotations to the AMF service
 3. Deploy LoxiLB using this chart
 4. Configure gNB (UERANSIM) to use LoxiLB's external IP
 
-See the [Free5GC integration guide](https://www.loxilb.io/post/ngap-load-balancing-with-loxilb) for detailed instructions.
+See the [free5GC integration guide](https://www.loxilb.io/post/ngap-load-balancing-with-loxilb) for detailed instructions.
 
 ## License
 
