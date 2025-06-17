@@ -1,0 +1,44 @@
+{{- if .Values.service.egress.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.egress.name }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+{{- range $key, $value := .Values.service.egress.annotations }}
+    {{ $key }}: {{ $value | quote }}
+{{- end }}
+spec:
+  type: {{ .Values.service.egress.type }}
+  loadBalancerClass: {{ .Values.service.egress.loadBalancerClass }}
+  selector:
+    app: {{ .Release.Name }}-app
+  ports:
+{{- range .Values.service.egress.ports }}
+  - name: {{ .name }}
+    port: {{ .port }}
+    targetPort: {{ .targetPort }}
+    protocol: {{ .protocol }}
+{{- end }}
+{{- end }}
+
+{{- if .Values.service.lb.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.lb.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  clusterIP: {{ .Values.service.lb.clusterIP }}
+  selector:
+    app: {{ .Release.Name }}-app
+  ports:
+{{- range .Values.service.lb.ports }}
+  - name: {{ .name }}
+    port: {{ .port }}
+    targetPort: {{ .targetPort }}
+    protocol: {{ .protocol }}
+{{- end }}
+{{- end }} 
