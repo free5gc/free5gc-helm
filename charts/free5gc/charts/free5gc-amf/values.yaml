@@ -83,13 +83,15 @@ amf:
       cpu: 150m
       memory: 128Mi
   readinessProbe:
-    initialDelaySeconds: 0
+    enabled: true
+    initialDelaySeconds: 10
     periodSeconds: 1
     timeoutSeconds: 1
     failureThreshold:  40
     successThreshold: 1
   livenessProbe:
-    initialDelaySeconds: 120
+    enabled: true
+    initialDelaySeconds: 30
     periodSeconds: 10
     timeoutSeconds: 10
     failureThreshold: 3

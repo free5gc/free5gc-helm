@@ -71,6 +71,19 @@ spec:
           containerPort: 8805
           protocol: UDP
         command: ["{{ .volume.mount }}/wrapper.sh"]
+        {{- if .readinessProbe.enabled }}
+        readinessProbe:
+          exec:
+            command:
+              - /bin/sh
+              - -c
+              - "grep -q ':2265 .* 07 ' /proc/net/udp || grep -q ':2265 .* 07 ' /proc/net/udp6"
+          initialDelaySeconds: {{ .readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .readinessProbe.timeoutSeconds }}
+          failureThreshold: {{ .readinessProbe.failureThreshold }}
+          successThreshold: {{ .readinessProbe.successThreshold }}
+        {{- end }}
         volumeMounts:
         - mountPath: {{ .volume.mount }}
           name: {{ include "free5gc-upf.fullname" $ }}-{{ .name }}-volume

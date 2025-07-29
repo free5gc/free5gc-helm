@@ -56,7 +56,8 @@ nef:
       cpu: 100m
       memory: 128Mi
   readinessProbe:
-    initialDelaySeconds: 0
+    enabled: true
+    initialDelaySeconds: 10
     periodSeconds: 1
     timeoutSeconds: 1
     failureThreshold:  40

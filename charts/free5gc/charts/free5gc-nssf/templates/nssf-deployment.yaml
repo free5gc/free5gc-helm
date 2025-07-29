@@ -75,6 +75,18 @@ spec:
         env:
           - name: GIN_MODE
             value: release
+        {{- if .readinessProbe.enabled }}
+        readinessProbe:
+          httpGet:
+            path: /nnssf-nsselection/v2/
+            scheme: HTTP
+            port: 80
+          initialDelaySeconds: {{ .readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .readinessProbe.timeoutSeconds }}
+          failureThreshold: {{ .readinessProbe.failureThreshold }}
+          successThreshold: {{ .readinessProbe.successThreshold }}
+        {{- end }}
         volumeMounts:
         - mountPath: {{ .volume.mount }}
           name: {{ include "free5gc-nssf.fullname" $ }}-volume

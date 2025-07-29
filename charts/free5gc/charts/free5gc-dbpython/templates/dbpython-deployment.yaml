@@ -63,6 +63,17 @@ spec:
         env:
           - name: DB_URI
             value: mongodb://{{ $.Values.mongodb.service.name }}:{{ $.Values.mongodb.service.port }}
+        {{- if .readinessProbe.enabled }}
+        readinessProbe:
+          exec:
+            command:
+            {{- toYaml .readinessProbe.exec.command | nindent 12 }}
+          initialDelaySeconds: {{ .readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .readinessProbe.timeoutSeconds }}
+          successThreshold: {{ .readinessProbe.successThreshold }}
+          failureThreshold: {{ .readinessProbe.failureThreshold }}
+        {{- end }}
         resources:
             {{- toYaml .resources | nindent 12 }}
       dnsPolicy: ClusterFirst

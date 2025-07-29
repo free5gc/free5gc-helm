@@ -55,8 +55,25 @@ dbpython:
     requests:
       cpu: 100m
       memory: 128Mi
-  readinessProbe: {}
-  livenessProbe: {}
+  readinessProbe:
+    enabled: true
+    exec:
+      command:
+        - "true"
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 40
+    successThreshold: 1
+  livenessProbe:
+    enabled: true
+    exec:
+      command:
+        - "true"
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 10
+    failureThreshold: 3
+    successThreshold: 1
   nodeSelector: {}
   tolerations: []
   affinity: {}
