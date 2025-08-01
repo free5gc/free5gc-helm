@@ -84,6 +84,10 @@ amf:
       memory: 128Mi
   readinessProbe:
     enabled: true
+    httpGet:
+      path: /namf-comm/v1/
+      scheme: HTTP
+      port: 80
     initialDelaySeconds: 10
     periodSeconds: 1
     timeoutSeconds: 1
@@ -91,7 +95,11 @@ amf:
     successThreshold: 1
   livenessProbe:
     enabled: true
-    initialDelaySeconds: 30
+    httpGet:
+      path: /namf-comm/v1/
+      scheme: HTTP
+      port: 80
+    initialDelaySeconds: 50
     periodSeconds: 10
     timeoutSeconds: 10
     failureThreshold: 3

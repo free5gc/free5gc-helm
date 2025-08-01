@@ -62,13 +62,22 @@ udm:
       memory: 128Mi
   readinessProbe:
     enabled: true
+    httpGet:
+      path: /nudm-sdm/v2/
+      scheme: HTTP
+      port: 80
     initialDelaySeconds: 10
     periodSeconds: 1
     timeoutSeconds: 1
     failureThreshold:  40
     successThreshold: 1
   livenessProbe:
-    initialDelaySeconds: 120
+    enabled: true
+    httpGet:
+      path: /nudm-sdm/v2/
+      scheme: HTTP
+      port: 80
+    initialDelaySeconds: 50
     periodSeconds: 10
     timeoutSeconds: 10
     failureThreshold: 3

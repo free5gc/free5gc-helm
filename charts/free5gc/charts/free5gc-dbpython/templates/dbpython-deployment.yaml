@@ -65,14 +65,35 @@ spec:
             value: mongodb://{{ $.Values.mongodb.service.name }}:{{ $.Values.mongodb.service.port }}
         {{- if .readinessProbe.enabled }}
         readinessProbe:
+          {{- if .readinessProbe.httpGet }}
+          httpGet:
+            {{- toYaml .readinessProbe.httpGet | nindent 12 }}
+          {{- end }}
+          {{- if .readinessProbe.exec }}
           exec:
-            command:
-            {{- toYaml .readinessProbe.exec.command | nindent 12 }}
+            {{- toYaml .readinessProbe.exec | nindent 12 }}
+          {{- end }}
           initialDelaySeconds: {{ .readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .readinessProbe.periodSeconds }}
-          timeoutSeconds: {{ .readinessProbe.timeoutSeconds }}
-          successThreshold: {{ .readinessProbe.successThreshold }}
-          failureThreshold: {{ .readinessProbe.failureThreshold }}
+          timeoutSeconds: {{ .readinessProbe.timeoutSeconds | default 1 }}
+          successThreshold: {{ .readinessProbe.successThreshold | default 1 }}
+          failureThreshold: {{ .readinessProbe.failureThreshold | default 3 }}
+        {{- end }}
+        {{- if .livenessProbe.enabled }}
+        livenessProbe:
+          {{- if .livenessProbe.httpGet }}
+          httpGet:
+            {{- toYaml .livenessProbe.httpGet | nindent 12 }}
+          {{- end }}
+          {{- if .livenessProbe.exec }}
+          exec:
+            {{- toYaml .livenessProbe.exec | nindent 12 }}
+          {{- end }}
+          initialDelaySeconds: {{ .livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .livenessProbe.timeoutSeconds | default 10 }}
+          successThreshold: {{ .livenessProbe.successThreshold | default 1 }}
+          failureThreshold: {{ .livenessProbe.failureThreshold | default 3 }}
         {{- end }}
         resources:
             {{- toYaml .resources | nindent 12 }}

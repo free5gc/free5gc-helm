@@ -79,16 +79,35 @@ spec:
             value: release
         {{- if .readinessProbe.enabled }}
         readinessProbe:
+          {{- if .readinessProbe.httpGet }}
+          httpGet:
+            {{- toYaml .readinessProbe.httpGet | nindent 12 }}
+          {{- end }}
+          {{- if .readinessProbe.exec }}
           exec:
-            command:
-              - /bin/sh
-              - -c
-              - "grep -q ':0050 .* 0A ' /proc/net/tcp || grep -q ':0050 .* 0A ' /proc/net/tcp6"
+            {{- toYaml .readinessProbe.exec | nindent 12 }}
+          {{- end }}
           initialDelaySeconds: {{ .readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .readinessProbe.periodSeconds }}
-          timeoutSeconds: {{ .readinessProbe.timeoutSeconds }}
-          failureThreshold: {{ .readinessProbe.failureThreshold }}
-          successThreshold: {{ .readinessProbe.successThreshold }}
+          timeoutSeconds: {{ .readinessProbe.timeoutSeconds | default 1 }}
+          successThreshold: {{ .readinessProbe.successThreshold | default 1 }}
+          failureThreshold: {{ .readinessProbe.failureThreshold | default 3 }}
+        {{- end }}
+        {{- if .livenessProbe.enabled }}
+        livenessProbe:
+          {{- if .livenessProbe.httpGet }}
+          httpGet:
+            {{- toYaml .livenessProbe.httpGet | nindent 12 }}
+          {{- end }}
+          {{- if .livenessProbe.exec }}
+          exec:
+            {{- toYaml .livenessProbe.exec | nindent 12 }}
+          {{- end }}
+          initialDelaySeconds: {{ .livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .livenessProbe.timeoutSeconds | default 10 }}
+          successThreshold: {{ .livenessProbe.successThreshold | default 1 }}
+          failureThreshold: {{ .livenessProbe.failureThreshold | default 3 }}
         {{- end }}
         volumeMounts:
         - mountPath: {{ .volume.mount }}

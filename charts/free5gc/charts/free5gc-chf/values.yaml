@@ -69,13 +69,24 @@ chf:
       memory: 128Mi
   readinessProbe:
     enabled: true
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - "grep -q ':0050 .* 0A ' /proc/net/tcp || grep -q ':0050 .* 0A ' /proc/net/tcp6"
     initialDelaySeconds: 10
     periodSeconds: 1
     timeoutSeconds: 1
     failureThreshold:  40
     successThreshold: 1
   livenessProbe:
-    initialDelaySeconds: 120
+    enabled: true
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - "grep -q ':0050 .* 0A ' /proc/net/tcp || grep -q ':0050 .* 0A ' /proc/net/tcp6"
+    initialDelaySeconds: 50
     periodSeconds: 10
     timeoutSeconds: 10
     failureThreshold: 3

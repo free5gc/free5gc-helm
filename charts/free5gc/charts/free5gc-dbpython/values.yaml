@@ -60,16 +60,17 @@ dbpython:
     exec:
       command:
         - "true"
-    initialDelaySeconds: 5
-    periodSeconds: 10
-    failureThreshold: 40
+    initialDelaySeconds: 10
+    periodSeconds: 1
+    timeoutSeconds: 1
+    failureThreshold:  40
     successThreshold: 1
   livenessProbe:
     enabled: true
     exec:
       command:
         - "true"
-    initialDelaySeconds: 30
+    initialDelaySeconds: 50
     periodSeconds: 10
     timeoutSeconds: 10
     failureThreshold: 3
