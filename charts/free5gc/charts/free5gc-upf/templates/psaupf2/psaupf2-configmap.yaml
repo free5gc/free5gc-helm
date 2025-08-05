@@ -56,7 +56,7 @@ data:
     {{- $.Values.psaupf2.configmap.wrapperAdditionalCommands | toYaml | indent 2 }}
     {{- end }}
 
-    /free5gc/upf -c {{ .volume.mount }}/upfcfg.yaml
+    exec /free5gc/upf -c {{ .volume.mount }}/upfcfg.yaml
 
 {{- end }}
 {{- end }}
