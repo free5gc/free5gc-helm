@@ -70,7 +70,10 @@ spec:
         - name: n4
           containerPort: 8805
           protocol: UDP
-        command: ["{{ .volume.mount }}/wrapper.sh"]
+        command:
+          - "/sbin/tini"
+          - "--"
+          - "{{ .volume.mount }}/wrapper.sh"
         {{- if .readinessProbe.enabled }}
         readinessProbe:
           {{- if .readinessProbe.httpGet }}

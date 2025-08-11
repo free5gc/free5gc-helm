@@ -70,8 +70,13 @@ spec:
         - name: metrics
           containerPort: {{ $.Values.nssf.configuration.metrics.port }}
         {{- end }}
-        command: ["./nssf"]
-        args: ["-c", "./config/nssfcfg.yaml"]
+        command:
+          - "/sbin/tini"
+          - "--"
+          - "./nssf"
+        args:
+          - "-c"
+          - "./config/nssfcfg.yaml"
         env:
           - name: GIN_MODE
             value: release

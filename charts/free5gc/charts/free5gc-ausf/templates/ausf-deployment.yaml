@@ -70,8 +70,13 @@ spec:
         - name: metrics
           containerPort: {{ $.Values.ausf.configuration.metrics.port }}
         {{- end }}
-        command: ["./ausf"]
-        args: ["-c", "./config/ausfcfg.yaml"]
+        command:
+          - "/sbin/tini"
+          - "--"
+          - "./ausf"
+        args:
+          - "-c"
+          - "./config/ausfcfg.yaml"
         env:
           - name: GIN_MODE
             value: release

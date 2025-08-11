@@ -71,8 +71,13 @@ spec:
         - name: metrics
           containerPort: {{ $.Values.nrf.configuration.metrics.port }}
         {{- end }}
-        command: ["./nrf"]
-        args: ["-c", "./config/nrfcfg.yaml"]
+        command:
+          - "/sbin/tini"
+          - "--"
+          - "./nrf"
+        args:
+          - "-c"
+          - "./config/nrfcfg.yaml"
         env:
           - name: DB_URI
             value: mongodb://{{ $.Values.mongodb.service.name }}/free5gc

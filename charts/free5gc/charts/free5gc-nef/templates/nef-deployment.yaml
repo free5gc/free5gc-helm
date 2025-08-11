@@ -50,8 +50,13 @@ spec:
             {{- toYaml .securityContext | nindent 12 }}
         ports:
         - containerPort: {{ .service.port }}
-        command: ["./nef"]
-        args: ["-c", "./config/nefcfg.yaml"]
+        command:
+          - "/sbin/tini"
+          - "--"
+          - "./nef"
+        args:
+          - "-c"
+          - "./config/nefcfg.yaml"
         env:
           - name: GIN_MODE
             value: release

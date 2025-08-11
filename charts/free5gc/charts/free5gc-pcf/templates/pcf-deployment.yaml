@@ -71,8 +71,13 @@ spec:
         - name: metrics
           containerPort: {{ $.Values.pcf.configuration.metrics.port }}
         {{- end }}
-        command: ["./pcf"]
-        args: ["-c", "./config/pcfcfg.yaml"]
+        command:
+          - "/sbin/tini"
+          - "--"
+          - "./pcf"
+        args:
+          - "-c"
+          - "./config/pcfcfg.yaml"
         env:
           - name: GIN_MODE
             value: release

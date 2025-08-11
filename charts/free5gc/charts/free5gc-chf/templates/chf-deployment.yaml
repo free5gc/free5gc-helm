@@ -60,8 +60,13 @@ spec:
         - name: metrics
           containerPort: {{ $.Values.chf.configuration.metrics.port }}
         {{- end }}
-        command: ["./chf"]
-        args: ["-c", "./config/chfcfg.yaml"]
+        command:
+          - "/sbin/tini"
+          - "--"
+          - "./chf"
+        args:
+          - "-c"
+          - "./config/chfcfg.yaml"
         env:
           - name: GIN_MODE
             value: release

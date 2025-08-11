@@ -70,8 +70,13 @@ spec:
         - name: metrics
           containerPort: {{ $.Values.udm.configuration.metrics.port }}
         {{- end }}
-        command: ["./udm"]
-        args: ["-c", "./config/udmcfg.yaml"]
+        command:
+          - "/sbin/tini"
+          - "--"
+          - "./udm"
+        args:
+          - "-c"
+          - "./config/udmcfg.yaml"
         env:
           - name: GIN_MODE
             value: release

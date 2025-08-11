@@ -83,8 +83,13 @@ spec:
         - name: metrics
           containerPort: {{ $.Values.amf.configuration.metrics.port }}
         {{- end }}
-        command: ["./amf"]
-        args: ["-c", "./config/amfcfg.yaml"]
+        command:
+          - "/sbin/tini"
+          - "--"
+          - "./amf"
+        args:
+          - "-c"
+          - "./config/amfcfg.yaml"
         env:
           - name: GIN_MODE
             value: release

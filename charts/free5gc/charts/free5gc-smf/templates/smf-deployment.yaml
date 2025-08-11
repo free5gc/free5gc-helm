@@ -83,8 +83,15 @@ spec:
         - name: metrics
           containerPort: {{ $.Values.smf.configuration.metrics.port }}
         {{- end }}
-        command: ["./smf"]
-        args: ["-c", "./config/smfcfg.yaml", "-u", "./config/uerouting.yaml"]
+        command:
+          - "/sbin/tini"
+          - "--"
+          - "./smf"
+        args:
+          - "-c"
+          - "./config/smfcfg.yaml"
+          - "-u"
+          - "./config/uerouting.yaml"
         env:
           - name: GIN_MODE
             value: release

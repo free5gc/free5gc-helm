@@ -62,8 +62,13 @@ spec:
         ports:
         - containerPort: {{ .service.port }}
         - containerPort: {{ $.Values.global.webui.service.port }}
-        command: ["./webui"]
-        args: ["-c", "./config/webuicfg.yaml"]
+        command:
+          - "/sbin/tini"
+          - "--"
+          - "./webui"
+        args:
+          - "-c"
+          - "./config/webuicfg.yaml"
         env:
           - name: GIN_MODE
             value: release
