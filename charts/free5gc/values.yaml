@@ -30,7 +30,7 @@ global:
       ipAddress: 10.100.50.249
     service:
       ngap:
-        enabled: true
+        enabled: false
         name: amf-n2
         port: 38412
         protocol: SCTP
