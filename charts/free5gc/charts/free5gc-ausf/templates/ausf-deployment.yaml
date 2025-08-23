@@ -42,29 +42,57 @@ spec:
         {{- toYaml .imagePullSecrets | nindent 8 }}
       securityContext:
         {{- toYaml .podSecurityContext | nindent 8 }}
-      initContainers:
-      - name: wait-nrf
-        {{- with $.Values.initcontainers.curl }}
-        image: {{ .registry }}/{{ .image }}:{{ .tag }}
-        {{- end }}
-        env:
-        - name: DEPENDENCIES
-          value: {{ $.Values.global.sbi.scheme }}://{{ $.Values.global.nrf.service.name }}:{{ $.Values.global.nrf.service.port }}
-        command: ['sh', '-c', 'set -x; for dependency in $DEPENDENCIES; do while [ $(curl --insecure --connect-timeout 1 -s -o /dev/null -w "%{http_code}" $dependency) -ne 200 ]; do echo waiting for dependencies; sleep 1; done; done;']
 
       containers:
       - name: {{ .name }}
         image: {{ .image.name }}:{{ .image.tag | default $.Chart.AppVersion }}
         imagePullPolicy: {{ .image.pullPolicy }}
         securityContext:
-            {{- toYaml .securityContext | nindent 12 }}
+          {{- toYaml .securityContext | nindent 10 }}
         ports:
         - containerPort: {{ .service.port }}
-        command: ["./ausf"]
-        args: ["-c", "./config/ausfcfg.yaml"]
+        command:
+          - "/sbin/tini"
+          - "--"
+          - "./ausf"
+        args:
+          - "-c"
+          - "./config/ausfcfg.yaml"
         env:
           - name: GIN_MODE
             value: release
+        {{- if .readinessProbe.enabled }}
+        readinessProbe:
+          {{- if .readinessProbe.httpGet }}
+          httpGet:
+            {{- toYaml .readinessProbe.httpGet | nindent 12 }}
+          {{- end }}
+          {{- if .readinessProbe.exec }}
+          exec:
+            {{- tpl (toYaml .readinessProbe.exec) . | nindent 12 }}
+          {{- end }}
+          initialDelaySeconds: {{ .readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .readinessProbe.timeoutSeconds | default 1 }}
+          successThreshold: {{ .readinessProbe.successThreshold | default 1 }}
+          failureThreshold: {{ .readinessProbe.failureThreshold | default 3 }}
+        {{- end }}
+        {{- if .livenessProbe.enabled }}
+        livenessProbe:
+          {{- if .livenessProbe.httpGet }}
+          httpGet:
+            {{- toYaml .livenessProbe.httpGet | nindent 12 }}
+          {{- end }}
+          {{- if .livenessProbe.exec }}
+          exec:
+            {{- tpl (toYaml .livenessProbe.exec) . | nindent 12 }}
+          {{- end }}
+          initialDelaySeconds: {{ .livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .livenessProbe.timeoutSeconds | default 10 }}
+          successThreshold: {{ .livenessProbe.successThreshold | default 1 }}
+          failureThreshold: {{ .livenessProbe.failureThreshold | default 3 }}
+        {{- end }}
         volumeMounts:
         - mountPath: {{ .volume.mount }}
           name: {{ include "free5gc-ausf.fullname" $ }}-volume

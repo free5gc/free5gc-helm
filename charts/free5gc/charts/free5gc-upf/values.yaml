@@ -92,13 +92,25 @@ upf:
       cpu: 500m
       memory: 512Mi
   readinessProbe:
-    initialDelaySeconds: 0
+    enabled: true
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - "grep -q ':2265 .* 07 ' /proc/net/udp || grep -q ':2265 .* 07 ' /proc/net/udp6"
+    initialDelaySeconds: 10
     periodSeconds: 1
     timeoutSeconds: 1
     failureThreshold:  40
     successThreshold: 1
   livenessProbe:
-    initialDelaySeconds: 120
+    enabled: true
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - "grep -q ':2265 .* 07 ' /proc/net/udp || grep -q ':2265 .* 07 ' /proc/net/udp6"
+    initialDelaySeconds: 50
     periodSeconds: 10
     timeoutSeconds: 10
     failureThreshold: 3
@@ -162,13 +174,25 @@ upf1:
       cpu: 500m
       memory: 512Mi
   readinessProbe:
-    initialDelaySeconds: 0
+    enabled: true
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - "grep -q ':2265 .* 07 ' /proc/net/udp || grep -q ':2265 .* 07 ' /proc/net/udp6"
+    initialDelaySeconds: 10
     periodSeconds: 1
     timeoutSeconds: 1
     failureThreshold:  40
     successThreshold: 1
   livenessProbe:
-    initialDelaySeconds: 120
+    enabled: true
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - "grep -q ':2265 .* 07 ' /proc/net/udp || grep -q ':2265 .* 07 ' /proc/net/udp6"
+    initialDelaySeconds: 50
     periodSeconds: 10
     timeoutSeconds: 10
     failureThreshold: 3
@@ -231,13 +255,25 @@ upf2:
       cpu: 500m
       memory: 512Mi
   readinessProbe:
-    initialDelaySeconds: 0
+    enabled: true
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - "grep -q ':2265 .* 07 ' /proc/net/udp || grep -q ':2265 .* 07 ' /proc/net/udp6"
+    initialDelaySeconds: 10
     periodSeconds: 1
     timeoutSeconds: 1
     failureThreshold:  40
     successThreshold: 1
   livenessProbe:
-    initialDelaySeconds: 120
+    enabled: true
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - "grep -q ':2265 .* 07 ' /proc/net/udp || grep -q ':2265 .* 07 ' /proc/net/udp6"
+    initialDelaySeconds: 50
     periodSeconds: 10
     timeoutSeconds: 10
     failureThreshold: 3
@@ -302,13 +338,25 @@ upfb:
       cpu: 500m
       memory: 512Mi
   readinessProbe:
-    initialDelaySeconds: 0
+    enabled: true
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - "grep -q ':2265 .* 07 ' /proc/net/udp || grep -q ':2265 .* 07 ' /proc/net/udp6"
+    initialDelaySeconds: 10
     periodSeconds: 1
     timeoutSeconds: 1
     failureThreshold:  40
     successThreshold: 1
   livenessProbe:
-    initialDelaySeconds: 120
+    enabled: true
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - "grep -q ':2265 .* 07 ' /proc/net/udp || grep -q ':2265 .* 07 ' /proc/net/udp6"
+    initialDelaySeconds: 50
     periodSeconds: 10
     timeoutSeconds: 10
     failureThreshold: 3

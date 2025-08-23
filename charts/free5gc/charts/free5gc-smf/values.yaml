@@ -61,7 +61,7 @@ smf:
     pullPolicy: Always
   service:
     type: ClusterIP
-    port: 80
+    port: &Port 8080
   volume:
     mount: /free5gc/config/
     tlsmount: /free5gc/config/TLS
@@ -69,20 +69,35 @@ smf:
   podAnnotations: {}
     # additional annotations
   imagePullSecrets: []
-  podSecurityContext: {}
-  securityContext: {}
+  podSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    runAsNonRoot: true
+    fsGroup: 1000
+  securityContext:
+    allowPrivilegeEscalation: false
   resources:
     requests:
       cpu: 100m
       memory: 128Mi
   readinessProbe:
-    initialDelaySeconds: 0
+    enabled: true
+    httpGet:
+      path: /nsmf-pdusession/v1/
+      scheme: HTTP
+      port: *Port
+    initialDelaySeconds: 10
     periodSeconds: 1
     timeoutSeconds: 1
     failureThreshold:  40
     successThreshold: 1
   livenessProbe:
-    initialDelaySeconds: 120
+    enabled: true
+    httpGet:
+      path: /nsmf-pdusession/v1/
+      scheme: HTTP
+      port: *Port
+    initialDelaySeconds: 50
     periodSeconds: 10
     timeoutSeconds: 10
     failureThreshold: 3
