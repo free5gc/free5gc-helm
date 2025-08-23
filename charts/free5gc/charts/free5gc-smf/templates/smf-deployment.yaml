@@ -70,7 +70,7 @@ spec:
         image: "{{ .image.name }}{{ if .image.tag }}:{{ .image.tag }}{{ else if .image.digest }}@sha256:{{ .image.digest }}{{ else }}:{{ $.Chart.AppVersion }}{{ end }}"
         imagePullPolicy: {{ .image.pullPolicy }}
         securityContext:
-            {{- toYaml .securityContext | nindent 12 }}
+          {{- toYaml .securityContext | nindent 10 }}
         ports:
         - name: nsmf
           containerPort: {{ .service.port }}
@@ -103,7 +103,7 @@ spec:
           {{- end }}
           {{- if .readinessProbe.exec }}
           exec:
-            {{- toYaml .readinessProbe.exec | nindent 12 }}
+            {{- tpl (toYaml .readinessProbe.exec) . | nindent 12 }}
           {{- end }}
           initialDelaySeconds: {{ .readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .readinessProbe.periodSeconds }}
@@ -119,7 +119,7 @@ spec:
           {{- end }}
           {{- if .livenessProbe.exec }}
           exec:
-            {{- toYaml .livenessProbe.exec | nindent 12 }}
+            {{- tpl (toYaml .livenessProbe.exec) . | nindent 12 }}
           {{- end }}
           initialDelaySeconds: {{ .livenessProbe.initialDelaySeconds }}
           periodSeconds: {{ .livenessProbe.periodSeconds }}

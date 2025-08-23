@@ -46,7 +46,7 @@ ausf:
     pullPolicy: Always
   service:
     type: ClusterIP
-    port: 80
+    port: &Port 8080
   volume:
     mount: /free5gc/config/
     tlsmount: /free5gc/config/TLS
@@ -54,8 +54,13 @@ ausf:
   podAnnotations: {}
     # additional annotations
   imagePullSecrets: []
-  podSecurityContext: {}
-  securityContext: {}
+  podSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    runAsNonRoot: true
+    fsGroup: 1000
+  securityContext:
+    allowPrivilegeEscalation: false
   resources:
     requests:
       cpu: 100m
@@ -66,7 +71,9 @@ ausf:
       command:
         - /bin/sh
         - -c
-        - "grep -q ':0050 .* 0A ' /proc/net/tcp || grep -q ':0050 .* 0A ' /proc/net/tcp6"
+        - |
+          HEX_PORT=$(printf '%04X' "{{ .service.port }}")
+          grep -q ":${HEX_PORT} .* 0A " /proc/net/tcp || grep -q ":${HEX_PORT} .* 0A " /proc/net/tcp6
     initialDelaySeconds: 10
     periodSeconds: 1
     timeoutSeconds: 1
@@ -78,7 +85,9 @@ ausf:
       command:
         - /bin/sh
         - -c
-        - "grep -q ':0050 .* 0A ' /proc/net/tcp || grep -q ':0050 .* 0A ' /proc/net/tcp6"
+        - |
+          HEX_PORT=$(printf '%04X' "{{ .service.port }}")
+          grep -q ":${HEX_PORT} .* 0A " /proc/net/tcp || grep -q ":${HEX_PORT} .* 0A " /proc/net/tcp6
     initialDelaySeconds: 50
     periodSeconds: 10
     timeoutSeconds: 10

@@ -68,8 +68,13 @@ nrf:
   podAnnotations: {}
     # additional annotations
   imagePullSecrets: []
-  podSecurityContext: {}
-  securityContext: {}
+  podSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    runAsNonRoot: true
+    fsGroup: 1000
+  securityContext:
+    allowPrivilegeEscalation: false
   resources:
     requests:
       cpu: 100m
