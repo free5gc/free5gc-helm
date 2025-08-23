@@ -48,7 +48,7 @@ spec:
         image: {{ .image.name }}:{{ .image.tag | default $.Chart.AppVersion }}
         imagePullPolicy: {{ .image.pullPolicy }}
         securityContext:
-            {{- toYaml .securityContext | nindent 12 }}
+          {{- toYaml .securityContext | nindent 10 }}
         ports:
         - containerPort: {{ .service.port }}
         command:
@@ -69,7 +69,7 @@ spec:
           {{- end }}
           {{- if .readinessProbe.exec }}
           exec:
-            {{- toYaml .readinessProbe.exec | nindent 12 }}
+            {{- tpl (toYaml .readinessProbe.exec) . | nindent 12 }}
           {{- end }}
           initialDelaySeconds: {{ .readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .readinessProbe.periodSeconds }}
@@ -85,7 +85,7 @@ spec:
           {{- end }}
           {{- if .livenessProbe.exec }}
           exec:
-            {{- toYaml .livenessProbe.exec | nindent 12 }}
+            {{- tpl (toYaml .livenessProbe.exec) . | nindent 12 }}
           {{- end }}
           initialDelaySeconds: {{ .livenessProbe.initialDelaySeconds }}
           periodSeconds: {{ .livenessProbe.periodSeconds }}
