@@ -91,6 +91,9 @@ upf:
     requests:
       cpu: 500m
       memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1024Mi
   readinessProbe:
     enabled: true
     exec:
@@ -173,6 +176,9 @@ psaupf1:
     requests:
       cpu: 500m
       memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1024Mi
   readinessProbe:
     enabled: true
     exec:
@@ -254,6 +260,9 @@ psaupf2:
     requests:
       cpu: 500m
       memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1024Mi
   readinessProbe:
     enabled: true
     exec:
@@ -337,6 +346,9 @@ iupf1:
     requests:
       cpu: 500m
       memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1024Mi
   readinessProbe:
     enabled: true
     exec:

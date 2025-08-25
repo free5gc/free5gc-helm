@@ -87,6 +87,9 @@ amf:
     requests:
       cpu: 150m
       memory: 128Mi
+    limits:
+      cpu: 300m
+      memory: 256Mi
   readinessProbe:
     enabled: true
     httpGet:
