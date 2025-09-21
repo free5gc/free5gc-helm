@@ -32,6 +32,18 @@ data:
         tls:
           key: ./cert/udr.key
           pem: ./cert/udr.pem
+{{- if $.Values.udr.configuration.metrics.enable }}
+      metrics: 
+        enable: true
+        scheme: {{ $.Values.udr.configuration.metrics.scheme }}
+        bindingIPv4: 0.0.0.0  # IP used to bind the service
+        port: {{ $.Values.udr.configuration.metrics.port }}
+        namespace: {{ $.Values.udr.configuration.metrics.namespace }}
+        tls:
+          key: ./cert/udr.key
+          pem: ./cert/udr.pem
+{{- end }}
+
       dbConnectorType: mongodb
       mongodb:
         name: free5gc

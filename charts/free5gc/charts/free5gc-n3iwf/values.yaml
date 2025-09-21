@@ -50,7 +50,7 @@ n3iwf:
   replicaCount: 1
   image:
     name: free5gc/n3iwf
-    tag: v4.0.1
+    tag: v4.1.0
     pullPolicy: Always
   configmap:
     name: n3iwf-configmap
@@ -151,6 +151,13 @@ n3iwf:
 
       # IP address that will be allocated to UE in IPSec tunnel
       UEIPAddressRange: 10.0.0.0/24
+
+    # Metrics configuration
+    metrics:
+      enable: false # (Optional, default false)
+      scheme: http # (Required) the protocol for metrics (http or https, default https)
+      port: 9091 # (Optional, default 9091) port used to bind the service
+      namespace: free5gc # (Optional, default free5gc)
 
     # the kind of log output
       # debugLevel: how detailed to output, value: trace, debug, info, warn, error, fatal, panic

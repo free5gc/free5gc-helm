@@ -32,6 +32,11 @@ spec:
     metadata:
       annotations:
         {{- include "free5gc-udr.udrAnnotations" $ | nindent 8 }}
+        {{- if $.Values.udr.configuration.metrics.enable }}
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: {{ $.Values.udr.configuration.metrics.port | quote }}
+        {{- end }}
         checksum/config: {{ include (print $.Template.BasePath "/udr-configmap.yaml") $ | sha256sum }}
       labels:
         {{- include "free5gc-udr.selectorLabels" $ | nindent 8 }}
@@ -59,7 +64,12 @@ spec:
         securityContext:
             {{- toYaml .securityContext | nindent 12 }}
         ports:
-        - containerPort: {{ .service.port }}
+        - name: nudr
+          containerPort: {{ .service.port }}
+        {{- if $.Values.udr.configuration.metrics.enable }}
+        - name: metrics
+          containerPort: {{ $.Values.udr.configuration.metrics.port }}
+        {{- end }}
         command: ["./udr"]
         args: ["-c", "./config/udrcfg.yaml"]
         env:

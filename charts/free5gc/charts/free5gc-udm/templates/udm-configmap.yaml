@@ -35,6 +35,17 @@ data:
         tls:
           key: ./cert/udm.key
           pem: ./cert/udm.pem
+{{- if $.Values.udm.configuration.metrics.enable }}
+      metrics: 
+        enable: true
+        scheme: {{ $.Values.udm.configuration.metrics.scheme }}
+        bindingIPv4: 0.0.0.0  # IP used to bind the service
+        port: {{ $.Values.udm.configuration.metrics.port }}
+        namespace: {{ $.Values.udm.configuration.metrics.namespace }}
+        tls:
+          key: ./cert/udm.key
+          pem: ./cert/udm.pem
+{{- end }}
 
       nrfUri: {{ $.Values.global.sbi.scheme }}://{{ $.Values.global.nrf.service.name }}:{{ $.Values.global.nrf.service.port }}
       nrfCertPem: cert/nrf.pem

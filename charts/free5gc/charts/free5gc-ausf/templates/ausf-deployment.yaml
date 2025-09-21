@@ -32,6 +32,11 @@ spec:
     metadata:
       annotations:
         {{- include "free5gc-ausf.ausfAnnotations" $ | nindent 8 }}
+        {{- if $.Values.ausf.configuration.metrics.enable }}
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: {{ $.Values.ausf.configuration.metrics.port | quote }}
+        {{- end }}
         checksum/config: {{ include (print $.Template.BasePath "/ausf-configmap.yaml") $ | sha256sum }}
       labels:
         {{- include "free5gc-ausf.selectorLabels" $ | nindent 8 }}
@@ -59,7 +64,12 @@ spec:
         securityContext:
             {{- toYaml .securityContext | nindent 12 }}
         ports:
-        - containerPort: {{ .service.port }}
+        - name: nausf
+          containerPort: {{ .service.port }}
+        {{- if $.Values.ausf.configuration.metrics.enable }}
+        - name: metrics
+          containerPort: {{ $.Values.ausf.configuration.metrics.port }}
+        {{- end }}
         command: ["./ausf"]
         args: ["-c", "./config/ausfcfg.yaml"]
         env:

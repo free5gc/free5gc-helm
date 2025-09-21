@@ -32,6 +32,11 @@ spec:
     metadata:
       annotations:
         {{- include "free5gc-pcf.pcfAnnotations" $ | nindent 8 }}
+        {{- if $.Values.pcf.configuration.metrics.enable }}
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: {{ $.Values.pcf.configuration.metrics.port | quote }}
+        {{- end }}
         checksum/config: {{ include (print $.Template.BasePath "/pcf-configmap.yaml") $ | sha256sum }}
       labels:
         {{- include "free5gc-pcf.selectorLabels" $ | nindent 8 }}
@@ -60,7 +65,12 @@ spec:
         securityContext:
             {{- toYaml .securityContext | nindent 12 }}
         ports:
-        - containerPort: {{ .service.port }}
+        - name: npcf
+          containerPort: {{ .service.port }}
+        {{- if $.Values.pcf.configuration.metrics.enable }}
+        - name: metrics
+          containerPort: {{ $.Values.pcf.configuration.metrics.port }}
+        {{- end }}
         command: ["./pcf"]
         args: ["-c", "./config/pcfcfg.yaml"]
         env:

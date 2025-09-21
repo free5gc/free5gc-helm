@@ -42,6 +42,17 @@ data:
           pem: cert/nrf.pem
           key: cert/nrf.key
         {{- .configuration.oauthConfiguration | nindent 8 }}
+{{- if $.Values.nrf.configuration.metrics.enable }}
+      metrics: 
+        enable: true
+        scheme: {{ $.Values.nrf.configuration.metrics.scheme }}
+        bindingIPv4: 0.0.0.0  # IP used to bind the service
+        port: {{ $.Values.nrf.configuration.metrics.port }}
+        namespace: {{ $.Values.nrf.configuration.metrics.namespace }}
+        tls:
+          key: ./cert/nrf.key
+          pem: ./cert/nrf.pem
+{{- end }}
 
       {{- .configuration.configuration | nindent 6 }}
 

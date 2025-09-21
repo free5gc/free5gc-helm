@@ -52,6 +52,11 @@ spec:
               "gateway": [ "{{ .ike.gatewayIP }}" ]
             }            
             ]'
+        {{- if $.Values.n3iwf.configuration.metrics.enable }}
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: {{ $.Values.n3iwf.configuration.metrics.port | quote }}
+        {{- end }}
         checksum/config: {{ include (print $.Template.BasePath "/n3iwf-configmap.yaml") $ | sha256sum }}
       labels:
         {{- include "free5gc-n3iwf.selectorLabels" $ | nindent 8 }}
@@ -68,6 +73,11 @@ spec:
         imagePullPolicy: {{ .image.pullPolicy }}
         securityContext:
             {{- toYaml .securityContext | nindent 12 }}
+        {{- if $.Values.n3iwf.configuration.metrics.enable }}
+        ports:
+        - name: metrics
+          containerPort: {{ $.Values.n3iwf.configuration.metrics.port }}
+        {{- end }}
         command: ["sh", "-c", "./n3iwf-ipsec.sh && ./n3iwf -c ./config/n3iwfcfg.yaml"]
         env:
           - name: GIN_MODE

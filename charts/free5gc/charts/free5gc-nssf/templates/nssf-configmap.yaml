@@ -35,6 +35,17 @@ data:
         tls:
           key: ./cert/nssf.key
           pem: ./cert/nssf.pem
+{{- if $.Values.nssf.configuration.metrics.enable }}
+      metrics: 
+        enable: true
+        scheme: {{ $.Values.nssf.configuration.metrics.scheme }}
+        bindingIPv4: 0.0.0.0  # IP used to bind the service
+        port: {{ $.Values.nssf.configuration.metrics.port }}
+        namespace: {{ $.Values.nssf.configuration.metrics.namespace }}
+        tls:
+          key: ./cert/nssf.key
+          pem: ./cert/nssf.pem
+{{- end }}
 
       nrfUri: {{ $.Values.global.sbi.scheme }}://{{ $.Values.global.nrf.service.name }}:{{ $.Values.global.nrf.service.port }}
       nrfCertPem: cert/nrf.pem
