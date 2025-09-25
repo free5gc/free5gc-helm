@@ -91,6 +91,29 @@ helm -n <namespace> uninstall <release-name>
 ### Enable the ULCL feature
 If you want to enable the ULCL feature, you can use the [ulcl-enabled-values.yaml](./ulcl-enabled-values.yaml) to override the default chart values.
 
+### Enable the Prometheus and Grafana
+To start Prometheus and Grafana, run the following commands to install Prometheus and Grafana using the kube-prometheus-stack chart.
+```
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm install prometheus prometheus-community/kube-prometheus-stack -n <namespace>
+```
+
+In values.yaml, set metrics.enable to true for each NF you want to monitor.
+
+Next, create a PodMonitor to tell Prometheus how to find and scrape the free5GC pods. (The namespace in prometheus.yaml must same as your free5GC deployment, default is free5gc)
+```
+cd ~/free5gc-helm/charts/free5gc
+kubectl apply -f prometheus.yaml
+```
+
+Now you can access the prometheus and grafana by port forwarding, for example
+```
+kubectl port-forward --address 0.0.0.0 prometheus-prometheus-kube-prometheus-prometheus-0 9090:9090 -n <namespace>
+kubectl port-forward --address 0.0.0.0 <grafana_pod_name> 3000:3000 -n <namespace>
+```
+default Grafana login info : admin / prom-operator
+
 ### Networks configuration
 
 In this section, we'll suppose that you have only one interface on each Kubernetes node and its name is `toto`. Then you have to set these parameters to `toto`:

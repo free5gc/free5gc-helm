@@ -40,6 +40,11 @@ spec:
               "gateway": [ "{{ $.Values.global.n4network.gatewayIP }}" ]
             }]'
         {{- end }}
+        {{- if $.Values.smf.configuration.metrics.enable }}
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: {{ $.Values.smf.configuration.metrics.port | quote }}
+        {{- end }}
         checksum/config: {{ include (print $.Template.BasePath "/smf-configmap.yaml") $ | sha256sum }}
       labels:
         {{- include "free5gc-smf.selectorLabels" $ | nindent 8 }}
@@ -73,6 +78,10 @@ spec:
         - name: n4
           containerPort: 8805
           protocol: UDP
+        {{- end }}
+        {{- if $.Values.smf.configuration.metrics.enable }}
+        - name: metrics
+          containerPort: {{ $.Values.smf.configuration.metrics.port }}
         {{- end }}
         command: ["./smf"]
         args: ["-c", "./config/smfcfg.yaml", "-u", "./config/uerouting.yaml"]

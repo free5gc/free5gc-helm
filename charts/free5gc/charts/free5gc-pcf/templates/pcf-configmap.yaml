@@ -35,6 +35,17 @@ data:
         tls:
           key: ./cert/pcf.key
           pem: ./cert/pcf.pem
+{{- if $.Values.pcf.configuration.metrics.enable }}
+      metrics: 
+        enable: true
+        scheme: {{ $.Values.pcf.configuration.metrics.scheme }}
+        bindingIPv4: 0.0.0.0  # IP used to bind the service
+        port: {{ $.Values.pcf.configuration.metrics.port }}
+        namespace: {{ $.Values.pcf.configuration.metrics.namespace }}
+        tls:
+          key: ./cert/pcf.key
+          pem: ./cert/pcf.pem
+{{- end }}
 
       mongodb:       # the mongodb connected by this PCF
         name: free5gc                  # name of the mongodb

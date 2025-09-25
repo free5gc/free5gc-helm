@@ -40,6 +40,11 @@ spec:
               "gateway": [ "{{ $.Values.global.n2network.gatewayIP }}" ]
             }]'
         {{- end }}
+        {{- if $.Values.amf.configuration.metrics.enable }}
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: {{ $.Values.amf.configuration.metrics.port | quote }}
+        {{- end }}
         checksum/config: {{ include (print $.Template.BasePath "/amf-configmap.yaml") $ | sha256sum }}
       labels:
         {{- include "free5gc-amf.selectorLabels" $ | nindent 8 }}
@@ -73,6 +78,10 @@ spec:
         - name: n2
           containerPort: {{ $.Values.global.amf.service.ngap.port }}
           protocol: {{ $.Values.global.amf.service.ngap.protocol }}
+        {{- end }}
+        {{- if $.Values.amf.configuration.metrics.enable }}
+        - name: metrics
+          containerPort: {{ $.Values.amf.configuration.metrics.port }}
         {{- end }}
         command: ["./amf"]
         args: ["-c", "./config/amfcfg.yaml"]

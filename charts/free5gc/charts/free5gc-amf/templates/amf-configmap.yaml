@@ -42,6 +42,17 @@ data:
         tls:
           key: ./cert/amf.key
           pem: ./cert/amf.pem
+{{- if $.Values.amf.configuration.metrics.enable }}
+      metrics: 
+        enable: true
+        scheme: {{ $.Values.amf.configuration.metrics.scheme }}
+        bindingIPv4: 0.0.0.0  # IP used to bind the service
+        port: {{ $.Values.amf.configuration.metrics.port }}
+        namespace: {{ $.Values.amf.configuration.metrics.namespace }}
+        tls:
+          key: ./cert/amf.key
+          pem: ./cert/amf.pem
+{{- end }}
 
       nrfUri: {{ $.Values.global.sbi.scheme }}://{{ $.Values.global.nrf.service.name }}:{{ $.Values.global.nrf.service.port }}
       nrfCertPem: cert/nrf.pem

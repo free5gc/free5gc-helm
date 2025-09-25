@@ -24,6 +24,17 @@ data:
         tls: # the local path of TLS key
           pem: ./cert/chf.pem # CHF TLS Certificate
           key: ./cert/chf.key # CHF TLS Private key
+{{- if $.Values.chf.configuration.metrics.enable }}
+      metrics: 
+        enable: true
+        scheme: {{ $.Values.chf.configuration.metrics.scheme }}
+        bindingIPv4: 0.0.0.0  # IP used to bind the service
+        port: {{ $.Values.chf.configuration.metrics.port }}
+        namespace: {{ $.Values.chf.configuration.metrics.namespace }}
+        tls:
+          key: ./cert/chf.key
+          pem: ./cert/chf.pem
+{{- end }}
 
       nrfUri: {{ $.Values.global.sbi.scheme }}://{{ $.Values.global.nrf.service.name }}:{{ $.Values.global.nrf.service.port }} # a valid URI of NRF
       nrfCertPem: ./nrf-cert/nrf.pem # NRF Certificate
