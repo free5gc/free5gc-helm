@@ -133,7 +133,7 @@ spec:
         - mountPath: {{ .volume.tlsmount }}
           name: {{ include "free5gc-smf.fullname" $ }}-empty-volume
         - mountPath: {{ .volume.certmount }}
-          name: {{ include "free5gc-smf.fullname" $ }}-cert-pvc
+          name: {{ include "free5gc-smf.fullname" $ }}-cert-volume
         resources:
             {{- toYaml .resources | nindent 12 }}
       dnsPolicy: ClusterFirst
@@ -158,7 +158,20 @@ spec:
                 path: uerouting.yaml
       - name: {{ include "free5gc-smf.fullname" $ }}-empty-volume
         emptyDir: {}
-      - name: {{ include "free5gc-smf.fullname" $ }}-cert-pvc
-        persistentVolumeClaim:
-          claimName: cert-pvc
+      - name: {{ include "free5gc-smf.fullname" $ }}-cert-volume
+        projected:
+          defaultMode: 0400
+          sources:
+          - secret:
+              name: {{ printf "%s-smf-tls-secret" $.Release.Name }}
+              items:
+                - key: smf.pem
+                  path: smf.pem
+                - key: smf.key
+                  path: smf.key
+          - configMap:
+              name: free5gc-public-certs
+              items:
+                - key: nrf.pem
+                  path: nrf.pem
 {{- end }}
