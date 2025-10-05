@@ -100,7 +100,7 @@ spec:
         - mountPath: {{ .volume.tlsmount }}
           name: {{ include "free5gc-udr.fullname" $ }}-empty-volume
         - mountPath: {{ .volume.certmount }}
-          name: {{ include "free5gc-udr.fullname" $ }}-cert-pvc
+          name: {{ include "free5gc-udr.fullname" $ }}-cert-volume
         resources:
             {{- toYaml .resources | nindent 12 }}
       dnsPolicy: ClusterFirst
@@ -120,7 +120,20 @@ spec:
               name: {{ include "free5gc-udr.fullname" $ }}-configmap
       - name: {{ include "free5gc-udr.fullname" $ }}-empty-volume
         emptyDir: {}
-      - name: {{ include "free5gc-udr.fullname" $ }}-cert-pvc
-        persistentVolumeClaim:
-          claimName: cert-pvc
+      - name: {{ include "free5gc-udr.fullname" $ }}-cert-volume
+        projected:
+          defaultMode: 0400
+          sources:
+          - secret:
+              name: {{ printf "%s-udr-tls-secret" $.Release.Name }}
+              items:
+                - key: udr.pem
+                  path: udr.pem
+                - key: udr.key
+                  path: udr.key
+          - configMap:
+              name: free5gc-public-certs
+              items:
+                - key: nrf.pem
+                  path: nrf.pem
 {{- end }}

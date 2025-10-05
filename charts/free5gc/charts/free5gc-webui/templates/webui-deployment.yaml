@@ -67,7 +67,7 @@ spec:
         - mountPath: {{ .volume.tlsmount }}
           name: {{ .volume.name }}-empty
         - mountPath: {{ .volume.certmount }}
-          name: {{ include "free5gc-webui.fullname" $ }}-cert-pvc
+          name: {{ include "free5gc-webui.fullname" $ }}-cert-volume
         resources:
             {{- toYaml .resources | nindent 12 }}
         readinessProbe:
@@ -105,7 +105,20 @@ spec:
               name: {{ .configmap.name }}
       - name: {{ .volume.name }}-empty
         emptyDir: {}
-      - name: {{ include "free5gc-webui.fullname" $ }}-cert-pvc
-        persistentVolumeClaim:
-          claimName: cert-pvc
+      - name: {{ include "free5gc-webui.fullname" $ }}-cert-volume
+        projected:
+          defaultMode: 0400
+          sources:
+          - secret:
+              name: {{ printf "%s-chf-tls-secret" $.Release.Name }}
+              items:
+                - key: chf.pem
+                  path: chf.pem
+                - key: chf.key
+                  path: chf.key
+          - configMap:
+              name: free5gc-public-certs
+              items:
+                - key: nrf.pem
+                  path: nrf.pem
 {{- end }}

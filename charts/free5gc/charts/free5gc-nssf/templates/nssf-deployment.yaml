@@ -98,7 +98,7 @@ spec:
         - mountPath: {{ .volume.tlsmount }}
           name: {{ include "free5gc-nssf.fullname" $ }}-empty-volume
         - mountPath: {{ .volume.certmount }}
-          name: {{ include "free5gc-nssf.fullname" $ }}-cert-pvc
+          name: {{ include "free5gc-nssf.fullname" $ }}-cert-volume
         resources:
             {{- toYaml .resources | nindent 12 }}
       dnsPolicy: ClusterFirst
@@ -118,7 +118,20 @@ spec:
               name: {{ include "free5gc-nssf.fullname" $ }}-configmap
       - name: {{ include "free5gc-nssf.fullname" $ }}-empty-volume
         emptyDir: {}
-      - name: {{ include "free5gc-nssf.fullname" $ }}-cert-pvc
-        persistentVolumeClaim:
-          claimName: cert-pvc
+      - name: {{ include "free5gc-nssf.fullname" $ }}-cert-volume
+        projected:
+          defaultMode: 0400
+          sources:
+          - secret:
+              name: {{ printf "%s-nssf-tls-secret" $.Release.Name }}
+              items:
+                - key: nssf.pem
+                  path: nssf.pem
+                - key: nssf.key
+                  path: nssf.key
+          - configMap:
+              name: free5gc-public-certs
+              items:
+                - key: nrf.pem
+                  path: nrf.pem
 {{- end }}
