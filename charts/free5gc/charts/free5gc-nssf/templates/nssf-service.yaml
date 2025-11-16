@@ -22,7 +22,7 @@ metadata:
 spec:
   type: {{ .service.type }}
   ports:
-    - port: 80
+    - port: {{ .service.port }}
       targetPort: {{ .service.port }}
       protocol: TCP
       name: http
