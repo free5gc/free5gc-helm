@@ -50,9 +50,9 @@ data:
       nrfCertPem: ./cert/nrf.pem # NRF Certificate
       {{- .configuration.urrConfiguration | nindent 6 }}
       pfcp:
-        nodeID: {{ $.Values.global.smf.n4if.ipAddress }}
-        listenAddr: {{ $.Values.global.smf.n4if.ipAddress }}
-        externalAddr: {{ $.Values.global.smf.n4if.ipAddress }}
+        nodeID: POD_IP_ADDR
+        listenAddr: POD_IP_ADDR
+        externalAddr: POD_IP_ADDR
 
       {{- .configuration.configuration | nindent 6 }}
 
@@ -66,5 +66,73 @@ data:
       description: Routing information for UE
     ueRoutingInfo:
       {{- .configuration.ueRoutingInfo | nindent 6 }}
+
+  wrapper.sh: |
+    #!/bin/sh
+    set -e
+
+    # Get Pod IP dynamically
+    POD_IP=$(hostname -i | awk '{print $1}')
+    echo "[wrapper] SMF Pod IP detected: $POD_IP"
+
+    # Copy ConfigMap files to writable location
+    cp {{ .volume.mount }}/smfcfg.yaml /tmp/smfcfg.yaml
+    cp {{ .volume.mount }}/uerouting.yaml /tmp/uerouting.yaml
+
+    # Replace POD_IP_ADDR placeholder with actual Pod IP for SMF's own PFCP identity
+    sed -i "s/POD_IP_ADDR/$POD_IP/g" /tmp/smfcfg.yaml
+
+    # With Headless Services, DNS names resolve directly to Pod IPs
+    # This ensures SMF's nodeID matches what UPF reports in PFCP responses
+    echo "[wrapper] Resolving UPF Pod IPs from Headless Services..."
+
+    # Wait for DNS to be ready and UPF pods to be running
+    echo "[wrapper] Waiting for UPF pods to be ready..."
+    sleep 10
+
+    # Resolve headless service names to Pod IPs with extended retry
+    UPFB_IP=""
+    UPF1_IP=""
+    UPF2_IP=""
+
+    # Retry loop with longer timeout
+    for i in 1 2 3 4 5 6 7 8 9 10; do
+      UPFB_IP=$(getent hosts {{ $.Release.Name }}-free5gc-upf-upfb-service 2>/dev/null | awk '{print $1}' | head -1)
+      UPF1_IP=$(getent hosts {{ $.Release.Name }}-free5gc-upf-upf1-service 2>/dev/null | awk '{print $1}' | head -1)
+      UPF2_IP=$(getent hosts {{ $.Release.Name }}-free5gc-upf-upf2-service 2>/dev/null | awk '{print $1}' | head -1)
+      
+      if [ -n "$UPFB_IP" ] && [ -n "$UPF1_IP" ] && [ -n "$UPF2_IP" ]; then
+        echo "[wrapper] All UPF IPs resolved successfully"
+        break
+      fi
+      echo "[wrapper] Waiting for UPF DNS resolution... attempt $i (UPFB=$UPFB_IP, UPF1=$UPF1_IP, UPF2=$UPF2_IP)"
+      sleep 3
+    done
+
+    # Final check
+    if [ -z "$UPFB_IP" ] || [ -z "$UPF1_IP" ] || [ -z "$UPF2_IP" ]; then
+      echo "[wrapper] WARNING: Some UPF IPs not resolved, using placeholder"
+      [ -z "$UPFB_IP" ] && UPFB_IP="UPFB_SERVICE_NAME"
+      [ -z "$UPF1_IP" ] && UPF1_IP="UPF1_SERVICE_NAME"
+      [ -z "$UPF2_IP" ] && UPF2_IP="UPF2_SERVICE_NAME"
+    fi
+
+    echo "[wrapper] UPFB Pod IP: $UPFB_IP"
+    echo "[wrapper] UPF1 Pod IP: $UPF1_IP"
+    echo "[wrapper] UPF2 Pod IP: $UPF2_IP"
+
+    # Replace UPF Service Name placeholders with resolved Pod IPs
+    sed -i "s/UPFB_SERVICE_NAME/$UPFB_IP/g" /tmp/smfcfg.yaml
+    sed -i "s/UPF1_SERVICE_NAME/$UPF1_IP/g" /tmp/smfcfg.yaml
+    sed -i "s/UPF2_SERVICE_NAME/$UPF2_IP/g" /tmp/smfcfg.yaml
+
+    echo "[wrapper] Configuration files prepared in /tmp"
+    echo "[wrapper] SMF PFCP config:"
+    cat /tmp/smfcfg.yaml | grep -A3 "pfcp:"
+    echo "[wrapper] UPF nodeIDs:"
+    cat /tmp/smfcfg.yaml | grep "nodeID:"
+
+    # Execute SMF with dynamic configuration
+    exec ./smf -c /tmp/smfcfg.yaml -u /tmp/uerouting.yaml
 
 {{- end }}

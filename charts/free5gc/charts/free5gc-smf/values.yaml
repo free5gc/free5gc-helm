@@ -20,6 +20,7 @@ fullnameOverride: ""
 global:
   projectName: free5gc
   userPlaneArchitecture: ulcl  # possible values are "single" and "ulcl"
+  uesubnet: 10.60.0.0/16  # UE IP address pool
   nrf:
     service:
       name: nrf-nnrf
@@ -28,11 +29,8 @@ global:
       nodePort: "30800"
   sbi:
     scheme: http
-  smf:
-    n4if:
-      ipAddress: 10.100.50.244
   n4network:
-    enabled: true
+    enabled: false
     name: n4network
     type: ipvlan
     masterIf: eth0
@@ -85,14 +83,17 @@ smf:
       memory: 256Mi
   readinessProbe:
     enabled: true
-    httpGet:
-      path: /nsmf-pdusession/v1/
-      scheme: HTTP
-      port: *Port
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - |
+          HEX_PORT=$(printf '%04X' "{{ .service.port }}")
+          grep -q ":${HEX_PORT} .* 0A " /proc/net/tcp || grep -q ":${HEX_PORT} .* 0A " /proc/net/tcp6
     initialDelaySeconds: 10
     periodSeconds: 1
     timeoutSeconds: 1
-    failureThreshold:  40
+    failureThreshold: 40
     successThreshold: 1
   livenessProbe:
     enabled: true
@@ -157,7 +158,7 @@ smf:
             type: AN # the type of the node (AN or UPF)
           BranchingUPF:
             type: UPF
-            nodeID: 10.100.50.241 # PFCP address
+            nodeID: UPFB_SERVICE_NAME # PFCP address - will be replaced by wrapper script
             sNssaiUpfInfos:
               - sNssai:
                   sst: 1
@@ -169,17 +170,17 @@ smf:
             interfaces:
               - interfaceType: N3
                 endpoints:
-                  - 10.100.50.233
+                  - UPFB_SERVICE_NAME
                 networkInstances: 
                   - internet
               - interfaceType: N9
                 endpoints:
-                  - 10.100.50.225
+                  - UPFB_SERVICE_NAME
                 networkInstances: 
                   - internet
           AnchorUPF1:
             type: UPF
-            nodeID: 10.100.50.242 # PFCP address
+            nodeID: UPF1_SERVICE_NAME # PFCP address - will be replaced by wrapper script
             sNssaiUpfInfos:
               - sNssai:
                   sst: 1
@@ -187,16 +188,16 @@ smf:
                 dnnUpfInfoList:
                   - dnn: internet
                     pools:
-                    - cidr: 10.1.0.0/17
+                    - cidr: 10.60.0.0/17
             interfaces:
               - interfaceType: N9
                 endpoints:
-                  - 10.100.50.226 # AnchorUPF1 N9 address
+                  - UPF1_SERVICE_NAME
                 networkInstances: 
                   - internet
           AnchorUPF2:
             type: UPF
-            nodeID: 10.100.50.243 # PFCP address
+            nodeID: UPF2_SERVICE_NAME # PFCP address - will be replaced by wrapper script
             sNssaiUpfInfos:
               - sNssai:
                   sst: 1
@@ -204,11 +205,11 @@ smf:
                 dnnUpfInfoList:
                   - dnn: internet
                     pools:
-                    - cidr: 10.1.128.0/17
+                    - cidr: 10.60.128.0/17
             interfaces:
               - interfaceType: N9
                 endpoints:
-                  - 10.100.50.227 # AnchorUPF2 N9 address
+                  - UPF2_SERVICE_NAME
                 networkInstances: 
                   - internet
         links:

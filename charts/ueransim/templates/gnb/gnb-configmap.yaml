@@ -26,12 +26,8 @@ data:
     
     linkIp: 0.0.0.0   # gNB's local IP address for Radio Link Simulation (Usually same with local IP)
     # gNB's local IP address for N2 Interface (Usually same with local IP)
-{{- if .amf.service.ngap.enabled }}
-    ngapIp: 0.0.0.0   
-{{- else }}
-    ngapIp: {{ .n2if.ipAddress }} 
-{{- end }}
-    gtpIp: {{ .n3if.ipAddress }}    # gNB's local IP address for N3 Interface (Usually same with local IP)
+    ngapIp: 0.0.0.0   # Bind to all interfaces (Pod IP)
+    gtpIp: 0.0.0.0    # gNB's local IP address for N3 Interface (Bind to Pod IP)
     
     # List of AMF address information
     amfConfigs:

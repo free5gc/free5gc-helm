@@ -15,9 +15,9 @@
 # Declare variables to be passed into your templates.
 
 global:
-  #Global network parametes
+  #Global network parameters - Disabled for single-interface (no-Multus) mode
   n2network:
-    enabled: true
+    enabled: false
     name: n2network
     type: ipvlan
     masterIf: eth0
@@ -26,7 +26,7 @@ global:
     gatewayIP: 10.100.50.254
     excludeIP: 10.100.50.254
   n3network:
-    enabled: true
+    enabled: false
     name: n3network
     type: ipvlan
     masterIf: eth0
@@ -69,7 +69,7 @@ gnb:
 
   amf:
     n2if:  # NGAP
-      ipAddress: 10.100.50.249
+      ipAddress: free5gc-v1-free5gc-amf-amf-n2
       port: 38412
     service:
       ngap:

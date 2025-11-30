@@ -56,7 +56,7 @@ free5gc-smf:
             type: AN # the type of the node (AN or UPF)
           BranchingUPF:
             type: UPF
-            node_id: 10.100.50.241 # PFCP address
+            node_id: free5gc-v1-free5gc-upf-upfb-pfcp # K8s Service for PFCP
             sNssaiUpfInfos:
               - sNssai:
                   sst: 1
@@ -71,15 +71,15 @@ free5gc-smf:
             interfaces:
               - interfaceType: N3
                 endpoints:
-                  - 10.100.50.233
+                  - 10.100.50.233 # UPFB N3 Multus IP (gNB direct connection)
                 networkInstance: internet
               - interfaceType: N9
                 endpoints:
-                  - 10.100.50.225
+                  - free5gc-v1-free5gc-upf-upfb-n9 # K8s Service for N9 GTP-U
                 networkInstance: internet
           AnchorUPF1:
             type: UPF
-            node_id: 10.100.50.242 # PFCP address
+            node_id: free5gc-v1-free5gc-upf-upf1-pfcp # K8s Service for PFCP
             sNssaiUpfInfos:
               - sNssai:
                   sst: 1
@@ -87,15 +87,15 @@ free5gc-smf:
                 dnnUpfInfoList:
                   - dnn: internet
                     pools:
-                    - cidr: 10.1.0.0/17
+                    - cidr: 10.60.0.0/17
             interfaces:
               - interfaceType: N9
                 endpoints:
-                  - 10.100.50.226 # AnchorUPF1 N9 address
+                  - free5gc-v1-free5gc-upf-upf1-n9 # K8s Service for N9 GTP-U
                 networkInstance: internet
           AnchorUPF2:
             type: UPF
-            node_id: 10.100.50.243 # PFCP address
+            node_id: free5gc-v1-free5gc-upf-upf2-pfcp # K8s Service for PFCP
             sNssaiUpfInfos:
               - sNssai:
                   sst: 1
@@ -103,11 +103,11 @@ free5gc-smf:
                 dnnUpfInfoList:
                   - dnn: internet
                     pools:
-                    - cidr: 10.1.128.0/17
+                    - cidr: 10.60.128.0/17
             interfaces:
               - interfaceType: N9
                 endpoints:
-                  - 10.100.50.227 # AnchorUPF2 N9 address
+                  - free5gc-v1-free5gc-upf-upf2-n9 # K8s Service for N9 GTP-U
                 networkInstance: internet
         links:
           - A: gNB1

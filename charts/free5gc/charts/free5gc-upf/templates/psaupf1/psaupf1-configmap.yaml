@@ -25,8 +25,8 @@ data:
 
     # The listen IP and nodeID of the N4 interface on this UPF (Can't set to 0.0.0.0)
     pfcp:
-      addr: {{ .n4if.ipAddress }} # IP addr for listening
-      nodeID: {{ .n4if.ipAddress }} # External IP or FQDN can be reached
+      addr: POD_IP_ADDR # IP addr for listening - replaced at runtime
+      nodeID: POD_IP_ADDR # External IP or FQDN can be reached - replaced at runtime
       retransTimeout: 1s # retransmission timeout
       maxRetrans: 3 # the max number of retransmission
 
@@ -35,7 +35,7 @@ data:
       # The IP list of the N3/N9 interfaces on this UPF
       # If there are multiple connection, set addr to 0.0.0.0 or list all the addresses
       ifList:
-        - addr: {{ .n9if.ipAddress }}
+        - addr: POD_IP_ADDR
           type: N9
           # name: upf.5gc.nctu.me
           # ifname: gtpif
@@ -44,19 +44,48 @@ data:
 
   wrapper.sh: |
     #!/bin/sh
+    set -e
 
-    ### Implement networking rules
+    # Get Pod IP dynamically
+    POD_IP=$(hostname -i | awk '{print $1}')
+    echo "[wrapper] UPF1 (AnchorUPF1) Pod IP detected: $POD_IP"
+
+    # Copy config to writable location
+    cp {{ .volume.mount }}/upfcfg.yaml /tmp/upfcfg.yaml
+
+    # Replace POD_IP_ADDR placeholder with actual Pod IP
+    sed -i "s/POD_IP_ADDR/$POD_IP/g" /tmp/upfcfg.yaml
+
+    echo "[wrapper] UPF1 PFCP config:"
+    cat /tmp/upfcfg.yaml | grep -A3 "pfcp:"
+
+    # Ensure IP forwarding is enabled
+    sysctl -w net.ipv4.ip_forward=1
+
+    # Wait for upfgtp interface to be created by gtp5g module
+    echo "[wrapper] Waiting for upfgtp interface..."
+    for i in $(seq 1 30); do
+      if ip link show upfgtp > /dev/null 2>&1; then
+        echo "[wrapper] upfgtp interface is ready"
+        break
+      fi
+      sleep 1
+    done
+
+    # Note: Route for UE subnet will be automatically added by UPF based on dnnList configuration
+    # No need to manually add route here
+
+    # Setup iptables for NAT (single interface mode - eth0)
     iptables -A FORWARD -j ACCEPT
-    iptables -t nat -A POSTROUTING -s {{ $.Values.global.uesubnet }} -o n6 -j MASQUERADE  # route traffic comming from the UE SUBNET to the interface N6
-    echo "1200 n6if" >> /etc/iproute2/rt_tables # create a routing table for the interface N6
-    ip rule add from {{ $.Values.global.uesubnet }} table n6if   # use the created ip table to route the traffic comming from the UE SUBNET
-    ip route add default via {{ $.Values.global.n6network.gatewayIP }} dev n6 table n6if  # add a default route in the created table so that all UEs will use this gateway for external communications (target IP not in the Data Network attached to the interface N6) and then the Data Network will manage to route the traffic
+    # NAT traffic from UE subnet going out via eth0 (for uplink to internet)
+    iptables -t nat -A POSTROUTING -s {{ $.Values.global.uesubnet }} -o eth0 -j MASQUERADE
 
     {{- if $.Values.psaupf1.configmap.wrapperAdditionalCommands }}
     {{- $.Values.psaupf1.configmap.wrapperAdditionalCommands | toYaml | indent 2 }}
     {{- end }}
 
-    exec /free5gc/upf -c {{ .volume.mount }}/upfcfg.yaml
+    echo "[wrapper] Starting UPF1 with dynamic config"
+    exec /free5gc/upf -c /tmp/upfcfg.yaml
 
 {{- end }}
 {{- end }}

@@ -28,18 +28,16 @@ global:
   sbi:
     scheme: http
   amf:
-    n2if:  # NGAP
-      ipAddress: 10.100.50.249
     service:
       ngap:
-        enabled: false
+        enabled: true  # Enable NGAP service for external access
         name: amf-n2
         port: 38412
         nodeport: 31412
         protocol: SCTP
         type: NodePort
   n2network:
-    enabled: true
+    enabled: false
     name: n2network
     type: ipvlan
     masterIf: eth0

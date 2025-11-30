@@ -18,10 +18,10 @@
 global:
   projectName: free5gc
   userPlaneArchitecture: ulcl  # possible values are "single" and "ulcl"
-  uesubnet: 10.1.0.0/16
-#Global network parametes
+  uesubnet: 10.60.0.0/16
+#Global network parameters - All disabled for single-interface (no-Multus) mode
   n4network:
-    enabled: true
+    enabled: false
     name: n4network
     type: ipvlan
     masterIf: eth0
@@ -30,7 +30,7 @@ global:
     gatewayIP: 10.100.50.246
     excludeIP: 10.100.50.246
   n3network:
-    enabled: true
+    enabled: false
     name: n3network
     type: ipvlan
     masterIf: eth0
@@ -39,7 +39,7 @@ global:
     gatewayIP: 10.100.50.238
     excludeIP: 10.100.50.238
   n6network:
-    enabled: true
+    enabled: false
     name: n6network
     type: ipvlan
     masterIf: eth1
@@ -48,7 +48,7 @@ global:
     gatewayIP: 10.100.100.1
     excludeIP: 10.100.100.254
   n9network:
-    enabled: true
+    enabled: false
     name: n9network
     type: ipvlan
     masterIf: eth0
@@ -79,14 +79,25 @@ upf:
     ipAddress: 10.100.50.241
   n6if:  # DN
     ipAddress: 10.100.100.12
+  # Network interfaces - IPs are dynamically assigned at runtime via Pod IP
+  # These placeholders are kept for documentation but not used
+  service:
+    pfcp:
+      port: 8805
+      protocol: UDP
 
   podAnnotations: {}
     # additional annotations
   imagePullSecrets: []
-  podSecurityContext: {}
+  podSecurityContext:
+    runAsUser: 0
+    runAsNonRoot: false
   securityContext:
+    privileged: true
+    runAsUser: 0
+    runAsNonRoot: false
     capabilities:
-      add: ["NET_ADMIN"]
+      add: ["NET_ADMIN", "SYS_PTRACE", "NET_RAW"]
   resources:
     requests:
       cpu: 500m
@@ -130,10 +141,7 @@ upf:
   configuration:
     dnnList: # The DNN list supported by UPF
       - dnn: internet # Data Network Name
-        cidr: 10.1.0.0/17 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
-        # natifname: n6
-      - dnn: internet # Data Network Name
-        cidr: 10.1.128.0/17 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
+        cidr: 10.60.0.0/16 # Full UE subnet for single UPF mode
         # natifname: n6
 
     logger: # log output setting
@@ -164,14 +172,24 @@ psaupf1:
     ipAddress: 10.100.50.242
   n6if:  # DN
     ipAddress: 10.100.100.13
+  # Network interfaces - IPs are dynamically assigned at runtime via Pod IP
+  service:
+    pfcp:
+      port: 8805
+      protocol: UDP
 
   podAnnotations: {}
     # additional annotations
   imagePullSecrets: []
-  podSecurityContext: {}
+  podSecurityContext:
+    runAsUser: 0
+    runAsNonRoot: false
   securityContext:
+    privileged: true
+    runAsUser: 0
+    runAsNonRoot: false
     capabilities:
-      add: ["NET_ADMIN"]
+      add: ["NET_ADMIN", "SYS_PTRACE", "NET_RAW"]
   resources:
     requests:
       cpu: 500m
@@ -215,15 +233,12 @@ psaupf1:
   configuration:
     dnnList: # The DNN list supported by UPF
       - dnn: internet # Data Network Name
-        cidr: 10.1.0.0/17 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
-        # natifname: n6
-      - dnn: internet # Data Network Name
-        cidr: 10.1.128.0/17 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
+        cidr: 10.60.0.0/17 # AnchorUPF1 handles first half of UE subnet
         # natifname: n6
 
     logger: # log output setting
       enable: true # true or false
-      level: info # how detailed to output, value: trace, debug, info, warn, error, fatal, panic
+      level: debug # how detailed to output, value: trace, debug, info, warn, error, fatal, panic
       reportCaller: false # enable the caller report or not, value: true or false
 
 psaupf2:
@@ -248,14 +263,24 @@ psaupf2:
     ipAddress: 10.100.50.243
   n6if:  # DN
     ipAddress: 10.100.100.14
+  # Network interfaces - IPs are dynamically assigned at runtime via Pod IP
+  service:
+    pfcp:
+      port: 8805
+      protocol: UDP
 
   podAnnotations: {}
     # additional annotations
   imagePullSecrets: []
-  podSecurityContext: {}
+  podSecurityContext:
+    runAsUser: 0
+    runAsNonRoot: false
   securityContext:
+    privileged: true
+    runAsUser: 0
+    runAsNonRoot: false
     capabilities:
-      add: ["NET_ADMIN"]
+      add: ["NET_ADMIN", "SYS_PTRACE", "NET_RAW"]
   resources:
     requests:
       cpu: 500m
@@ -299,15 +324,12 @@ psaupf2:
   configuration:
     dnnList: # The DNN list supported by UPF
       - dnn: internet # Data Network Name
-        cidr: 10.1.0.0/17 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
-        # natifname: n6
-      - dnn: internet # Data Network Name
-        cidr: 10.1.128.0/17 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
+        cidr: 10.60.128.0/17 # AnchorUPF2 handles second half of UE subnet
         # natifname: n6
 
     logger: # log output setting
       enable: true # true or false
-      level: info # how detailed to output, value: trace, debug, info, warn, error, fatal, panic
+      level: debug # how detailed to output, value: trace, debug, info, warn, error, fatal, panic
       reportCaller: false # enable the caller report or not, value: true or false
 
 iupf1:
@@ -334,14 +356,24 @@ iupf1:
     ipAddress: 10.100.50.241
   n6if:  # DN
     ipAddress: 10.100.100.12
+  # Network interfaces - IPs are dynamically assigned at runtime via Pod IP
+  service:
+    pfcp:
+      port: 8805
+      protocol: UDP
 
   podAnnotations: {}
     # additional annotations
   imagePullSecrets: []
-  podSecurityContext: {}
+  podSecurityContext:
+    runAsUser: 0
+    runAsNonRoot: false
   securityContext:
+    privileged: true
+    runAsUser: 0
+    runAsNonRoot: false
     capabilities:
-      add: ["NET_ADMIN"]
+      add: ["NET_ADMIN", "SYS_PTRACE", "NET_RAW"]
   resources:
     requests:
       cpu: 500m
@@ -383,12 +415,9 @@ iupf1:
     targetCPUUtilizationPercentage: 80
     # targetMemoryUtilizationPercentage: 80
   configuration:
-    dnnList: # The DNN list supported by UPF
+    dnnList: # The DNN list supported by UPF - UPFB needs full /16 to handle all UE traffic
       - dnn: internet # Data Network Name
-        cidr: 10.1.0.0/17 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
-        # natifname: n6
-      - dnn: internet # Data Network Name
-        cidr: 10.1.128.0/17 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
+        cidr: 10.60.0.0/16 # Full UE subnet for branching UPF
         # natifname: n6
 
     logger: # log output setting

@@ -67,7 +67,7 @@ smf:
                 dnnUpfInfoList:
                   - dnn: internet
                     pools:
-                    - cidr: 10.1.0.0/17
+                    - cidr: 10.60.0.0/17
             interfaces:
               - interfaceType: N9
                 endpoints:
@@ -84,7 +84,7 @@ smf:
                 dnnUpfInfoList:
                   - dnn: internet
                     pools:
-                    - cidr: 10.1.128.0/17
+                    - cidr: 10.60.128.0/17
             interfaces:
               - interfaceType: N9
                 endpoints:

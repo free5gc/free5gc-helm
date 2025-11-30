@@ -17,6 +17,7 @@
 global:
   name: free5gc
   userPlaneArchitecture: ulcl  # possible values are "single" and "ulcl"
+  uesubnet: 10.60.0.0/16  # UE IP address pool
   nrf:
     service:
       name: nrf-nnrf
@@ -26,22 +27,17 @@ global:
   sbi:
     scheme: http
   amf:
-    n2if:  # NGAP
-      ipAddress: 10.100.50.249
     service:
       ngap:
-        enabled: false
+        enabled: true  # Enable NGAP service for external access
         name: amf-n2
         port: 38412
         nodeport: 31412
         protocol: SCTP
         type: NodePort
-  smf:
-    n4if:
-      ipAddress: 10.100.50.244
-  #Global network parametes
+  #Global network parameters - All disabled for single-interface (no-Multus) mode
   n2network:
-    enabled: true
+    enabled: false
     name: n2network
     type: ipvlan
     masterIf: eth0
@@ -50,7 +46,7 @@ global:
     gatewayIP: 10.100.50.254
     excludeIP: 10.100.50.254
   n3network:
-    enabled: true
+    enabled: false
     name: n3network
     type: ipvlan
     masterIf: eth0
@@ -59,7 +55,7 @@ global:
     gatewayIP: 10.100.50.238
     excludeIP: 10.100.50.238
   n4network:
-    enabled: true
+    enabled: false
     name: n4network
     type: ipvlan
     masterIf: eth0
@@ -68,7 +64,7 @@ global:
     gatewayIP: 10.100.50.246
     excludeIP: 10.100.50.246
   n6network:
-    enabled: true
+    enabled: false
     name: n6network
     type: ipvlan
     masterIf: eth1
@@ -77,7 +73,7 @@ global:
     gatewayIP: 10.100.100.1
     excludeIP: 10.100.100.254
   n9network:
-    enabled: true
+    enabled: false
     name: n9network
     type: ipvlan
     masterIf: eth0

@@ -35,22 +35,6 @@ spec:
         component: {{ .name }}
       annotations:
         {{- include "ueransim.gnbAnnotations" $ | nindent 8 }}
-        {{- if or $.Values.global.n2network.enabled $.Values.global.n3network.enabled}}
-        k8s.v1.cni.cncf.io/networks: '[
-        {{- if $.Values.global.n2network.enabled }}
-            { "name": "{{ $.Values.global.n2network.name }}-{{ include "ueransim.fullname" $ }}",
-              "interface": "n2",
-              "ips": [ "{{ .n2if.ipAddress }}/{{ $.Values.global.n2network.cidr }}" ],
-              "gateway": [ "{{ $.Values.global.n2network.gatewayIP }}" ]
-            },
-        {{- end }}
-            { "name": "{{ $.Values.global.n3network.name }}-{{ include "ueransim.fullname" $ }}",
-              "interface": "n3",
-              "ips": [ "{{ .n3if.ipAddress }}/{{ $.Values.global.n3network.cidr }}" ],
-              "gateway": [ "{{ $.Values.global.n3network.gatewayIP }}" ]
-            }
-            ]'
-        {{- end }}
     spec:
       imagePullSecrets:
         {{- toYaml .imagePullSecrets | nindent 8 }}

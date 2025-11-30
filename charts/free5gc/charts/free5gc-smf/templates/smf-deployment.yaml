@@ -32,14 +32,6 @@ spec:
     metadata:
       annotations:
         {{- include "free5gc-smf.smfAnnotations" $ | nindent 8 }}
-        {{- if and $.Values.isPfcpNeeded $.Values.global.n4network.enabled}}
-        k8s.v1.cni.cncf.io/networks: '[
-            { "name": "{{ $.Values.global.n4network.name }}-{{ include "free5gc-smf.fullname" $ }}",
-              "interface": "n4",
-              "ips": [ "{{ $.Values.global.smf.n4if.ipAddress }}/{{ $.Values.global.n4network.cidr }}" ],
-              "gateway": [ "{{ $.Values.global.n4network.gatewayIP }}" ]
-            }]'
-        {{- end }}
         {{- if $.Values.smf.configuration.metrics.enable }}
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"
@@ -86,12 +78,8 @@ spec:
         command:
           - "/sbin/tini"
           - "--"
-          - "./smf"
-        args:
-          - "-c"
-          - "./config/smfcfg.yaml"
-          - "-u"
-          - "./config/uerouting.yaml"
+          - "/bin/sh"
+          - "{{ .volume.mount }}/wrapper.sh"
         env:
           - name: GIN_MODE
             value: release
@@ -156,6 +144,9 @@ spec:
                 path: smfcfg.yaml
               - key: uerouting.yaml
                 path: uerouting.yaml
+              - key: wrapper.sh
+                path: wrapper.sh
+                mode: 0777
       - name: {{ include "free5gc-smf.fullname" $ }}-empty-volume
         emptyDir: {}
       - name: {{ include "free5gc-smf.fullname" $ }}-cert-volume
