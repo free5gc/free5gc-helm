@@ -24,15 +24,34 @@ data:
 
     {{- .configuration | nindent 4 }}
     
-    linkIp: 0.0.0.0   # gNB's local IP address for Radio Link Simulation (Usually same with local IP)
-    # gNB's local IP address for N2 Interface (Usually same with local IP)
-    ngapIp: 0.0.0.0   # Bind to all interfaces (Pod IP)
-    gtpIp: 0.0.0.0    # gNB's local IP address for N3 Interface (Bind to Pod IP)
+    linkIp: GNB_POD_IP   # gNB's local IP address for Radio Link Simulation
+    ngapIp: GNB_POD_IP   # gNB's local IP address for N2 Interface
+    gtpIp: GNB_POD_IP    # gNB's local IP address for N3 Interface
     
     # List of AMF address information
     amfConfigs:
-      - address: {{ .amf.n2if.ipAddress }}
+      - address: {{ $.Values.global.free5gcReleaseName }}-{{ .amf.n2if.serviceName }}
         port: {{ .amf.n2if.port }}
+
+  wrapper.sh: |
+    #!/bin/sh
+    set -e
+    
+    # Get Pod IP dynamically
+    POD_IP=$(hostname -i | awk '{print $1}')
+    echo "[gNB wrapper] Pod IP detected: $POD_IP"
+    
+    # Copy config to writable location
+    cp /ueransim/config/gnb-config.yaml /tmp/gnb-config.yaml
+    
+    # Replace POD_IP placeholder
+    sed -i "s/GNB_POD_IP/$POD_IP/g" /tmp/gnb-config.yaml
+    
+    echo "[gNB wrapper] Configuration prepared:"
+    cat /tmp/gnb-config.yaml | grep -E "linkIp|ngapIp|gtpIp"
+    
+    # Execute gNB
+    exec ./nr-gnb -c /tmp/gnb-config.yaml
 
 {{- end }}
 {{- end }}
