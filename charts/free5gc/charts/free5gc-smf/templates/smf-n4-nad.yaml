@@ -31,11 +31,7 @@ spec:
 {{- end }}
           "ipam": {
             "type": "static",
-            "routes": [
-              {
-                "dst": "0.0.0.0/0",
-                "gw": "{{ .Values.global.n4network.gatewayIP }}"
-              }
+            "routes": []
             ]
           }
         }

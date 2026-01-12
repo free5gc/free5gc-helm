@@ -31,12 +31,7 @@ spec:
 {{- end }}
           "ipam": {
             "type": "static",
-            "routes": [
-              {
-                "dst": "0.0.0.0/0",
-                "gw": "{{ .Values.global.n2network.gatewayIP }}"
-              }
-            ]
+            "routes": []
           }
         }
 {{- if eq .Values.global.n2network.type "macvlan" -}}
