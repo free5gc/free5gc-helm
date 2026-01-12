@@ -8,11 +8,8 @@ metadata:
   labels:
     project: {{ $.Values.global.projectName }}
 spec:
-  selector:
-    matchLabels: 
-      project: {{ $.Values.global.projectName }}
   accessModes:
-  - ReadOnlyMany
+  - ReadWriteMany
   resources:
     requests:
       storage: 1Mi
