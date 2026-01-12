@@ -17,7 +17,7 @@
 
 global:
   projectName: free5gc
-  userPlaneArchitecture: ulcl  # possible values are "single" and "ulcl"
+  userPlaneArchitecture: single  # possible values are "single" and "ulcl"
   uesubnet: 10.1.0.0/16
 #Global network parametes
   n4network:

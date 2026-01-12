@@ -16,7 +16,7 @@
 
 global:
   name: free5gc
-  userPlaneArchitecture: ulcl  # possible values are "single" and "ulcl"
+  userPlaneArchitecture: single  # possible values are "single" and "ulcl"
   nrf:
     service:
       name: nrf-nnrf
