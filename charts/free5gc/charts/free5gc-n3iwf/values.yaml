@@ -27,7 +27,7 @@ global:
         enabled: false
         name: amf-n2
         port: 38412
-        nodeport: 31412
+        nodePort: 31412
         protocol: SCTP
         type: NodePort
   n2network:
@@ -50,7 +50,7 @@ n3iwf:
   replicaCount: 1
   image:
     name: free5gc/n3iwf
-    tag: v4.1.0
+    tag: v4.2.0
     pullPolicy: Always
   configmap:
     name: n3iwf-configmap
