@@ -21,10 +21,10 @@ spec:
       "cniVersion": "0.3.1",
       "plugins": [
         {
-          "type": "macvlan",
+          "type": "ipvlan",
           "capabilities": { "ips": true },
           "master": {{ .masterIf | quote }},
-          "mode": "bridge",
+          "mode": "l2",
           "ipam": {
             "type": "static",
             "routes": [

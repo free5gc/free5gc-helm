@@ -24,24 +24,17 @@ data:
       description: N3IWF initial local configuration
 
     configuration:
-      AMFSCTPAddresses:
-        - IP:
+      amfSCTPAddresses:
+        - ip:
 {{- if $.Values.global.amf.service.ngap.enabled }}
-          - {{ $.Values.global.amf.service.ngap.name }}
+            - {{ $.Values.global.amf.service.ngap.name }}
 {{- else }}
-          - {{ $.Values.global.amf.n2if.ipAddress }}
+            - {{ $.Values.global.amf.n2if.ipAddress }}
 {{- end }}
-          Port: {{ $.Values.global.amf.service.ngap.port }}
+          port: {{ $.Values.global.amf.service.ngap.port }}
 
-      # Bind Interfaces
-      # IKE interface
-      IKEBindAddress: {{ .ike.ipAddress }} 
-      # contrarly to the example used in docker compose here we attribute a special interface for the IKE daemon (as specified in the free5gc main project in github)
-
-      # GTP interface
-      GTPBindAddress: {{ .n3if.ipAddress }}
 {{- if $.Values.n3iwf.configuration.metrics.enable }}
-      metrics: 
+      metrics:
         enable: true
         scheme: {{ $.Values.n3iwf.configuration.metrics.scheme }}
         bindingIPv4: 0.0.0.0  # IP used to bind the service
@@ -52,7 +45,30 @@ data:
           pem: ./cert/n3iwf.pem
 {{- end }}
 
-      {{- .configuration.configuration | nindent 6 }}
+      nasTcpPort: {{ .configuration.nasTcpPort }}
+
+      # Nwu interface
+      ikeBindAddress: {{ .ike.ipAddress }}
+      ipSecTunnelAddress: {{ .configuration.ipSecTunnelAddress }}
+      ueIpAddressRange: {{ .configuration.ueIpAddressRange }}
+      xfrmInterfaceName: {{ .configuration.xfrmInterfaceName }}
+      xfrmInterfaceID: {{ .configuration.xfrmInterfaceID }}
+
+      # N3 interface
+      n3iwfGtpBindAddress: {{ .n3if.ipAddress }}
+
+      fqdn: {{ .configuration.fqdn }}
+
+      # Security
+      privateKey: {{ .configuration.privateKey }}
+      certificateAuthority: {{ .configuration.certificateAuthority }}
+      certificate: {{ .configuration.certificate }}
+
+      livenessCheck:
+        {{- toYaml .configuration.livenessCheck | nindent 8 }}
+
+      n3iwfInformation:
+        {{- toYaml .configuration.n3iwfInformation | nindent 8 }}
 
     logger:
       {{- toYaml .configuration.logger | nindent 6 }}
@@ -62,9 +78,9 @@ data:
     #!/bin/sh
     
     ### N3iwf IPSec tunnel configuration
-    
+    {{- $ueRange := splitList "/" .configuration.ueIpAddressRange }}
     ip l add name ipsec0 type vti local {{ .ike.ipAddress }} remote 0.0.0.0 key 5
-    ip a add {{ .configuration.IPSecInterfaceAddress }}/24 dev ipsec0
+    ip a add {{ .configuration.ipSecTunnelAddress }}/{{ index $ueRange 1 }} dev ipsec0
     ip l set dev ipsec0 up
 
 {{- end }}
