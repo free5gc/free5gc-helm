@@ -50,7 +50,7 @@ pcf:
   replicaCount: 1
   image:
     name: free5gc/pcf
-    tag: v4.1.0
+    tag: v4.2.0
     pullPolicy: Always
   service:
     type: ClusterIP
