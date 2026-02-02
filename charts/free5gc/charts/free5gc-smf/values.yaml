@@ -93,14 +93,17 @@ smf:
     initialDelaySeconds: 10
     periodSeconds: 1
     timeoutSeconds: 1
-    failureThreshold: 40
+    failureThreshold:  40
     successThreshold: 1
   livenessProbe:
     enabled: true
-    httpGet:
-      path: /nsmf-pdusession/v1/
-      scheme: HTTP
-      port: *Port
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - |
+          HEX_PORT=$(printf '%04X' "{{ .service.port }}")
+          grep -q ":${HEX_PORT} .* 0A " /proc/net/tcp || grep -q ":${HEX_PORT} .* 0A " /proc/net/tcp6
     initialDelaySeconds: 50
     periodSeconds: 10
     timeoutSeconds: 10
