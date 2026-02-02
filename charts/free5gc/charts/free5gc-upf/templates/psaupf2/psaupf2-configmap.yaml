@@ -59,9 +59,6 @@ data:
     echo "[wrapper] UPF2 PFCP config:"
     cat /tmp/upfcfg.yaml | grep -A3 "pfcp:"
 
-    # Ensure IP forwarding is enabled
-    sysctl -w net.ipv4.ip_forward=1
-
     # Wait for upfgtp interface to be created by gtp5g module
     echo "[wrapper] Waiting for upfgtp interface..."
     for i in $(seq 1 30); do

@@ -90,14 +90,13 @@ upf:
     # additional annotations
   imagePullSecrets: []
   podSecurityContext:
-    runAsUser: 0
-    runAsNonRoot: false
+    sysctls:
+      - name: net.ipv4.ip_forward
+        value: "1"
   securityContext:
-    privileged: true
-    runAsUser: 0
-    runAsNonRoot: false
+    allowPrivilegeEscalation: false
     capabilities:
-      add: ["NET_ADMIN", "SYS_PTRACE", "NET_RAW"]
+      add: ["NET_ADMIN"]
   resources:
     requests:
       cpu: 500m
@@ -182,14 +181,13 @@ psaupf1:
     # additional annotations
   imagePullSecrets: []
   podSecurityContext:
-    runAsUser: 0
-    runAsNonRoot: false
+    sysctls:
+      - name: net.ipv4.ip_forward
+        value: "1"
   securityContext:
-    privileged: true
-    runAsUser: 0
-    runAsNonRoot: false
+    allowPrivilegeEscalation: false
     capabilities:
-      add: ["NET_ADMIN", "SYS_PTRACE", "NET_RAW"]
+      add: ["NET_ADMIN"]
   resources:
     requests:
       cpu: 500m
@@ -238,7 +236,7 @@ psaupf1:
 
     logger: # log output setting
       enable: true # true or false
-      level: debug # how detailed to output, value: trace, debug, info, warn, error, fatal, panic
+      level: info # how detailed to output, value: trace, debug, info, warn, error, fatal, panic
       reportCaller: false # enable the caller report or not, value: true or false
 
 psaupf2:
@@ -273,14 +271,13 @@ psaupf2:
     # additional annotations
   imagePullSecrets: []
   podSecurityContext:
-    runAsUser: 0
-    runAsNonRoot: false
+    sysctls:
+      - name: net.ipv4.ip_forward
+        value: "1"
   securityContext:
-    privileged: true
-    runAsUser: 0
-    runAsNonRoot: false
+    allowPrivilegeEscalation: false
     capabilities:
-      add: ["NET_ADMIN", "SYS_PTRACE", "NET_RAW"]
+      add: ["NET_ADMIN"]
   resources:
     requests:
       cpu: 500m
@@ -329,7 +326,7 @@ psaupf2:
 
     logger: # log output setting
       enable: true # true or false
-      level: debug # how detailed to output, value: trace, debug, info, warn, error, fatal, panic
+      level: info # how detailed to output, value: trace, debug, info, warn, error, fatal, panic
       reportCaller: false # enable the caller report or not, value: true or false
 
 iupf1:
@@ -366,14 +363,13 @@ iupf1:
     # additional annotations
   imagePullSecrets: []
   podSecurityContext:
-    runAsUser: 0
-    runAsNonRoot: false
+    sysctls:
+      - name: net.ipv4.ip_forward
+        value: "1"
   securityContext:
-    privileged: true
-    runAsUser: 0
-    runAsNonRoot: false
+    allowPrivilegeEscalation: false
     capabilities:
-      add: ["NET_ADMIN", "SYS_PTRACE", "NET_RAW"]
+      add: ["NET_ADMIN"]
   resources:
     requests:
       cpu: 500m
