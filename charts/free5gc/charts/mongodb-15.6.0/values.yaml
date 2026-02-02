@@ -128,7 +128,7 @@ diagnosticMode:
 ##
 image:
   registry: docker.io
-  repository: bitnami/mongodb
+  repository: bitnamilegacy/mongodb
   tag: 7.0.9-debian-12-r4
   digest: ""
   ## Specify a imagePullPolicy
@@ -254,7 +254,7 @@ tls:
   ##
   image:
     registry: docker.io
-    repository: bitnami/nginx
+    repository: bitnamilegacy/nginx
     tag: 1.26.0-debian-12-r1
     digest: ""
     pullPolicy: IfNotPresent
@@ -427,8 +427,12 @@ initdbScriptsConfigMap: ""
 ## @param command Override default container command (useful when using custom images)
 ## @param args Override default container args (useful when using custom images)
 ##
-command: []
-args: []
+command:
+  - "/usr/bin/tini"
+  - "--"
+  - "/opt/bitnami/scripts/mongodb/entrypoint.sh"
+args:
+  - "/opt/bitnami/scripts/mongodb/run.sh"
 ## @param extraFlags MongoDB(&reg;) additional command line flags
 ## Example:
 ## extraFlags:
@@ -842,7 +846,7 @@ externalAccess:
     ##
     image:
       registry: docker.io
-      repository: bitnami/kubectl
+      repository: bitnamilegacy/kubectl
       tag: 1.30.1-debian-12-r0
       digest: ""
       ## Specify a imagePullPolicy
@@ -892,7 +896,7 @@ externalAccess:
     ##
     image:
       registry: docker.io
-      repository: bitnami/os-shell
+      repository: bitnamilegacy/os-shell
       tag: 12-debian-12-r21
       digest: ""
       ## Specify a imagePullPolicy
@@ -1464,7 +1468,7 @@ volumePermissions:
   ##
   image:
     registry: docker.io
-    repository: bitnami/os-shell
+    repository: bitnamilegacy/os-shell
     tag: 12-debian-12-r21
     digest: ""
     ## Specify a imagePullPolicy
@@ -2262,7 +2266,7 @@ metrics:
   ##
   image:
     registry: docker.io
-    repository: bitnami/mongodb-exporter
+    repository: bitnamilegacy/mongodb-exporter
     tag: 0.40.0-debian-12-r29
     digest: ""
     pullPolicy: IfNotPresent
