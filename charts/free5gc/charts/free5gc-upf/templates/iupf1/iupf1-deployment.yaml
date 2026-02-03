@@ -33,6 +33,30 @@ spec:
     metadata:
       annotations:
         {{- include "free5gc-upf.iupf1Annotations" $ | nindent 8 }}
+        {{- if $.Values.global.upf.multus.enabled }}
+        k8s.v1.cni.cncf.io/networks: '[
+            { "name": "{{ $.Values.global.upf.multus.n3network.name }}-{{ include "free5gc-upf.fullname" $ }}",
+              "interface": "n3",
+              "ips": [ "{{ $.Values.global.upf.multus.upfb.n3if.ipAddress }}/{{ $.Values.global.upf.multus.n3network.cidr }}" ],
+              "gateway": [ "{{ $.Values.global.upf.multus.n3network.gatewayIP }}" ]
+            },
+            { "name": "{{ $.Values.global.upf.multus.n9network.name }}-{{ include "free5gc-upf.fullname" $ }}",
+              "interface": "n9",
+              "ips": [ "{{ $.Values.global.upf.multus.upfb.n9if.ipAddress }}/{{ $.Values.global.upf.multus.n9network.cidr }}" ],
+              "gateway": [ "{{ $.Values.global.upf.multus.n9network.gatewayIP }}" ]
+            },
+            { "name": "{{ $.Values.global.upf.multus.n4network.name }}-{{ include "free5gc-upf.fullname" $ }}",
+              "interface": "n4",
+              "ips": [ "{{ $.Values.global.upf.multus.upfb.n4if.ipAddress }}/{{ $.Values.global.upf.multus.n4network.cidr }}" ],
+              "gateway": [ "{{ $.Values.global.upf.multus.n4network.gatewayIP }}" ]
+            },
+            { "name": "{{ $.Values.global.upf.multus.n6network.name }}-{{ include "free5gc-upf.fullname" $ }}",
+              "interface": "n6",
+              "ips": [ "{{ $.Values.global.upf.multus.upfb.n6if.ipAddress }}/{{ $.Values.global.upf.multus.n6network.cidr }}" ],
+              "gateway": [ "{{ $.Values.global.upf.multus.n6network.gatewayIP }}" ]
+            }
+            ]'
+        {{- end }}
         checksum/config: {{ include (print $.Template.BasePath "/iupf1/iupf1-configmap.yaml") $ | sha256sum }}
       labels:
         {{- include "free5gc-upf.selectorLabels" $ | nindent 8 }}

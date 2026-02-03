@@ -29,15 +29,20 @@ global:
       nodePort: "30800"
   sbi:
     scheme: http
-  n4network:
-    enabled: false
-    name: n4network
-    type: ipvlan
-    masterIf: eth0
-    subnetIP: 10.100.50.240
-    cidr: 29
-    gatewayIP: 10.100.50.246
-    excludeIP: 10.100.50.246
+  smf:
+    multus:
+      enabled: false
+      n4if:  # PFCP interface (used when multus.enabled=true)
+        ipAddress: 10.100.50.244
+      n4network:
+        enabled: true
+        name: n4network
+        type: ipvlan
+        masterIf: eth0
+        subnetIP: 10.100.50.240
+        cidr: 29
+        gatewayIP: 10.100.50.246
+        excludeIP: 10.100.50.246
 
 initcontainers:
   curl:

@@ -28,6 +28,19 @@ global:
   sbi:
     scheme: http
   amf:
+    multus:
+      enabled: false
+      n2if:  # NGAP interface (used when multus.enabled=true)
+        ipAddress: 10.100.50.249
+      n2network:
+        enabled: true
+        name: n2network
+        type: ipvlan
+        masterIf: eth0
+        subnetIP: 10.100.50.248
+        cidr: 29
+        gatewayIP: 10.100.50.254
+        excludeIP: 10.100.50.254
     service:
       ngap:
         enabled: true  # Enable NGAP service for external access
@@ -36,15 +49,6 @@ global:
         nodeport: 31412
         protocol: SCTP
         type: NodePort
-  n2network:
-    enabled: false
-    name: n2network
-    type: ipvlan
-    masterIf: eth0
-    subnetIP: 10.100.50.248
-    cidr: 29
-    gatewayIP: 10.100.50.254
-    excludeIP: 10.100.50.254
 
 initcontainers:
   curl:

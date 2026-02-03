@@ -50,11 +50,114 @@ data:
       nrfCertPem: ./cert/nrf.pem # NRF Certificate
       {{- .configuration.urrConfiguration | nindent 6 }}
       pfcp:
+{{- if $.Values.global.smf.multus.enabled }}
+        nodeID: {{ $.Values.global.smf.multus.n4if.ipAddress }}
+        listenAddr: {{ $.Values.global.smf.multus.n4if.ipAddress }}
+        externalAddr: {{ $.Values.global.smf.multus.n4if.ipAddress }}
+{{- else }}
         nodeID: POD_IP_ADDR
         listenAddr: POD_IP_ADDR
         externalAddr: POD_IP_ADDR
+{{- end }}
 
+{{- if $.Values.global.smf.multus.enabled }}
+      # Multus mode: Use static UPF N4 IP addresses
+      smfName: SMF
+      snssaiInfos:
+        - sNssai:
+            sst: 1
+            sd: 010203
+          dnnInfos: # DNN information list
+            - dnn: internet # Data Network Name
+              dnaiList:
+                - mec
+              dns: # the IP address of DNS
+                ipv4: 8.8.8.8
+                ipv6: 2001:4860:4860::8888
+      plmnList: # the list of PLMN IDs that this SMF belongs to (optional, remove this key when unnecessary)
+        - mcc: 208 # Mobile Country Code (3 digits string, digit: 0~9)
+          mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
+      userplaneInformation: # list of userplane information
+        upNodes: # information of userplane node (AN or UPF)
+          gNB1: # the name of the node
+            type: AN # the type of the node (AN or UPF)
+          BranchingUPF:
+            type: UPF
+            nodeID: {{ $.Values.global.upf.multus.upfb.n4if.ipAddress }} # UPFB N4 interface IP
+            sNssaiUpfInfos:
+              - sNssai:
+                  sst: 1
+                  sd: 010203
+                dnnUpfInfoList:
+                  - dnn: internet
+                    dnaiList:
+                      - mec
+            interfaces:
+              - interfaceType: N3
+                endpoints:
+                  - {{ $.Values.global.upf.multus.upfb.n3if.ipAddress }}
+                networkInstances: 
+                  - internet
+              - interfaceType: N9
+                endpoints:
+                  - {{ $.Values.global.upf.multus.upfb.n9if.ipAddress }}
+                networkInstances: 
+                  - internet
+          AnchorUPF1:
+            type: UPF
+            nodeID: {{ $.Values.global.upf.multus.upf1.n4if.ipAddress }} # UPF1 N4 interface IP
+            sNssaiUpfInfos:
+              - sNssai:
+                  sst: 1
+                  sd: 010203
+                dnnUpfInfoList:
+                  - dnn: internet
+                    pools:
+                    - cidr: 10.60.0.0/17
+            interfaces:
+              - interfaceType: N9
+                endpoints:
+                  - {{ $.Values.global.upf.multus.upf1.n9if.ipAddress }}
+                networkInstances: 
+                  - internet
+          AnchorUPF2:
+            type: UPF
+            nodeID: {{ $.Values.global.upf.multus.upf2.n4if.ipAddress }} # UPF2 N4 interface IP
+            sNssaiUpfInfos:
+              - sNssai:
+                  sst: 1
+                  sd: 010203
+                dnnUpfInfoList:
+                  - dnn: internet
+                    pools:
+                    - cidr: 10.60.128.0/17
+            interfaces:
+              - interfaceType: N9
+                endpoints:
+                  - {{ $.Values.global.upf.multus.upf2.n9if.ipAddress }}
+                networkInstances: 
+                  - internet
+        links:
+          - A: gNB1
+            B: BranchingUPF
+          - A: BranchingUPF
+            B: AnchorUPF1
+          - A: BranchingUPF
+            B: AnchorUPF2
+      locality: area1 # Name of the location where a set of AMF, SMF and UPFs are located
+      t3591:
+        enable: true # true or false
+        expireTime: 16s # default is 6 seconds
+        maxRetryTimes: 3 # the max number of retransmission
+      # retransmission timer for pdu session release command
+      t3592:
+        enable: true # true or false
+        expireTime: 16s # default is 6 seconds
+        maxRetryTimes: 3 # the max number of retransmission
+{{- else }}
+      # Non-multus mode: Use placeholders that will be replaced by wrapper script
       {{- .configuration.configuration | nindent 6 }}
+{{- end }}
 
     logger:
       {{- toYaml .configuration.logger | nindent 6 }}
@@ -71,6 +174,12 @@ data:
     #!/bin/sh
     set -e
 
+{{- if $.Values.global.smf.multus.enabled }}
+    # Multus mode: Static IPs are already configured, run SMF directly
+    echo "[wrapper] Multus mode enabled - using static IP configuration"
+    exec ./smf -c {{ .volume.mount }}/smfcfg.yaml -u {{ .volume.mount }}/uerouting.yaml
+{{- else }}
+    # Dynamic Pod IP mode: Replace placeholders at runtime
     # Get Pod IP dynamically
     POD_IP=$(hostname -i | awk '{print $1}')
     echo "[wrapper] SMF Pod IP detected: $POD_IP"
@@ -135,4 +244,5 @@ data:
     # Execute SMF with dynamic configuration
     exec ./smf -c /tmp/smfcfg.yaml -u /tmp/uerouting.yaml
 
+{{- end }}
 {{- end }}

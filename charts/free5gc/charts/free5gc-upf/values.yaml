@@ -19,43 +19,76 @@ global:
   projectName: free5gc
   userPlaneArchitecture: ulcl  # possible values are "single" and "ulcl"
   uesubnet: 10.60.0.0/16
-#Global network parameters - All disabled for single-interface (no-Multus) mode
-  n4network:
-    enabled: false
-    name: n4network
-    type: ipvlan
-    masterIf: eth0
-    subnetIP: 10.100.50.240
-    cidr: 29
-    gatewayIP: 10.100.50.246
-    excludeIP: 10.100.50.246
-  n3network:
-    enabled: false
-    name: n3network
-    type: ipvlan
-    masterIf: eth0
-    subnetIP: 10.100.50.232
-    cidr: 29
-    gatewayIP: 10.100.50.238
-    excludeIP: 10.100.50.238
-  n6network:
-    enabled: false
-    name: n6network
-    type: ipvlan
-    masterIf: eth1
-    subnetIP: 10.100.100.0
-    cidr: 24
-    gatewayIP: 10.100.100.1
-    excludeIP: 10.100.100.254
-  n9network:
-    enabled: false
-    name: n9network
-    type: ipvlan
-    masterIf: eth0
-    subnetIP: 10.100.50.224
-    cidr: 29
-    gatewayIP: 10.100.50.230
-    excludeIP: 10.100.50.230
+  upf:
+    multus:
+      enabled: false
+      # Static IP configurations for UPF instances (used when multus.enabled=true)
+      upf:
+        n3if:
+          ipAddress: 10.100.50.233
+        n4if:
+          ipAddress: 10.100.50.241
+        n6if:
+          ipAddress: 10.100.100.11
+      upf1:
+        n4if:
+          ipAddress: 10.100.50.242
+        n6if:
+          ipAddress: 10.100.100.12
+        n9if:
+          ipAddress: 10.100.50.225
+      upf2:
+        n4if:
+          ipAddress: 10.100.50.243
+        n6if:
+          ipAddress: 10.100.100.13
+        n9if:
+          ipAddress: 10.100.50.226
+      upfb:
+        n3if:
+          ipAddress: 10.100.50.234
+        n4if:
+          ipAddress: 10.100.50.245
+        n6if:
+          ipAddress: 10.100.100.14
+        n9if:
+          ipAddress: 10.100.50.227
+      n3network:
+        enabled: true
+        name: n3network
+        type: ipvlan
+        masterIf: eth0
+        subnetIP: 10.100.50.232
+        cidr: 29
+        gatewayIP: 10.100.50.238
+        excludeIP: 10.100.50.238
+      n4network:
+        enabled: true
+        name: n4network
+        type: ipvlan
+        masterIf: eth0
+        subnetIP: 10.100.50.240
+        cidr: 29
+        gatewayIP: 10.100.50.246
+        excludeIP: 10.100.50.246
+      n6network:
+        enabled: true
+        name: n6network
+        type: ipvlan
+        masterIf: eth1
+        subnetIP: 10.100.100.0
+        cidr: 24
+        gatewayIP: 10.100.100.1
+        excludeIP: 10.100.100.254
+      n9network:
+        enabled: true
+        name: n9network
+        type: ipvlan
+        masterIf: eth0
+        subnetIP: 10.100.50.224
+        cidr: 29
+        gatewayIP: 10.100.50.230
+        excludeIP: 10.100.50.230
 
 upf:
   name: upf
@@ -72,15 +105,6 @@ upf:
     mount: /free5gc/config/
     tlsmount: /free5gc/config/TLS
 
-  # network paramters
-  n3if:  # GTP-U
-    ipAddress: 10.100.50.233
-  n4if:  # PFCP
-    ipAddress: 10.100.50.241
-  n6if:  # DN
-    ipAddress: 10.100.100.12
-  # Network interfaces - IPs are dynamically assigned at runtime via Pod IP
-  # These placeholders are kept for documentation but not used
   service:
     pfcp:
       port: 8805
@@ -164,14 +188,6 @@ psaupf1:
     mount: /free5gc/config/
     tlsmount: /free5gc/config/TLS
 
-  # network paramters
-  n9if:  # GTP-U
-    ipAddress: 10.100.50.226
-  n4if:  # PFCP
-    ipAddress: 10.100.50.242
-  n6if:  # DN
-    ipAddress: 10.100.100.13
-  # Network interfaces - IPs are dynamically assigned at runtime via Pod IP
   service:
     pfcp:
       port: 8805
@@ -254,14 +270,6 @@ psaupf2:
     mount: /free5gc/config/
     tlsmount: /free5gc/config/TLS
 
-  # network paramters
-  n9if:  # GTP-U
-    ipAddress: 10.100.50.227
-  n4if:  # PFCP
-    ipAddress: 10.100.50.243
-  n6if:  # DN
-    ipAddress: 10.100.100.14
-  # Network interfaces - IPs are dynamically assigned at runtime via Pod IP
   service:
     pfcp:
       port: 8805
@@ -344,16 +352,6 @@ iupf1:
     mount: /free5gc/config/
     tlsmount: /free5gc/config/TLS
 
-  # network paramters
-  n3if:  # GTP-U
-    ipAddress: 10.100.50.233
-  n9if:  # GTP-U
-    ipAddress: 10.100.50.225
-  n4if:  # PFCP
-    ipAddress: 10.100.50.241
-  n6if:  # DN
-    ipAddress: 10.100.100.12
-  # Network interfaces - IPs are dynamically assigned at runtime via Pod IP
   service:
     pfcp:
       port: 8805

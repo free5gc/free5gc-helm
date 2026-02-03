@@ -26,7 +26,22 @@ global:
       nodePort: "30800"
   sbi:
     scheme: http
+  
+  # AMF Multus CNI Configuration
   amf:
+    multus:
+      enabled: true  # Default: disabled for cloud-native deployments
+      n2if:  # NGAP interface (used when multus.enabled=true)
+        ipAddress: 10.100.50.249
+      n2network:
+        enabled: true
+        name: n2network
+        type: ipvlan
+        masterIf: eth0
+        subnetIP: 10.100.50.248
+        cidr: 29
+        gatewayIP: 10.100.50.254
+        excludeIP: 10.100.50.254
     service:
       ngap:
         enabled: true  # Enable NGAP service for external access
@@ -35,52 +50,94 @@ global:
         nodeport: 31412
         protocol: SCTP
         type: NodePort
-  #Global network parameters - All disabled for single-interface (no-Multus) mode
-  n2network:
-    enabled: false
-    name: n2network
-    type: ipvlan
-    masterIf: eth0
-    subnetIP: 10.100.50.248
-    cidr: 29
-    gatewayIP: 10.100.50.254
-    excludeIP: 10.100.50.254
-  n3network:
-    enabled: false
-    name: n3network
-    type: ipvlan
-    masterIf: eth0
-    subnetIP: 10.100.50.232
-    cidr: 29
-    gatewayIP: 10.100.50.238
-    excludeIP: 10.100.50.238
-  n4network:
-    enabled: false
-    name: n4network
-    type: ipvlan
-    masterIf: eth0
-    subnetIP: 10.100.50.240
-    cidr: 29
-    gatewayIP: 10.100.50.246
-    excludeIP: 10.100.50.246
-  n6network:
-    enabled: false
-    name: n6network
-    type: ipvlan
-    masterIf: eth1
-    subnetIP: 10.100.100.0
-    cidr: 24
-    gatewayIP: 10.100.100.1
-    excludeIP: 10.100.100.254
-  n9network:
-    enabled: false
-    name: n9network
-    type: ipvlan
-    masterIf: eth0
-    subnetIP: 10.100.50.224
-    cidr: 29
-    gatewayIP: 10.100.50.230
-    excludeIP: 10.100.50.230
+  
+  # SMF Multus CNI Configuration
+  smf:
+    multus:
+      enabled: true  # Default: disabled for cloud-native deployments
+      n4if:  # PFCP interface (used when multus.enabled=true)
+        ipAddress: 10.100.50.244
+      n4network:
+        enabled: true
+        name: n4network
+        type: ipvlan
+        masterIf: eth0
+        subnetIP: 10.100.50.240
+        cidr: 29
+        gatewayIP: 10.100.50.246
+        excludeIP: 10.100.50.246
+  
+  # UPF Multus CNI Configuration
+  upf:
+    multus:
+      enabled: true  # Default: disabled for cloud-native deployments
+      # Static IP configurations for UPF instances (used when multus.enabled=true)
+      upf:
+        n3if:
+          ipAddress: 10.100.50.233
+        n4if:
+          ipAddress: 10.100.50.241
+        n6if:
+          ipAddress: 10.0.2.11
+      upf1:
+        n4if:
+          ipAddress: 10.100.50.242
+        n6if:
+          ipAddress: 10.0.2.12
+        n9if:
+          ipAddress: 10.100.50.225
+      upf2:
+        n4if:
+          ipAddress: 10.100.50.243
+        n6if:
+          ipAddress: 10.0.2.13
+        n9if:
+          ipAddress: 10.100.50.226
+      upfb:
+        n3if:
+          ipAddress: 10.100.50.234
+        n4if:
+          ipAddress: 10.100.50.245
+        n6if:
+          ipAddress: 10.0.2.14
+        n9if:
+          ipAddress: 10.100.50.227
+      n3network:
+        enabled: true
+        name: n3network
+        type: ipvlan
+        masterIf: eth0
+        subnetIP: 10.100.50.232
+        cidr: 29
+        gatewayIP: 10.100.50.238
+        excludeIP: 10.100.50.238
+      n4network:
+        enabled: true
+        name: n4network
+        type: ipvlan
+        masterIf: eth0
+        subnetIP: 10.100.50.240
+        cidr: 29
+        gatewayIP: 10.100.50.246
+        excludeIP: 10.100.50.246
+      n6network:
+        enabled: true
+        name: n6network
+        type: ipvlan
+        masterIf: eth1
+        subnetIP: 10.0.2.0
+        cidr: 24
+        gatewayIP: 10.0.2.2
+        excludeIP: 10.0.2.254
+      n9network:
+        enabled: true
+        name: n9network
+        type: ipvlan
+        masterIf: eth0
+        subnetIP: 10.100.50.224
+        cidr: 29
+        gatewayIP: 10.100.50.230
+        excludeIP: 10.100.50.230
 
 
 # These parameters can be used to enable/disable deployment of subcharts

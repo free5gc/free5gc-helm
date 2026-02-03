@@ -32,6 +32,14 @@ spec:
     metadata:
       annotations:
         {{- include "free5gc-smf.smfAnnotations" $ | nindent 8 }}
+        {{- if and $.Values.isPfcpNeeded $.Values.global.smf.multus.n4network.enabled $.Values.global.smf.multus.enabled}}
+        k8s.v1.cni.cncf.io/networks: '[
+            { "name": "{{ $.Values.global.smf.multus.n4network.name }}-{{ include "free5gc-smf.fullname" $ }}",
+              "interface": "n4",
+              "ips": [ "{{ $.Values.global.smf.multus.n4if.ipAddress }}/{{ $.Values.global.smf.multus.n4network.cidr }}" ],
+              "gateway": [ "{{ $.Values.global.smf.multus.n4network.gatewayIP }}" ]
+            }]'
+        {{- end }}
         {{- if $.Values.smf.configuration.metrics.enable }}
         prometheus.io/scrape: "true"
         prometheus.io/path: "/metrics"

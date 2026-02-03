@@ -33,23 +33,25 @@ spec:
     metadata:
       annotations:
         {{- include "free5gc-upf.upfAnnotations" $ | nindent 8 }}
+        {{- if $.Values.global.upf.multus.enabled }}
         k8s.v1.cni.cncf.io/networks: '[
-            { "name": "{{ $.Values.global.n3network.name }}-{{ include "free5gc-upf.fullname" $ }}",
+            { "name": "{{ $.Values.global.upf.multus.n3network.name }}-{{ include "free5gc-upf.fullname" $ }}",
               "interface": "n3",
-              "ips": [ "{{ .n3if.ipAddress }}/{{ $.Values.global.n3network.cidr }}" ],
-              "gateway": [ "{{ $.Values.global.n3network.gatewayIP }}" ]
+              "ips": [ "{{ $.Values.global.upf.multus.upf.n3if.ipAddress }}/{{ $.Values.global.upf.multus.n3network.cidr }}" ],
+              "gateway": [ "{{ $.Values.global.upf.multus.n3network.gatewayIP }}" ]
             },
-            { "name": "{{ $.Values.global.n6network.name }}-{{ include "free5gc-upf.fullname" $ }}",
+            { "name": "{{ $.Values.global.upf.multus.n6network.name }}-{{ include "free5gc-upf.fullname" $ }}",
               "interface": "n6",
-              "ips": [ "{{ .n6if.ipAddress }}/{{ $.Values.global.n6network.cidr }}" ],
-              "gateway": [ "{{ $.Values.global.n6network.gatewayIP }}" ]
+              "ips": [ "{{ $.Values.global.upf.multus.upf.n6if.ipAddress }}/{{ $.Values.global.upf.multus.n6network.cidr }}" ],
+              "gateway": [ "{{ $.Values.global.upf.multus.n6network.gatewayIP }}" ]
             },
-            { "name": "{{ $.Values.global.n4network.name }}-{{ include "free5gc-upf.fullname" $ }}",
+            { "name": "{{ $.Values.global.upf.multus.n4network.name }}-{{ include "free5gc-upf.fullname" $ }}",
               "interface": "n4",
-              "ips": [ "{{ .n4if.ipAddress }}/{{ $.Values.global.n4network.cidr }}" ],
-              "gateway": [ "{{ $.Values.global.n4network.gatewayIP }}" ]
+              "ips": [ "{{ $.Values.global.upf.multus.upf.n4if.ipAddress }}/{{ $.Values.global.upf.multus.n4network.cidr }}" ],
+              "gateway": [ "{{ $.Values.global.upf.multus.n4network.gatewayIP }}" ]
             }
             ]'
+        {{- end }}
         checksum/config: {{ include (print $.Template.BasePath "/upf/upf-configmap.yaml") $ | sha256sum }}
       labels:
         {{- include "free5gc-upf.selectorLabels" $ | nindent 8 }}
