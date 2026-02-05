@@ -74,10 +74,10 @@ UPF Pod Annotations
 {{- end }}
 
 {{/*
-UPFb Pod Annotations
+iupf1 Pod Annotations
 */}}
-{{- define "free5gc-upf.upfbAnnotations" -}}
-{{- with .Values.upfb }}
+{{- define "free5gc-upf.iupf1Annotations" -}}
+{{- with .Values.iupf1 }}
 {{- if .podAnnotations }}
 {{- toYaml .podAnnotations }}
 {{- end }}
@@ -85,10 +85,10 @@ UPFb Pod Annotations
 {{- end }}
 
 {{/*
-UPF1 Pod Annotations
+psaupf1 Pod Annotations
 */}}
-{{- define "free5gc-upf.upf1Annotations" -}}
-{{- with .Values.upf1 }}
+{{- define "free5gc-upf.psaupf1Annotations" -}}
+{{- with .Values.psaupf1 }}
 {{- if .podAnnotations }}
 {{- toYaml .podAnnotations }}
 {{- end }}
@@ -96,10 +96,10 @@ UPF1 Pod Annotations
 {{- end }}
 
 {{/*
-UPF2 Pod Annotations
+psaupf2 Pod Annotations
 */}}
-{{- define "free5gc-upf.upf2Annotations" -}}
-{{- with .Values.upf2 }}
+{{- define "free5gc-upf.psaupf2Annotations" -}}
+{{- with .Values.psaupf2 }}
 {{- if .podAnnotations }}
 {{- toYaml .podAnnotations }}
 {{- end }}

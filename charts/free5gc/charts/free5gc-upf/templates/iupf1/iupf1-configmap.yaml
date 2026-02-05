@@ -11,7 +11,7 @@
 # Software description: An open-source project providing Helm charts to deploy 5G components (Core + RAN) on top of Kubernetes
 #
 {{- if eq .Values.global.userPlaneArchitecture "ulcl" }}
-{{- with .Values.upfb }}
+{{- with .Values.iupf1 }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -52,8 +52,8 @@ data:
     iptables -t nat -A POSTROUTING -o n9 -j MASQUERADE
     iptables -t nat -A POSTROUTING -o n3 -j MASQUERADE
 
-    {{- if $.Values.upfb.configmap.wrapperAdditionalCommands }}
-    {{- $.Values.upfb.configmap.wrapperAdditionalCommands | toYaml | indent 2 }}
+    {{- if $.Values.iupf1.configmap.wrapperAdditionalCommands }}
+    {{- $.Values.iupf1.configmap.wrapperAdditionalCommands | toYaml | indent 2 }}
     {{- end }}
 
     /free5gc/upf -c {{ .volume.mount }}/upfcfg.yaml
