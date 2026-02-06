@@ -59,7 +59,7 @@ In this section, we'll suppose that you have only one interface on each Kubernet
 
 In addition, please make sure `global.n6network.subnetIP`, `global.n6network.gatewayIP` and `upf.n6if.ipAddress` parameters will match the IP address of the `toto` interface in order to make the UPF able to reach the Data Network via its N6 interface.
 
-In case of ULCL enabled take care about `upfb.n6if.ipAddress`, `upf1.n6if.ipAddress` and `upf2.n6if.ipAddress` instead of `upf.n6if.ipAddress`.
+In case of ULCL enabled take care about `iupf1.n6if.ipAddress`, `psaupf1.n6if.ipAddress` and `psaupf2.n6if.ipAddress` instead of `upf.n6if.ipAddress`.
 
 ## Customized installation
 This chart allows you to customize its installation. The table below shows the parameters that can be modified before installing the chart or when upgrading it as well as their default values.
@@ -127,48 +127,48 @@ These parameters if `global.userPlaneArchitecture` is set to `signle`.
 | `upf.n4if.ipAddress` | The IP address of the UPF’s N4 interface. | `10.100.50.241` |
 | `upf.n6if.ipAddress` | The IP address of the UPF’s N6 interface. | `10.100.100.12` |
 
-### UPF1 parameters
+### psaupf1 parameters
 These parameters if `global.userPlaneArchitecture` is set to `ulcl`.
 
 | Parameter | Description | Default value |
 | --- | --- | --- |
-| `upf1.name` | The Network Function name of UPF1. | `upf1` |
-| `upf1.replicaCount` | The number of UPF1 replicas. | `1` |
+| `psaupf1.name` | The Network Function name of psaupf1. | `psaupf1` |
+| `psaupf1.replicaCount` | The number of psaupf1 replicas. | `1` |
 | `upf.image.name` | The UPF Docker image name. | `towards5gs/free5gc-upf` |
 | `upf.image.tag` | The UPF Docker image tag. | `defaults to the chart AppVersion` |
-| `upf1.volume.mount` | The path to the folder where configuration files should be mounted. | `/free5gc/config/` |
-| `upf1.n4if.ipAddress` | The IP address of the UPF1’s N4 interface. | `10.100.50.242` |
-| `upf1.n6if.ipAddress` | The IP address of the UPF1’s N6 interface. | `10.100.100.13` |
-| `upf1.n9if.ipAddress` | The IP address of the UPF1’s N9 interface. | `10.100.50.226` |
+| `psaupf1.volume.mount` | The path to the folder where configuration files should be mounted. | `/free5gc/config/` |
+| `psaupf1.n4if.ipAddress` | The IP address of the psaupf1 N4 interface. | `10.100.50.242` |
+| `psaupf1.n6if.ipAddress` | The IP address of the psaupf1 N6 interface. | `10.100.100.13` |
+| `psaupf1.n9if.ipAddress` | The IP address of the psaupf1 N9 interface. | `10.100.50.226` |
 
-### UPF2 parameters
+### psaupf2 parameters
 These parameters if `global.userPlaneArchitecture` is set to `ulcl`.
 
 | Parameter | Description | Default value |
 | --- | --- | --- |
-| `upf2.name` | The Network Function name of UPF2. | `upf2` |
-| `upf2.replicaCount` | The number of UPF2 replicas. | `1` |
+| `psaupf2.name` | The Network Function name of psaupf2. | `psaupf2` |
+| `psaupf2.replicaCount` | The number of psaupf2 replicas. | `1` |
 | `upf.image.name` | The UPF Docker image name. | `towards5gs/free5gc-upf` |
 | `upf.image.tag` | The UPF Docker image tag. | `defaults to the chart AppVersion` |
-| `upf2.volume.mount` | The path to the folder where configuration files should be mounted. | `/free5gc/config/` |
-| `upf2.n4if.ipAddress` | The IP address of the UPF2’s N4 interface. | `10.100.50.243` |
-| `upf2.n6if.ipAddress` | The IP address of the UPF2’s N6 interface. | `10.100.100.14` |
-| `upf2.n9if.ipAddress` | The IP address of the UPF2’s N9 interface. | `10.100.50.227` |
+| `psaupf2.volume.mount` | The path to the folder where configuration files should be mounted. | `/free5gc/config/` |
+| `psaupf2.n4if.ipAddress` | The IP address of the psaupf2’s N4 interface. | `10.100.50.243` |
+| `psaupf2.n6if.ipAddress` | The IP address of the psaupf2’s N6 interface. | `10.100.100.14` |
+| `psaupf2.n9if.ipAddress` | The IP address of the psaupf2’s N9 interface. | `10.100.50.227` |
 
-### UPFb parameters
+### iupf1 parameters
 These parameters if `global.userPlaneArchitecture` is set to `ulcl`.
 
 | Parameter | Description | Default value |
 | --- | --- | --- |
-| `upfb.name` | The Network Function name of UPFb. | `upfb` |
-| `upfb.replicaCount` | The number of UPFb replicas. | `1` |
+| `iupf1.name` | The Network Function name of iupf1. | `iupf1` |
+| `iupf1.replicaCount` | The number of iupf1 replicas. | `1` |
 | `upf.image.name` | The UPF Docker image name. | `towards5gs/free5gc-upf` |
 | `upf.image.tag` | The UPF Docker image tag. | `defaults to the chart AppVersion` |
-| `upfb.volume.mount` | The path to the folder where configuration files should be mounted. | `/free5gc/config/` |
-| `upfb.n3if.ipAddress` | The IP address of the UPFb’s N3 interface. | `10.100.50.233` |
-| `upfb.n4if.ipAddress` | The IP address of the UPFb’s N4 interface. | `10.100.50.241` |
-| `upfb.n6if.ipAddress` | The IP address of the UPFb’s N6 interface. | `10.100.100.12` |
-| `upfb.n9if.ipAddress` | The IP address of the UPFb’s N9 interface. | `10.100.50.225` |
+| `iupf1.volume.mount` | The path to the folder where configuration files should be mounted. | `/free5gc/config/` |
+| `iupf1.n3if.ipAddress` | The IP address of the iupf1’s N3 interface. | `10.100.50.233` |
+| `iupf1.n4if.ipAddress` | The IP address of the iupf1’s N4 interface. | `10.100.50.241` |
+| `iupf1.n6if.ipAddress` | The IP address of the iupf1’s N6 interface. | `10.100.100.12` |
+| `iupf1.n9if.ipAddress` | The IP address of the iupf1’s N9 interface. | `10.100.50.225` |
 
 ## Known limitations
 Currently, this Helm chart uses the [MACVLAN plugin](https://www.cni.dev/plugins/main/macvlan/) for all network attachment definition. However, the use of a Userspace CNI plugin like [SR-IOV] is necessary for user plane traffic (N3 and N6 interfaces). Using this CNI plugin may be possible in next versions.

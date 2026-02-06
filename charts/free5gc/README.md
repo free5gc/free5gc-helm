@@ -125,7 +125,7 @@ In this section, we'll suppose that you have only one interface on each Kubernet
 
 In addition, please make sure `global.n6network.subnetIP`, `global.n6network.gatewayIP` and `free5gc-upf.upf.n6if.ipAddress` parameters will match the IP address of the `toto` interface in order to make the UPF able to reach the Data Network via its N6 interface.
 
-In case of ULCL enabled take care about `free5gc-upf.upfb.n6if.ipAddress`, `free5gc-upf.upf1.n6if.ipAddress` and `free5gc-upf.upf2.n6if.ipAddress` instead of `free5gc-upf.upf.n6if.ipAddress`.
+In case of ULCL enabled take care about `free5gc-upf.iupf1.n6if.ipAddress`, `free5gc-upf.psaupf1.n6if.ipAddress` and `free5gc-upf.psaupf2.n6if.ipAddress` instead of `free5gc-upf.upf.n6if.ipAddress`.
 
 ## Customized installation
 This chart allows you to customize its installation. The table below shows the parameters that can be modified before installing the chart or when upgrading it as well as their default values.
