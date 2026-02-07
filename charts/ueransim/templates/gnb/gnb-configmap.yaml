@@ -26,9 +26,8 @@ data:
     
 {{- if $.Values.global.gnb.multus.enabled }}
     linkIp: 0.0.0.0   # gNB's local IP address for Radio Link Simulation (listen on all interfaces for UE connection)
-    # gNB's local IP address for N2 Interface (Usually same with local IP)
 {{- if .amf.service.ngap.enabled }}
-    ngapIp: 0.0.0.0   
+    ngapIp: 0.0.0.0
 {{- else }}
     ngapIp: {{ .n2if.ipAddress }} 
 {{- end }}

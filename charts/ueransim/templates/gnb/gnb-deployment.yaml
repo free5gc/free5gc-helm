@@ -61,7 +61,11 @@ spec:
         {{- with $.Values.initcontainers.sctp_test }}
         image: {{ .image }}:{{ .tag }}
         {{- end }}
+{{- if $.Values.global.gnb.multus.enabled }}
+        command: ["sh", "-c", "until sctp_test -s -H 0.0.0.0 -P 25000 -h {{ .amf.n2if.ipAddress }} -p {{ .amf.n2if.port }}; do echo waiting for the AMF; sleep 2; done;"]
+{{- else }}
         command: ["sh", "-c", "until sctp_test -s -H 0.0.0.0 -P 25000 -h {{ $.Values.global.free5gcReleaseName }}-{{ .amf.n2if.serviceName }} -p {{ .amf.n2if.port }}; do echo waiting for the AMF; sleep 2; done;"]
+{{- end }}
       containers:
       - image: {{ .image.name }}:{{ .image.tag | default $.Chart.AppVersion }}
         name: {{ .name }}
@@ -72,8 +76,13 @@ spec:
         securityContext:
           capabilities:
             add: ["NET_ADMIN"]
+{{- if $.Values.global.gnb.multus.enabled }}
+        command: ["./nr-gnb"]
+        args: ["-c", "{{ .volume.mount }}/gnb-config.yaml"]
+{{- else }}
         command: ["/bin/sh", "-c"]
         args: ["cp /ueransim/config/wrapper.sh /tmp/wrapper.sh && chmod +x /tmp/wrapper.sh && /tmp/wrapper.sh"]
+{{- end }}  
         volumeMounts:
         - mountPath: {{ .volume.mount }}
           name: {{ .volume.name }}

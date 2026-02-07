@@ -44,7 +44,7 @@ global:
         excludeIP: 10.100.50.254
     service:
       ngap:
-        enabled: true  # Enable NGAP service for external access
+        enabled: false  # Enable NGAP service for external access
         name: amf-n2
         port: 38412
         nodeport: 31412
