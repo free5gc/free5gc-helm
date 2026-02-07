@@ -37,22 +37,22 @@ spec:
         k8s.v1.cni.cncf.io/networks: '[
             { "name": "{{ $.Values.global.upf.multus.n3network.name }}-{{ include "free5gc-upf.fullname" $ }}",
               "interface": "n3",
-              "ips": [ "{{ $.Values.global.upf.multus.upfb.n3if.ipAddress }}/{{ $.Values.global.upf.multus.n3network.cidr }}" ],
+              "ips": [ "{{ $.Values.global.upf.multus.iupf1.n3if.ipAddress }}/{{ $.Values.global.upf.multus.n3network.cidr }}" ],
               "gateway": [ "{{ $.Values.global.upf.multus.n3network.gatewayIP }}" ]
             },
             { "name": "{{ $.Values.global.upf.multus.n9network.name }}-{{ include "free5gc-upf.fullname" $ }}",
               "interface": "n9",
-              "ips": [ "{{ $.Values.global.upf.multus.upfb.n9if.ipAddress }}/{{ $.Values.global.upf.multus.n9network.cidr }}" ],
+              "ips": [ "{{ $.Values.global.upf.multus.iupf1.n9if.ipAddress }}/{{ $.Values.global.upf.multus.n9network.cidr }}" ],
               "gateway": [ "{{ $.Values.global.upf.multus.n9network.gatewayIP }}" ]
             },
             { "name": "{{ $.Values.global.upf.multus.n4network.name }}-{{ include "free5gc-upf.fullname" $ }}",
               "interface": "n4",
-              "ips": [ "{{ $.Values.global.upf.multus.upfb.n4if.ipAddress }}/{{ $.Values.global.upf.multus.n4network.cidr }}" ],
+              "ips": [ "{{ $.Values.global.upf.multus.iupf1.n4if.ipAddress }}/{{ $.Values.global.upf.multus.n4network.cidr }}" ],
               "gateway": [ "{{ $.Values.global.upf.multus.n4network.gatewayIP }}" ]
             },
             { "name": "{{ $.Values.global.upf.multus.n6network.name }}-{{ include "free5gc-upf.fullname" $ }}",
               "interface": "n6",
-              "ips": [ "{{ $.Values.global.upf.multus.upfb.n6if.ipAddress }}/{{ $.Values.global.upf.multus.n6network.cidr }}" ],
+              "ips": [ "{{ $.Values.global.upf.multus.iupf1.n6if.ipAddress }}/{{ $.Values.global.upf.multus.n6network.cidr }}" ],
               "gateway": [ "{{ $.Values.global.upf.multus.n6network.gatewayIP }}" ]
             }
             ]'

@@ -79,21 +79,21 @@ global:
           ipAddress: 10.100.50.241
         n6if:
           ipAddress: 10.0.2.11
-      upf1:
+      psaupf1:
         n4if:
           ipAddress: 10.100.50.242
         n6if:
           ipAddress: 10.0.2.12
         n9if:
           ipAddress: 10.100.50.225
-      upf2:
+      psaupf2:
         n4if:
           ipAddress: 10.100.50.243
         n6if:
           ipAddress: 10.0.2.13
         n9if:
           ipAddress: 10.100.50.226
-      upfb:
+      iupf1:
         n3if:
           ipAddress: 10.100.50.234
         n4if:

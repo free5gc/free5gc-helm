@@ -166,7 +166,7 @@ smf:
             type: AN # the type of the node (AN or UPF)
           BranchingUPF:
             type: UPF
-            nodeID: UPFB_SERVICE_NAME # PFCP address - will be replaced by wrapper script
+            nodeID: IUPF1_SERVICE_NAME # PFCP address - will be replaced by wrapper script
             sNssaiUpfInfos:
               - sNssai:
                   sst: 1
@@ -178,17 +178,17 @@ smf:
             interfaces:
               - interfaceType: N3
                 endpoints:
-                  - UPFB_SERVICE_NAME
+                  - IUPF1_SERVICE_NAME
                 networkInstances: 
                   - internet
               - interfaceType: N9
                 endpoints:
-                  - UPFB_SERVICE_NAME
+                  - IUPF1_SERVICE_NAME
                 networkInstances: 
                   - internet
           AnchorUPF1:
             type: UPF
-            nodeID: UPF1_SERVICE_NAME # PFCP address - will be replaced by wrapper script
+            nodeID: PSAUPF1_SERVICE_NAME # PFCP address - will be replaced by wrapper script
             sNssaiUpfInfos:
               - sNssai:
                   sst: 1
@@ -200,12 +200,12 @@ smf:
             interfaces:
               - interfaceType: N9
                 endpoints:
-                  - UPF1_SERVICE_NAME
+                  - PSAUPF1_SERVICE_NAME
                 networkInstances: 
                   - internet
           AnchorUPF2:
             type: UPF
-            nodeID: UPF2_SERVICE_NAME # PFCP address - will be replaced by wrapper script
+            nodeID: PSAUPF2_SERVICE_NAME # PFCP address - will be replaced by wrapper script
             sNssaiUpfInfos:
               - sNssai:
                   sst: 1
@@ -217,7 +217,7 @@ smf:
             interfaces:
               - interfaceType: N9
                 endpoints:
-                  - UPF2_SERVICE_NAME
+                  - PSAUPF2_SERVICE_NAME
                 networkInstances: 
                   - internet
         links:

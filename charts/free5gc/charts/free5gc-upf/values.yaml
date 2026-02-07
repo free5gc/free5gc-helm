@@ -30,21 +30,21 @@ global:
           ipAddress: 10.100.50.241
         n6if:
           ipAddress: 10.100.100.11
-      upf1:
+      psaupf1:
         n4if:
           ipAddress: 10.100.50.242
         n6if:
           ipAddress: 10.100.100.12
         n9if:
           ipAddress: 10.100.50.225
-      upf2:
+      psaupf2:
         n4if:
           ipAddress: 10.100.50.243
         n6if:
           ipAddress: 10.100.100.13
         n9if:
           ipAddress: 10.100.50.226
-      upfb:
+      iupf1:
         n3if:
           ipAddress: 10.100.50.234
         n4if:
@@ -409,9 +409,9 @@ iupf1:
     targetCPUUtilizationPercentage: 80
     # targetMemoryUtilizationPercentage: 80
   configuration:
-    dnnList: # The DNN list supported by UPF - UPFB needs full /16 to handle all UE traffic
+    dnnList: # The DNN list supported by UPF - iupf1 needs full /16 to handle all UE traffic
       - dnn: internet # Data Network Name
-        cidr: 10.60.0.0/16 # Full UE subnet for branching UPF
+        cidr: 10.60.0.0/16 # Full UE subnet for branching UPF (iupf1)
         # natifname: n6
 
     logger: # log output setting
