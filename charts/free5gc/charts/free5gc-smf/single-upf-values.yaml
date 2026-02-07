@@ -29,15 +29,20 @@ global:
       nodePort: "30800"
   sbi:
     scheme: http
-  n4network:
-    enabled: false
-    name: n4network
-    type: ipvlan
-    masterIf: enp0s3
-    subnetIP: 10.100.50.240
-    cidr: 29
-    gatewayIP: 10.100.50.246
-    excludeIP: 10.100.50.246
+  smf:
+    multus:
+      enabled: false
+      n4if:  # PFCP interface (used when multus.enabled=true)
+        ipAddress: 10.100.50.244
+      n4network:
+        enabled: true
+        name: n4network
+        type: ipvlan
+        masterIf: eth0
+        subnetIP: 10.100.50.240
+        cidr: 29
+        gatewayIP: 10.100.50.246
+        excludeIP: 10.100.50.246
 
 initcontainers:
   curl:
@@ -97,10 +102,13 @@ smf:
     successThreshold: 1
   livenessProbe:
     enabled: true
-    httpGet:
-      path: /nsmf-pdusession/v1/
-      scheme: HTTP
-      port: *Port
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - |
+          HEX_PORT=$(printf '%04X' "{{ .service.port }}")
+          grep -q ":${HEX_PORT} .* 0A " /proc/net/tcp || grep -q ":${HEX_PORT} .* 0A " /proc/net/tcp6
     initialDelaySeconds: 50
     periodSeconds: 10
     timeoutSeconds: 10
@@ -159,7 +167,6 @@ smf:
           UPF:
             type: UPF
             nodeID: UPF_SERVICE_NAME # PFCP address
-            addr: UPF_SERVICE_NAME
             sNssaiUpfInfos:
               - sNssai:
                   sst: 1
@@ -167,7 +174,9 @@ smf:
                 dnnUpfInfoList:
                   - dnn: internet
                     pools:
-                    - cidr: 10.60.0.0/16
+                      - cidr: 10.60.0.0/16
+                    dnaiList:
+                      - mec
             interfaces:
               - interfaceType: N3
                 endpoints:
@@ -197,6 +206,13 @@ smf:
         # node name should be consistent with smfcfg.yaml
           - A: gNB1
             B: UPF
+
+    # Metrics configuration
+    metrics:
+      enable: false # (Optional, default false)
+      scheme: http # (Required) the protocol for metrics (http or https, default https)
+      port: 9091 # (Optional, default 9091) port used to bind the service
+      namespace: free5gc # (Optional, default free5gc)
 
     logger: # log output setting
       enable: true # true or false
