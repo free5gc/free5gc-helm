@@ -428,7 +428,7 @@ initdbScriptsConfigMap: ""
 ## @param args Override default container args (useful when using custom images)
 ##
 command:
-  - "/usr/bin/tini"
+  - "/tmp/tini"
   - "--"
   - "/opt/bitnami/scripts/mongodb/entrypoint.sh"
 args:
@@ -691,7 +691,19 @@ customStartupProbe: {}
 ##       - name: portname
 ##         containerPort: 1234
 ##
-initContainers: []
+initContainers:
+  - name: install-tini
+    image: debian:12-slim
+    command:
+      - sh
+      - -c
+      - |
+        apt-get update && apt-get install -y tini
+        cp /usr/bin/tini /tmp/tini
+        chmod +x /tmp/tini
+    volumeMounts:
+      - name: tini-volume
+        mountPath: /tmp
 ## @param sidecars Add additional sidecar containers for the MongoDB(&reg;) pod(s)
 ## Example:
 ## sidecars:
@@ -726,13 +738,19 @@ sidecars: []
 ##     mountPath: /usr/share/extras
 ##     readOnly: true
 ##
-extraVolumeMounts: []
+extraVolumeMounts:
+  - name: tini-volume
+    mountPath: /tmp/tini
+    subPath: tini
+    readOnly: true
 ## @param extraVolumes Optionally specify extra list of additional volumes to the MongoDB(&reg;) statefulset
 ## extraVolumes:
 ##   - name: extras
 ##     emptyDir: {}
 ##
-extraVolumes: []
+extraVolumes:
+  - name: tini-volume
+    emptyDir: {}
 ## MongoDB(&reg;) Pod Disruption Budget configuration
 ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
 ##
@@ -1188,7 +1206,7 @@ persistence:
   ## If undefined (the default) or set to null, no storageClassName spec is
   ## set, choosing the default provisioner.
   ##
-  storageClass: ""
+  storageClass: "microk8s-hostpath"
   ## @param persistence.accessModes PV Access Mode
   ##
   accessModes:
