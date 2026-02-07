@@ -59,9 +59,9 @@ smf:
   name: smf
   replicaCount: 1
   image:
-    name: localhost:32000/free5gc/smf-base
-    tag: v4.0.1
-    pullPolicy: Always 
+    name: free5gc/smf
+    tag: v4.1.0
+    pullPolicy: IfNotPresent 
   service:
     type: ClusterIP
     port: &Port 8080

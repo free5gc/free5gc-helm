@@ -78,19 +78,19 @@ global:
         n4if:
           ipAddress: 10.100.50.241
         n6if:
-          ipAddress: 10.0.2.11
+          ipAddress: 10.100.100.11
       psaupf1:
         n4if:
           ipAddress: 10.100.50.242
         n6if:
-          ipAddress: 10.0.2.12
+          ipAddress: 10.100.100.12
         n9if:
           ipAddress: 10.100.50.225
       psaupf2:
         n4if:
           ipAddress: 10.100.50.243
         n6if:
-          ipAddress: 10.0.2.13
+          ipAddress: 10.100.100.13
         n9if:
           ipAddress: 10.100.50.226
       iupf1:
@@ -99,7 +99,7 @@ global:
         n4if:
           ipAddress: 10.100.50.245
         n6if:
-          ipAddress: 10.0.2.14
+          ipAddress: 10.100.100.14
         n9if:
           ipAddress: 10.100.50.227
       n3network:
@@ -125,10 +125,10 @@ global:
         name: n6network
         type: ipvlan
         masterIf: eth1
-        subnetIP: 10.0.2.0
+        subnetIP: 10.100.100.0
         cidr: 24
-        gatewayIP: 10.0.2.2
-        excludeIP: 10.0.2.254
+        gatewayIP: 10.100.100.1
+        excludeIP: 10.100.100.254
       n9network:
         enabled: true
         name: n9network
@@ -155,7 +155,7 @@ deployUdm: true
 deployUdr: true
 deployUpf: true
 deployWebui: true
-deployDbPython: true
+deployDbPython: false
 
 # Disable the deployment of mongodb as an NRF subchart
 free5gc-nrf:

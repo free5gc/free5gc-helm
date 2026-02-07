@@ -51,7 +51,7 @@ n3iwf:
   image:
     name: free5gc/n3iwf
     tag: v4.2.0
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
   configmap:
     name: n3iwf-configmap
   volume:

@@ -15,10 +15,10 @@
 # Declare variables to be passed into your templates.
 
 global:
-  free5gcReleaseName: free5gc-v1  # Name of the free5gc helm release
+  free5gcReleaseName: free5gc-helm  # Name of the free5gc helm release
   gnb:
     multus:
-      enabled: true
+      enabled: false
       n2network:
         enabled: true
         name: n2network

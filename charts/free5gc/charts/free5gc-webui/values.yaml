@@ -63,7 +63,7 @@ webui:
   image:
     name: free5gc/webui
     tag: v4.2.0
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
   service:
     name: webui-service
     type: NodePort

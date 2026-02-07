@@ -96,7 +96,7 @@ upf:
   image:
     name: free5gc/upf
     tag: v4.2.0
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
   configmap:
     wrapperAdditionalCommands: ""
     # wrapperAdditionalCommands: |
@@ -179,7 +179,7 @@ psaupf1:
   image:
     name: free5gc/upf
     tag: v4.2.0
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
   configmap:
     wrapperAdditionalCommands: ""
     # wrapperAdditionalCommands: |
@@ -261,7 +261,7 @@ psaupf2:
   image:
     name: free5gc/upf
     tag: v4.2.0
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
   configmap:
     wrapperAdditionalCommands: ""
     # wrapperAdditionalCommands: |
@@ -343,7 +343,7 @@ iupf1:
   image:
     name: free5gc/upf
     tag: v4.2.0
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
   configmap:
     wrapperAdditionalCommands: ""
     # wrapperAdditionalCommands: |

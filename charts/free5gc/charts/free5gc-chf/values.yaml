@@ -48,7 +48,7 @@ chf:
   image:
     name: free5gc/chf
     tag: v4.2.0
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
   service:
     type: ClusterIP
     port: &Port 8080
