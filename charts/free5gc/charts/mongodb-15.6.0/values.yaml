@@ -78,7 +78,34 @@ clusterDomain: cluster.local
 ##       app.kubernetes.io/name: mongodb
 ##       primary: "true"
 ##
-extraDeploy: []
+## @param extraDeploy Array of extra objects to deploy with the release
+## The PersistentVolume below will be automatically created during helm install
+## To customize the storage path or node, edit the 'local.path' and 'nodeAffinity.values' fields
+##
+extraDeploy:
+  - apiVersion: v1
+    kind: PersistentVolume
+    metadata:
+      name: free5gc-pv-mongo
+      labels:
+        project: free5gc
+    spec:
+      capacity:
+        storage: 8Gi
+      accessModes:
+      - ReadWriteOnce
+      persistentVolumeReclaimPolicy: Retain
+      storageClassName: microk8s-hostpath
+      local:
+        path: /home/free5gc/mongo
+      nodeAffinity:
+        required:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+              - free5gc
 ## @param commonLabels Add labels to all the deployed resources (sub-charts are not considered). Evaluated as a template
 ##
 commonLabels: {}
