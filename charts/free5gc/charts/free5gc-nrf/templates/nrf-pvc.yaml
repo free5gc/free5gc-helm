@@ -16,4 +16,3 @@ spec:
   resources:
     requests:
       storage: 1Mi
-  volumeName: free5gc-pv-cert
