@@ -50,7 +50,7 @@ n3iwf:
   replicaCount: 1
   image:
     name: free5gc/n3iwf
-    tag: v4.1.0
+    tag: v4.2.0
     pullPolicy: Always
   configmap:
     name: n3iwf-configmap
@@ -58,18 +58,19 @@ n3iwf:
     name: n3iwf-volume
     mount: /free5gc/config/
     tlsmount: /free5gc/config/TLS
+    certmount: /free5gc/cert
   # network paramters
   n2if:  # NGAP
     ipAddress: 10.100.50.251
   n3if:  # GTPU
     ipAddress: 10.100.50.237
   ike:  # define an interface for the IKE daemon as mentioned in the free5gc github README.md
-    ipAddress: 172.16.10.5
+    ipAddress: 10.100.50.15
     name: ikenetwork
     masterIf: eth0
-    subnetIP: 172.16.10.0
+    subnetIP: 10.100.50.0
     cidr: 24
-    gatewayIP: 172.16.10.1
+    gatewayIP: 10.100.50.1
 
   podAnnotations: {}
     # additional annotations
@@ -105,52 +106,40 @@ n3iwf:
     # targetMemoryUtilizationPercentage: 80
 
   configuration:
-    IPSecInterfaceAddress: 10.0.0.1
-    configuration: |-
-      N3IWFInformation:
-        GlobalN3IWFID:
-          PLMNID:
-            MCC: 208
-            MNC: 93
-          N3IWFID: 135
-        Name:
-          free5GC_N3IWF
-        SupportedTAList:
-          - TAC: 000001
-            BroadcastPLMNList:
-              - PLMNID:
-                  MCC: 208
-                  MNC: 93
-                TAISliceSupportList:
-                  - SNSSAI:
-                      SST: 1
-                      SD: 010203
-                  - SNSSAI:
-                      SST: 1
-                      SD: 112233
-
-      # IPSec virtual interface
-      IPSecInterfaceAddress: 10.0.0.1
-
-      # IPSec virtual interface mark
-      IPSecInterfaceMark: 5
-
-      # NAS TCP Listen Port
-      NASTCPPort: 20000
-
-      # N3IWF FQDN
-      FQDN: n3iwf.free5gc.org
-
-      # Security
-      # Private Key File Path
-      PrivateKey: ../cert/n3iwf.key
-      # Certificate Authority (CA)
-      CertificateAuthority: ../cert/n3iwf.pem
-      # Certificate
-      Certificate: ../cert/n3iwf.pem
-
-      # IP address that will be allocated to UE in IPSec tunnel
-      UEIPAddressRange: 10.0.0.0/24
+    nasTcpPort: 20000
+    ikeBindAddress: 10.100.50.15
+    ipSecTunnelAddress: 10.0.0.1
+    ueIpAddressRange: 10.0.0.0/24
+    xfrmInterfaceName: ipsec
+    xfrmInterfaceID: 7
+    fqdn: n3iwf.free5gc.org
+    privateKey: ./cert/n3iwf.key
+    certificateAuthority: ./cert/n3iwf.pem
+    certificate: ./cert/n3iwf.pem
+    livenessCheck:
+      enable: true
+      transFreq: 60s
+      maxRetryTimes: 4
+    n3iwfInformation:
+      globalN3IWFID:
+        plmnID:
+          mcc: 208
+          mnc: 93
+        n3iwfID: 135
+      name: free5GC_N3IWF
+      supportedTAList:
+        - tac: "000001"
+          broadcastPlmnList:
+            - plmnID:
+                mcc: 208
+                mnc: 93
+              taiSliceSupportList:
+                - snssai:
+                    sst: 1
+                    sd: "010203"
+                - snssai:
+                    sst: 1
+                    sd: "112233"
 
     # Metrics configuration
     metrics:
