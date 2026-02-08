@@ -28,25 +28,27 @@ global:
   sbi:
     scheme: http
   amf:
-    n2if:  # NGAP
-      ipAddress: 10.100.50.249
+    multus:
+      enabled: false
+      n2if:  # NGAP interface (used when multus.enabled=true)
+        ipAddress: 10.100.50.249
+      n2network:
+        enabled: true
+        name: n2network
+        type: ipvlan
+        masterIf: eth0
+        subnetIP: 10.100.50.248
+        cidr: 29
+        gatewayIP: 10.100.50.254
+        excludeIP: 10.100.50.254
     service:
       ngap:
-        enabled: false
+        enabled: true  # Enable NGAP service for external access
         name: amf-n2
         port: 38412
         nodeport: 31412
         protocol: SCTP
         type: NodePort
-  n2network:
-    enabled: true
-    name: n2network
-    type: ipvlan
-    masterIf: eth0
-    subnetIP: 10.100.50.248
-    cidr: 29
-    gatewayIP: 10.100.50.254
-    excludeIP: 10.100.50.254
 
 initcontainers:
   curl:
@@ -65,10 +67,10 @@ amf:
   image:
     name: free5gc/amf
     tag: v4.2.0
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
   service:
     type: ClusterIP
-    port: 80
+    port: &Port 8080
   volume:
     mount: /free5gc/config/
     tlsmount: /free5gc/config/TLS
@@ -76,20 +78,44 @@ amf:
   podAnnotations: {}
     # additional annotations
   imagePullSecrets: []
-  podSecurityContext: {}
-  securityContext: {}
+  podSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    runAsNonRoot: true
+    fsGroup: 1000
+  securityContext:
+    allowPrivilegeEscalation: false
   resources:
     requests:
       cpu: 150m
       memory: 128Mi
+    limits:
+      cpu: 300m
+      memory: 256Mi
   readinessProbe:
-    initialDelaySeconds: 0
+    enabled: true
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - |
+          HEX_PORT=$(printf '%04X' "{{ .service.port }}")
+          grep -q ":${HEX_PORT} .* 0A " /proc/net/tcp || grep -q ":${HEX_PORT} .* 0A " /proc/net/tcp6
+    initialDelaySeconds: 10
     periodSeconds: 1
     timeoutSeconds: 1
     failureThreshold:  40
     successThreshold: 1
   livenessProbe:
-    initialDelaySeconds: 120
+    enabled: true
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - |
+          HEX_PORT=$(printf '%04X' "{{ .service.port }}")
+          grep -q ":${HEX_PORT} .* 0A " /proc/net/tcp || grep -q ":${HEX_PORT} .* 0A " /proc/net/tcp6
+    initialDelaySeconds: 50
     periodSeconds: 10
     timeoutSeconds: 10
     failureThreshold: 3

@@ -28,10 +28,10 @@ data:
         {{- .configuration.serviceNameList | nindent 8 }}
 
       ngapIpList:
-{{- if $.Values.global.amf.service.ngap.enabled }}
-        - 0.0.0.0
+{{- if $.Values.global.amf.multus.enabled }}
+        - {{ $.Values.global.amf.multus.n2if.ipAddress }}
 {{- else }}
-        - {{ $.Values.global.amf.n2if.ipAddress }}
+        - 0.0.0.0  # Bind to all interfaces for cloud-native deployment
 {{- end }}
       ngapPort: {{ $.Values.global.amf.service.ngap.port }} # the SCTP port listened by NGAP
       sbi:

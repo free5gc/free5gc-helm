@@ -33,23 +33,25 @@ spec:
     metadata:
       annotations:
         {{- include "free5gc-upf.psaupf2Annotations" $ | nindent 8 }}
+        {{- if $.Values.global.upf.multus.enabled }}
         k8s.v1.cni.cncf.io/networks: '[
-            { "name": "{{ $.Values.global.n9network.name }}-{{ include "free5gc-upf.fullname" $ }}",
+            { "name": "{{ $.Values.global.upf.multus.n9network.name }}-{{ include "free5gc-upf.fullname" $ }}",
               "interface": "n9",
-              "ips": [ "{{ .n9if.ipAddress }}/{{ $.Values.global.n9network.cidr }}" ],
-              "gateway": [ "{{ $.Values.global.n9network.gatewayIP }}" ]
+              "ips": [ "{{ $.Values.global.upf.multus.psaupf2.n9if.ipAddress }}/{{ $.Values.global.upf.multus.n9network.cidr }}" ],
+              "gateway": [ "{{ $.Values.global.upf.multus.n9network.gatewayIP }}" ]
             },
-            { "name": "{{ $.Values.global.n6network.name }}-{{ include "free5gc-upf.fullname" $ }}",
+            { "name": "{{ $.Values.global.upf.multus.n6network.name }}-{{ include "free5gc-upf.fullname" $ }}",
               "interface": "n6",
-              "ips": [ "{{ .n6if.ipAddress }}/{{ $.Values.global.n6network.cidr }}" ],
-              "gateway": [ "{{ $.Values.global.n6network.gatewayIP }}" ]
+              "ips": [ "{{ $.Values.global.upf.multus.psaupf2.n6if.ipAddress }}/{{ $.Values.global.upf.multus.n6network.cidr }}" ],
+              "gateway": [ "{{ $.Values.global.upf.multus.n6network.gatewayIP }}" ]
             },
-            { "name": "{{ $.Values.global.n4network.name }}-{{ include "free5gc-upf.fullname" $ }}",
+            { "name": "{{ $.Values.global.upf.multus.n4network.name }}-{{ include "free5gc-upf.fullname" $ }}",
               "interface": "n4",
-              "ips": [ "{{ .n4if.ipAddress }}/{{ $.Values.global.n4network.cidr }}" ],
-              "gateway": [ "{{ $.Values.global.n4network.gatewayIP }}" ]
+              "ips": [ "{{ $.Values.global.upf.multus.psaupf2.n4if.ipAddress }}/{{ $.Values.global.upf.multus.n4network.cidr }}" ],
+              "gateway": [ "{{ $.Values.global.upf.multus.n4network.gatewayIP }}" ]
             }
             ]'
+        {{- end }}
         checksum/config: {{ include (print $.Template.BasePath "/psaupf2/psaupf2-configmap.yaml") $ | sha256sum }}
       labels:
         {{- include "free5gc-upf.selectorLabels" $ | nindent 8 }}
@@ -65,12 +67,47 @@ spec:
         image: {{ .image.name }}:{{ .image.tag | default $.Chart.AppVersion }}
         imagePullPolicy: {{ .image.pullPolicy }}
         securityContext:
-            {{- toYaml .securityContext | nindent 12 }}
+          {{- toYaml .securityContext | nindent 10 }}
         ports:
         - name: n4
           containerPort: 8805
           protocol: UDP
-        command: ["{{ .volume.mount }}/wrapper.sh"]
+        command:
+          - "/sbin/tini"
+          - "--"
+          - "{{ .volume.mount }}/wrapper.sh"
+        {{- if .readinessProbe.enabled }}
+        readinessProbe:
+          {{- if .readinessProbe.httpGet }}
+          httpGet:
+            {{- toYaml .readinessProbe.httpGet | nindent 12 }}
+          {{- end }}
+          {{- if .readinessProbe.exec }}
+          exec:
+            {{- toYaml .readinessProbe.exec | nindent 12 }}
+          {{- end }}
+          initialDelaySeconds: {{ .readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .readinessProbe.timeoutSeconds | default 1 }}
+          successThreshold: {{ .readinessProbe.successThreshold | default 1 }}
+          failureThreshold: {{ .readinessProbe.failureThreshold | default 3 }}
+        {{- end }}
+        {{- if .livenessProbe.enabled }}
+        livenessProbe:
+          {{- if .livenessProbe.httpGet }}
+          httpGet:
+            {{- toYaml .livenessProbe.httpGet | nindent 12 }}
+          {{- end }}
+          {{- if .livenessProbe.exec }}
+          exec:
+            {{- toYaml .livenessProbe.exec | nindent 12 }}
+          {{- end }}
+          initialDelaySeconds: {{ .livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .livenessProbe.timeoutSeconds | default 10 }}
+          successThreshold: {{ .livenessProbe.successThreshold | default 1 }}
+          failureThreshold: {{ .livenessProbe.failureThreshold | default 3 }}
+        {{- end }}
         volumeMounts:
         - mountPath: {{ .volume.mount }}
           name: {{ include "free5gc-upf.fullname" $ }}-{{ .name }}-volume

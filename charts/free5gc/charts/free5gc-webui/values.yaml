@@ -63,7 +63,7 @@ webui:
   image:
     name: free5gc/webui
     tag: v4.2.0
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
   service:
     name: webui-service
     type: NodePort
@@ -79,14 +79,23 @@ webui:
   podAnnotations: {}
     # additional annotations
   imagePullSecrets: []
-  podSecurityContext: {}
-  securityContext: {}
+  podSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    runAsNonRoot: true
+    fsGroup: 1000
+  securityContext:
+    allowPrivilegeEscalation: false
   resources:
     requests:
       cpu: 100m
       memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
   readinessProbe:
-    initialDelaySeconds: 0
+    enabled: true
+    initialDelaySeconds: 10
     periodSeconds: 1
     timeoutSeconds: 1
     failureThreshold:  40

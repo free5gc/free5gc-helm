@@ -32,12 +32,12 @@ spec:
     metadata:
       annotations:
         {{- include "free5gc-smf.smfAnnotations" $ | nindent 8 }}
-        {{- if and $.Values.isPfcpNeeded $.Values.global.n4network.enabled}}
+        {{- if and $.Values.isPfcpNeeded $.Values.global.smf.multus.n4network.enabled $.Values.global.smf.multus.enabled}}
         k8s.v1.cni.cncf.io/networks: '[
-            { "name": "{{ $.Values.global.n4network.name }}-{{ include "free5gc-smf.fullname" $ }}",
+            { "name": "{{ $.Values.global.smf.multus.n4network.name }}-{{ include "free5gc-smf.fullname" $ }}",
               "interface": "n4",
-              "ips": [ "{{ $.Values.global.smf.n4if.ipAddress }}/{{ $.Values.global.n4network.cidr }}" ],
-              "gateway": [ "{{ $.Values.global.n4network.gatewayIP }}" ]
+              "ips": [ "{{ $.Values.global.smf.multus.n4if.ipAddress }}/{{ $.Values.global.smf.multus.n4network.cidr }}" ],
+              "gateway": [ "{{ $.Values.global.smf.multus.n4network.gatewayIP }}" ]
             }]'
         {{- end }}
         {{- if $.Values.smf.configuration.metrics.enable }}
@@ -70,7 +70,7 @@ spec:
         image: "{{ .image.name }}{{ if .image.tag }}:{{ .image.tag }}{{ else if .image.digest }}@sha256:{{ .image.digest }}{{ else }}:{{ $.Chart.AppVersion }}{{ end }}"
         imagePullPolicy: {{ .image.pullPolicy }}
         securityContext:
-            {{- toYaml .securityContext | nindent 12 }}
+          {{- toYaml .securityContext | nindent 10 }}
         ports:
         - name: nsmf
           containerPort: {{ .service.port }}
@@ -83,18 +83,53 @@ spec:
         - name: metrics
           containerPort: {{ $.Values.smf.configuration.metrics.port }}
         {{- end }}
-        command: ["./smf"]
-        args: ["-c", "./config/smfcfg.yaml", "-u", "./config/uerouting.yaml"]
+        command:
+          - "/sbin/tini"
+          - "--"
+          - "/bin/sh"
+          - "{{ .volume.mount }}/wrapper.sh"
         env:
           - name: GIN_MODE
             value: release
+        {{- if .readinessProbe.enabled }}
+        readinessProbe:
+          {{- if .readinessProbe.httpGet }}
+          httpGet:
+            {{- toYaml .readinessProbe.httpGet | nindent 12 }}
+          {{- end }}
+          {{- if .readinessProbe.exec }}
+          exec:
+            {{- tpl (toYaml .readinessProbe.exec) . | nindent 12 }}
+          {{- end }}
+          initialDelaySeconds: {{ .readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .readinessProbe.timeoutSeconds | default 1 }}
+          successThreshold: {{ .readinessProbe.successThreshold | default 1 }}
+          failureThreshold: {{ .readinessProbe.failureThreshold | default 3 }}
+        {{- end }}
+        {{- if .livenessProbe.enabled }}
+        livenessProbe:
+          {{- if .livenessProbe.httpGet }}
+          httpGet:
+            {{- toYaml .livenessProbe.httpGet | nindent 12 }}
+          {{- end }}
+          {{- if .livenessProbe.exec }}
+          exec:
+            {{- tpl (toYaml .livenessProbe.exec) . | nindent 12 }}
+          {{- end }}
+          initialDelaySeconds: {{ .livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .livenessProbe.timeoutSeconds | default 10 }}
+          successThreshold: {{ .livenessProbe.successThreshold | default 1 }}
+          failureThreshold: {{ .livenessProbe.failureThreshold | default 3 }}
+        {{- end }}
         volumeMounts:
         - mountPath: {{ .volume.mount }}
           name: {{ include "free5gc-smf.fullname" $ }}-volume
         - mountPath: {{ .volume.tlsmount }}
           name: {{ include "free5gc-smf.fullname" $ }}-empty-volume
         - mountPath: {{ .volume.certmount }}
-          name: {{ include "free5gc-smf.fullname" $ }}-cert-pvc
+          name: {{ include "free5gc-smf.fullname" $ }}-cert-volume
         resources:
             {{- toYaml .resources | nindent 12 }}
       dnsPolicy: ClusterFirst
@@ -117,9 +152,25 @@ spec:
                 path: smfcfg.yaml
               - key: uerouting.yaml
                 path: uerouting.yaml
+              - key: wrapper.sh
+                path: wrapper.sh
+                mode: 0777
       - name: {{ include "free5gc-smf.fullname" $ }}-empty-volume
         emptyDir: {}
-      - name: {{ include "free5gc-smf.fullname" $ }}-cert-pvc
-        persistentVolumeClaim:
-          claimName: cert-pvc
+      - name: {{ include "free5gc-smf.fullname" $ }}-cert-volume
+        projected:
+          defaultMode: 0400
+          sources:
+          - secret:
+              name: {{ printf "%s-smf-tls-secret" $.Release.Name }}
+              items:
+                - key: smf.pem
+                  path: smf.pem
+                - key: smf.key
+                  path: smf.key
+          - configMap:
+              name: free5gc-public-certs
+              items:
+                - key: nrf.pem
+                  path: nrf.pem
 {{- end }}
