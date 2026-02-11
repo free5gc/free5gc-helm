@@ -195,10 +195,6 @@ data:
     # This ensures SMF's nodeID matches what UPF reports in PFCP responses
     echo "[wrapper] Resolving UPF Pod IPs from Headless Services..."
 
-    # Wait for DNS to be ready and UPF pods to be running
-    echo "[wrapper] Waiting for UPF pods to be ready..."
-    sleep 10
-
     # Resolve headless service names to Pod IPs with extended retry
     IUPF1_IP=""
     PSAUPF1_IP=""
