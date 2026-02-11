@@ -88,8 +88,57 @@ helm -n <namespace> uninstall <release-name>
 
 ## Configuration
 
-### Enable the ULCL feature
-If you want to enable the ULCL feature, you can use the [ulcl-enabled-values.yaml](./ulcl-enabled-values.yaml) to override the default chart values.
+### Connection for UERANSIM (Without Multus CNI)
+
+If Multus CNI is not enabled and you need to use UERANSIM for connectivity:
+
+- **Modify `charts/ueransim/values.yaml`:**
+    - Update `global.free5gcReleaseName` to match your `helm install` specific **release name**.
+
+### Enable Multus CNI
+
+- Currently, free5gc-helm does not use Multus CNI by default.
+- To enable it, follow these steps:
+    - **`charts/free5gc/values.yaml`**:
+        - Set `global.amf.multus.enabled`, `global.smf.multus.enabled`, and `global.upf.multus.enabled` to `true`.
+        - Set `global.amf.service.ngap.enabled` to `false`.
+    - **`charts/ueransim/values.yaml`**:
+        - Set `global.gnb.multus.enabled` to `true`.
+
+### Multus CNI Configuration
+
+When Multus CNI is enabled, update **`charts/free5gc/values.yaml`** with the following settings:
+
+**1. Network Interface Setup**
+
+- Set the following to your machine's network interface (e.g., `enp0s8`):
+    - `global.amf.multus.n2network.masterif`
+    - `global.smf.multus.n4network.masterif`
+    - `global.upf.multus.n3network.masterif`
+    - `global.upf.multus.n4network.masterif`
+    - `global.upf.multus.n9network.masterif`
+- Set `global.upf.multus.n6network.masterif` to your external interface (e.g., `enp0s3`) for internet access.
+
+**2. External Connectivity Settings (N6 Interface)**
+
+*Note: The following values are examples for external access configuration:*
+
+- **Network:** `subnetIP` (10.0.2.0), `gatewayIP` (10.0.2.2), `excludeIP` (10.0.2.254)
+- **IP Assignments:**
+    - `upf.n6if`: 10.0.2.11
+    - `psaupf1.n6if`: 10.0.2.12
+    - `psaupf2.n6if`: 10.0.2.13
+    - `iupf1.n6if`: 10.0.2.14
+
+### Enable the single UPF feature
+
+- The default architecture of free5gc-helm is **ULCL**.
+
+To enable a **single UPF**, replace the following files in `charts/free5gc/charts/free5gc-smf/`:
+
+1. `values.yaml`: Replace with `single-upf-values.yaml`.
+2. `templates/smf-configmap.yaml`: Replace with `smf-configmap-single-upf.yml`.
+3. `charts/free5gc/values.yaml`, set `global.userPlaneArchitecture` to `single`.
 
 ### Enable the Prometheus and Grafana
 To start Prometheus and Grafana, run the following commands to install Prometheus and Grafana using the kube-prometheus-stack chart.

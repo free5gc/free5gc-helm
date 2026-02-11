@@ -15,25 +15,28 @@
 # Declare variables to be passed into your templates.
 
 global:
-  #Global network parametes
-  n2network:
-    enabled: true
-    name: n2network
-    type: ipvlan
-    masterIf: eth0
-    subnetIP: 10.100.50.248
-    cidr: 29
-    gatewayIP: 10.100.50.254
-    excludeIP: 10.100.50.254
-  n3network:
-    enabled: true
-    name: n3network
-    type: ipvlan
-    masterIf: eth0
-    subnetIP: 10.100.50.232
-    cidr: 29
-    gatewayIP: 10.100.50.238
-    excludeIP: 10.100.50.238
+  free5gcReleaseName: free5gc-helm  # Name of the free5gc helm release
+  gnb:
+    multus:
+      enabled: false
+      n2network:
+        enabled: true
+        name: n2network
+        type: ipvlan
+        masterIf: eth0
+        subnetIP: 10.100.50.248
+        cidr: 29
+        gatewayIP: 10.100.50.254
+        excludeIP: 10.100.50.254
+      n3network:
+        enabled: true
+        name: n3network
+        type: ipvlan
+        masterIf: eth0
+        subnetIP: 10.100.50.232
+        cidr: 29
+        gatewayIP: 10.100.50.238
+        excludeIP: 10.100.50.238
 
 
 projectName: ueransim
@@ -70,6 +73,7 @@ gnb:
   amf:
     n2if:  # NGAP
       ipAddress: 10.100.50.249
+      serviceName: free5gc-amf-amf-n2
       port: 38412
     service:
       ngap:
