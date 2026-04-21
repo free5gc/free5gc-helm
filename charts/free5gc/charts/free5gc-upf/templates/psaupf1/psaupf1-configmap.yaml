@@ -63,6 +63,12 @@ data:
     # Setup iptables for NAT via dedicated interfaces
     iptables -A FORWARD -j ACCEPT
     iptables -t nat -A POSTROUTING -s {{ $.Values.global.uesubnet }} -o n6 -j MASQUERADE  # route traffic comming from the UE SUBNET to the interface N6
+
+    mkdir -p /etc/iproute2 # Debian 13 (trixie) ships the default table mappings at /usr/share/iproute2/rt_tables, but the UPF needs it at /etc/iproute2/rt_tables, so we need to copy it if it doesn't exist
+    if [ ! -f /etc/iproute2/rt_tables ]; then
+        cp /usr/share/iproute2/rt_tables /etc/iproute2/rt_tables
+    fi
+
     echo "1200 n6if" >> /etc/iproute2/rt_tables # create a routing table for the interface N6
     ip rule add from {{ $.Values.global.uesubnet }} table n6if   # use the created ip table to route the traffic comming from the UE SUBNET
     ip route add default via {{ $.Values.global.upf.multus.n6network.gatewayIP }} dev n6 table n6if  # add a default route in the created table so that all UEs will use this gateway for external communications
