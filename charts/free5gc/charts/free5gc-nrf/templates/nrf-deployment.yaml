@@ -71,20 +71,37 @@ spec:
         - name: metrics
           containerPort: {{ $.Values.nrf.configuration.metrics.port }}
         {{- end }}
-        command: ["./nrf"]
-        args: ["-c", "./config/nrfcfg.yaml"]
+        command:
+          - "/sbin/tini"
+          - "--"
+          - "./nrf"
+        args:
+          - "-c"
+          - "./config/nrfcfg.yaml"
         env:
           - name: DB_URI
             value: mongodb://{{ $.Values.mongodb.service.name }}/free5gc
           - name: GIN_MODE
             value: release
+        {{- if .readinessProbe.enabled }}
+        readinessProbe:
+          httpGet:
+            path: /nnrf-nfm/v1/
+            scheme: HTTP
+            port: 80
+          initialDelaySeconds: {{ .readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .readinessProbe.timeoutSeconds }}
+          failureThreshold: {{ .readinessProbe.failureThreshold }}
+          successThreshold: {{ .readinessProbe.successThreshold }}
+        {{- end }}
         volumeMounts:
         - mountPath: {{ .volume.mount }}
           name: {{ include "free5gc-nrf.fullname" $ }}-volume
         - mountPath: {{ .volume.tlsmount }}
           name: {{ include "free5gc-nrf.fullname" $ }}-empty-volume
         - mountPath: {{ .volume.certmount }}
-          name: {{ include "free5gc-nrf.fullname" $ }}-cert-pvc
+          name: {{ include "free5gc-nrf.fullname" $ }}-cert-volume
         resources:
             {{- toYaml .resources | nindent 12 }}
         readinessProbe:
@@ -122,7 +139,15 @@ spec:
               name: {{ include "free5gc-nrf.fullname" $ }}-configmap
       - name: {{ include "free5gc-nrf.fullname" $ }}-empty-volume
         emptyDir: {}
-      - name: {{ include "free5gc-nrf.fullname" $ }}-cert-pvc
-        persistentVolumeClaim:
-          claimName: cert-pvc
+      - name: {{ include "free5gc-nrf.fullname" $ }}-cert-volume
+        projected:
+          defaultMode: 0400
+          sources:
+          - secret:
+              name: {{ printf "%s-nrf-tls-secret" $.Release.Name }}
+              items:
+                - key: nrf.pem
+                  path: nrf.pem
+                - key: nrf.key
+                  path: nrf.key
 {{- end }}

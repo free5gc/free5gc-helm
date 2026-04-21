@@ -35,19 +35,19 @@ spec:
         component: {{ .name }}
       annotations:
         {{- include "ueransim.gnbAnnotations" $ | nindent 8 }}
-        {{- if or $.Values.global.n2network.enabled $.Values.global.n3network.enabled}}
+        {{- if and $.Values.global.gnb.multus.enabled (or $.Values.global.gnb.multus.n2network.enabled $.Values.global.gnb.multus.n3network.enabled) }}
         k8s.v1.cni.cncf.io/networks: '[
-        {{- if $.Values.global.n2network.enabled }}
-            { "name": "{{ $.Values.global.n2network.name }}-{{ include "ueransim.fullname" $ }}",
+        {{- if $.Values.global.gnb.multus.n2network.enabled }}
+            { "name": "{{ $.Values.global.gnb.multus.n2network.name }}-{{ include "ueransim.fullname" $ }}",
               "interface": "n2",
-              "ips": [ "{{ .n2if.ipAddress }}/{{ $.Values.global.n2network.cidr }}" ],
-              "gateway": [ "{{ $.Values.global.n2network.gatewayIP }}" ]
+              "ips": [ "{{ .n2if.ipAddress }}/{{ $.Values.global.gnb.multus.n2network.cidr }}" ],
+              "gateway": [ "{{ $.Values.global.gnb.multus.n2network.gatewayIP }}" ]
             },
         {{- end }}
-            { "name": "{{ $.Values.global.n3network.name }}-{{ include "ueransim.fullname" $ }}",
+            { "name": "{{ $.Values.global.gnb.multus.n3network.name }}-{{ include "ueransim.fullname" $ }}",
               "interface": "n3",
-              "ips": [ "{{ .n3if.ipAddress }}/{{ $.Values.global.n3network.cidr }}" ],
-              "gateway": [ "{{ $.Values.global.n3network.gatewayIP }}" ]
+              "ips": [ "{{ .n3if.ipAddress }}/{{ $.Values.global.gnb.multus.n3network.cidr }}" ],
+              "gateway": [ "{{ $.Values.global.gnb.multus.n3network.gatewayIP }}" ]
             }
             ]'
         {{- end }}
@@ -61,7 +61,11 @@ spec:
         {{- with $.Values.initcontainers.sctp_test }}
         image: {{ .image }}:{{ .tag }}
         {{- end }}
+{{- if $.Values.global.gnb.multus.enabled }}
         command: ["sh", "-c", "until sctp_test -s -H 0.0.0.0 -P 25000 -h {{ .amf.n2if.ipAddress }} -p {{ .amf.n2if.port }}; do echo waiting for the AMF; sleep 2; done;"]
+{{- else }}
+        command: ["sh", "-c", "until sctp_test -s -H 0.0.0.0 -P 25000 -h {{ $.Values.global.free5gcReleaseName }}-{{ .amf.n2if.serviceName }} -p {{ .amf.n2if.port }}; do echo waiting for the AMF; sleep 2; done;"]
+{{- end }}
       containers:
       - image: {{ .image.name }}:{{ .image.tag | default $.Chart.AppVersion }}
         name: {{ .name }}
@@ -72,8 +76,13 @@ spec:
         securityContext:
           capabilities:
             add: ["NET_ADMIN"]
+{{- if $.Values.global.gnb.multus.enabled }}
         command: ["./nr-gnb"]
         args: ["-c", "{{ .volume.mount }}/gnb-config.yaml"]
+{{- else }}
+        command: ["/bin/sh", "-c"]
+        args: ["cp /ueransim/config/wrapper.sh /tmp/wrapper.sh && chmod +x /tmp/wrapper.sh && /tmp/wrapper.sh"]
+{{- end }}  
         volumeMounts:
         - mountPath: {{ .volume.mount }}
           name: {{ .volume.name }}

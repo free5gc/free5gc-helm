@@ -32,12 +32,12 @@ spec:
     metadata:
       annotations:
         {{- include "free5gc-amf.amfAnnotations" $ | nindent 8 }}
-        {{- if and $.Values.isNgapNeeded $.Values.global.n2network.enabled}}
+        {{- if and $.Values.isNgapNeeded $.Values.global.amf.multus.n2network.enabled $.Values.global.amf.multus.enabled}}
         k8s.v1.cni.cncf.io/networks: '[
-            { "name": "{{ $.Values.global.n2network.name }}-{{ include "free5gc-amf.fullname" $ }}",
+            { "name": "{{ $.Values.global.amf.multus.n2network.name }}-{{ include "free5gc-amf.fullname" $ }}",
               "interface": "n2",
-              "ips": [ "{{ $.Values.global.amf.n2if.ipAddress }}/{{ $.Values.global.n2network.cidr }}" ],
-              "gateway": [ "{{ $.Values.global.n2network.gatewayIP }}" ]
+              "ips": [ "{{ $.Values.global.amf.multus.n2if.ipAddress }}/{{ $.Values.global.amf.multus.n2network.cidr }}" ],
+              "gateway": [ "{{ $.Values.global.amf.multus.n2network.gatewayIP }}" ]
             }]'
         {{- end }}
         {{- if $.Values.amf.configuration.metrics.enable }}
@@ -70,7 +70,7 @@ spec:
         image: {{ .image.name }}:{{ .image.tag | default $.Chart.AppVersion }}
         imagePullPolicy: {{ .image.pullPolicy }}
         securityContext:
-            {{- toYaml .securityContext | nindent 12 }}
+          {{- toYaml .securityContext | nindent 10 }}
         ports:
         - name: namf
           containerPort: {{ .service.port }}
@@ -83,18 +83,55 @@ spec:
         - name: metrics
           containerPort: {{ $.Values.amf.configuration.metrics.port }}
         {{- end }}
-        command: ["./amf"]
-        args: ["-c", "./config/amfcfg.yaml"]
+        command:
+          - "/sbin/tini"
+          - "--"
+          - "./amf"
+        args:
+          - "-c"
+          - "./config/amfcfg.yaml"
         env:
           - name: GIN_MODE
             value: release
+        {{- if .readinessProbe.enabled }}
+        readinessProbe:
+          {{- if .readinessProbe.httpGet }}
+          httpGet:
+            {{- toYaml .readinessProbe.httpGet | nindent 12 }}
+          {{- end }}
+          {{- if .readinessProbe.exec }}
+          exec:
+            {{- tpl (toYaml .readinessProbe.exec) . | nindent 12 }}
+          {{- end }}
+          initialDelaySeconds: {{ .readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .readinessProbe.timeoutSeconds | default 1 }}
+          successThreshold: {{ .readinessProbe.successThreshold | default 1 }}
+          failureThreshold: {{ .readinessProbe.failureThreshold | default 3 }}
+        {{- end }}
+        {{- if .livenessProbe.enabled }}
+        livenessProbe:
+          {{- if .livenessProbe.httpGet }}
+          httpGet:
+            {{- toYaml .livenessProbe.httpGet | nindent 12 }}
+          {{- end }}
+          {{- if .livenessProbe.exec }}
+          exec:
+            {{- tpl (toYaml .livenessProbe.exec) . | nindent 12 }}
+          {{- end }}
+          initialDelaySeconds: {{ .livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .livenessProbe.timeoutSeconds | default 10 }}
+          successThreshold: {{ .livenessProbe.successThreshold | default 1 }}
+          failureThreshold: {{ .livenessProbe.failureThreshold | default 3 }}
+        {{- end }}
         volumeMounts:
         - mountPath: {{ .volume.mount }}
           name: {{ include "free5gc-amf.fullname" $ }}-volume
         - mountPath: {{ .volume.tlsmount }}
           name: {{ include "free5gc-amf.fullname" $ }}-empty-volume
         - mountPath: {{ .volume.certmount }}
-          name: {{ include "free5gc-amf.fullname" $ }}-cert-pvc
+          name: {{ include "free5gc-amf.fullname" $ }}-cert-volume
         resources:
             {{- toYaml .resources | nindent 12 }}
       dnsPolicy: ClusterFirst
@@ -114,7 +151,20 @@ spec:
               name: {{ include "free5gc-amf.fullname" $ }}-configmap
       - name: {{ include "free5gc-amf.fullname" $ }}-empty-volume
         emptyDir: {}
-      - name: {{ include "free5gc-amf.fullname" $ }}-cert-pvc
-        persistentVolumeClaim:
-          claimName: cert-pvc
+      - name: {{ include "free5gc-amf.fullname" $ }}-cert-volume
+        projected:
+          defaultMode: 0400
+          sources:
+          - secret:
+              name: {{ printf "%s-amf-tls-secret" $.Release.Name }}
+              items:
+                - key: amf.pem
+                  path: amf.pem
+                - key: amf.key
+                  path: amf.key
+          - configMap:
+              name: free5gc-public-certs
+              items:
+                - key: nrf.pem
+                  path: nrf.pem
 {{- end }}
