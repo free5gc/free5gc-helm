@@ -1,0 +1,3 @@
+[submodule "charts/free-ran-ue"]
+	path = charts/free-ran-ue
+	url = https://github.com/free-ran-ue/fru-helm.git
