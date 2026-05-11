@@ -97,7 +97,7 @@ extraDeploy:
       persistentVolumeReclaimPolicy: Retain
       storageClassName: microk8s-hostpath
       local:
-        path: /home/free5gc/mongo
+        path: /home/alonza/mongodb
       nodeAffinity:
         required:
           nodeSelectorTerms:
@@ -105,7 +105,7 @@ extraDeploy:
             - key: kubernetes.io/hostname
               operator: In
               values:
-              - free5gc
+              - wirelab
 ## @param commonLabels Add labels to all the deployed resources (sub-charts are not considered). Evaluated as a template
 ##
 commonLabels: {}

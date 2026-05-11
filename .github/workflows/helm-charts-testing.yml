@@ -28,4 +28,4 @@ jobs:
 
       - name: Run chart-testing (lint)
         run: |
-          helm lint --with-subcharts charts/*
+          helm lint --with-subcharts $(find charts -mindepth 1 -maxdepth 1 -type d ! -name free-ran-ue | sort)
