@@ -11,6 +11,10 @@
 # Software description: An open-source project providing Helm charts to deploy 5G components (Core + RAN) on top of Kubernetes
 #
 {{- with .Values.smf }}
+{{- $arch := $.Values.global.userPlaneArchitecture | default "ulcl" }}
+{{- if not (or (eq $arch "single") (eq $arch "ulcl")) }}
+{{- fail "global.userPlaneArchitecture must be either single or ulcl" }}
+{{- end }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -60,104 +64,7 @@ data:
         externalAddr: POD_IP_ADDR
 {{- end }}
 
-{{- if $.Values.global.smf.multus.enabled }}
-      # Multus mode: Use static UPF N4 IP addresses
-      smfName: SMF
-      snssaiInfos:
-        - sNssai:
-            sst: 1
-            sd: 010203
-          dnnInfos: # DNN information list
-            - dnn: internet # Data Network Name
-              dnaiList:
-                - mec
-              dns: # the IP address of DNS
-                ipv4: 8.8.8.8
-                ipv6: 2001:4860:4860::8888
-      plmnList: # the list of PLMN IDs that this SMF belongs to (optional, remove this key when unnecessary)
-        - mcc: 208 # Mobile Country Code (3 digits string, digit: 0~9)
-          mnc: 93 # Mobile Network Code (2 or 3 digits string, digit: 0~9)
-      userplaneInformation: # list of userplane information
-        upNodes: # information of userplane node (AN or UPF)
-          gNB1: # the name of the node
-            type: AN # the type of the node (AN or UPF)
-          BranchingUPF:
-            type: UPF
-            nodeID: {{ $.Values.global.upf.multus.iupf1.n4if.ipAddress }} # UPFB N4 interface IP
-            sNssaiUpfInfos:
-              - sNssai:
-                  sst: 1
-                  sd: 010203
-                dnnUpfInfoList:
-                  - dnn: internet
-                    dnaiList:
-                      - mec
-            interfaces:
-              - interfaceType: N3
-                endpoints:
-                  - {{ $.Values.global.upf.multus.iupf1.n3if.ipAddress }}
-                networkInstances: 
-                  - internet
-              - interfaceType: N9
-                endpoints:
-                  - {{ $.Values.global.upf.multus.iupf1.n9if.ipAddress }}
-                networkInstances: 
-                  - internet
-          AnchorUPF1:
-            type: UPF
-            nodeID: {{ $.Values.global.upf.multus.psaupf1.n4if.ipAddress }} # UPF1 N4 interface IP
-            sNssaiUpfInfos:
-              - sNssai:
-                  sst: 1
-                  sd: 010203
-                dnnUpfInfoList:
-                  - dnn: internet
-                    pools:
-                    - cidr: 10.60.0.0/17
-            interfaces:
-              - interfaceType: N9
-                endpoints:
-                  - {{ $.Values.global.upf.multus.psaupf1.n9if.ipAddress }}
-                networkInstances: 
-                  - internet
-          AnchorUPF2:
-            type: UPF
-            nodeID: {{ $.Values.global.upf.multus.psaupf2.n4if.ipAddress }} # UPF2 N4 interface IP
-            sNssaiUpfInfos:
-              - sNssai:
-                  sst: 1
-                  sd: 010203
-                dnnUpfInfoList:
-                  - dnn: internet
-                    pools:
-                    - cidr: 10.60.128.0/17
-            interfaces:
-              - interfaceType: N9
-                endpoints:
-                  - {{ $.Values.global.upf.multus.psaupf2.n9if.ipAddress }}
-                networkInstances: 
-                  - internet
-        links:
-          - A: gNB1
-            B: BranchingUPF
-          - A: BranchingUPF
-            B: AnchorUPF1
-          - A: BranchingUPF
-            B: AnchorUPF2
-      locality: area1 # Name of the location where a set of AMF, SMF and UPFs are located
-      t3591:
-        enable: true # true or false
-        expireTime: 16s # default is 6 seconds
-        maxRetryTimes: 3 # the max number of retransmission
-      # retransmission timer for pdu session release command
-      t3592:
-        enable: true # true or false
-        expireTime: 16s # default is 6 seconds
-        maxRetryTimes: 3 # the max number of retransmission
-{{- else }}
-      # Non-multus mode: Use placeholders that will be replaced by wrapper script
-      {{- .configuration.configuration | nindent 6 }}
-{{- end }}
+      {{- include (printf "free5gc-smf.%sConfig" $arch) $ | nindent 6 }}
 
     logger:
       {{- toYaml .configuration.logger | nindent 6 }}
@@ -168,7 +75,7 @@ data:
       version: 1.0.7
       description: Routing information for UE
     ueRoutingInfo:
-      {{- .configuration.ueRoutingInfo | nindent 6 }}
+      {{- include (printf "free5gc-smf.%sUeRoutingInfo" $arch) $ | nindent 6 }}
 
   wrapper.sh: |
     #!/bin/sh
@@ -180,41 +87,55 @@ data:
     exec ./smf -c {{ .volume.mount }}/smfcfg.yaml -u {{ .volume.mount }}/uerouting.yaml
 {{- else }}
     # Dynamic Pod IP mode: Replace placeholders at runtime
-    # Get Pod IP dynamically
     POD_IP=$(hostname -i | awk '{print $1}')
     echo "[wrapper] SMF Pod IP detected: $POD_IP"
 
-    # Copy ConfigMap files to writable location
     cp {{ .volume.mount }}/smfcfg.yaml /tmp/smfcfg.yaml
     cp {{ .volume.mount }}/uerouting.yaml /tmp/uerouting.yaml
 
-    # Replace POD_IP_ADDR placeholder with actual Pod IP for SMF's own PFCP identity
     sed -i "s/POD_IP_ADDR/$POD_IP/g" /tmp/smfcfg.yaml
 
-    # With Headless Services, DNS names resolve directly to Pod IPs
-    # This ensures SMF's nodeID matches what UPF reports in PFCP responses
-    echo "[wrapper] Resolving UPF Pod IPs from Headless Services..."
+{{- if eq $arch "single" }}
+    echo "[wrapper] Resolving single UPF Pod IP from Headless Service..."
+    UPF_IP=""
 
-    # Resolve headless service names to Pod IPs with extended retry
+    for i in 1 2 3 4 5 6 7 8 9 10; do
+      UPF_IP=$(getent hosts {{ $.Release.Name }}-free5gc-upf-upf-service 2>/dev/null | awk '{print $1}' | head -1)
+
+      if [ -n "$UPF_IP" ]; then
+        echo "[wrapper] UPF IP resolved successfully"
+        break
+      fi
+      echo "[wrapper] Waiting for UPF DNS resolution... attempt $i (UPF=$UPF_IP)"
+      sleep 3
+    done
+
+    if [ -z "$UPF_IP" ]; then
+      echo "[wrapper] WARNING: UPF IP not resolved, using placeholder"
+      UPF_IP="UPF_SERVICE_NAME"
+    fi
+
+    echo "[wrapper] UPF Pod IP: $UPF_IP"
+    sed -i "s/UPF_SERVICE_NAME/$UPF_IP/g" /tmp/smfcfg.yaml
+{{- else }}
+    echo "[wrapper] Resolving ULCL UPF Pod IPs from Headless Services..."
     IUPF1_IP=""
     PSAUPF1_IP=""
     PSAUPF2_IP=""
 
-    # Retry loop with longer timeout
     for i in 1 2 3 4 5 6 7 8 9 10; do
       IUPF1_IP=$(getent hosts {{ $.Release.Name }}-free5gc-upf-iupf1-service 2>/dev/null | awk '{print $1}' | head -1)
       PSAUPF1_IP=$(getent hosts {{ $.Release.Name }}-free5gc-upf-psaupf1-service 2>/dev/null | awk '{print $1}' | head -1)
       PSAUPF2_IP=$(getent hosts {{ $.Release.Name }}-free5gc-upf-psaupf2-service 2>/dev/null | awk '{print $1}' | head -1)
-      
+
       if [ -n "$IUPF1_IP" ] && [ -n "$PSAUPF1_IP" ] && [ -n "$PSAUPF2_IP" ]; then
-        echo "[wrapper] All UPF IPs resolved successfully"
+        echo "[wrapper] All ULCL UPF IPs resolved successfully"
         break
       fi
       echo "[wrapper] Waiting for UPF DNS resolution... attempt $i (IUPF1=$IUPF1_IP, PSAUPF1=$PSAUPF1_IP, PSAUPF2=$PSAUPF2_IP)"
       sleep 3
     done
 
-    # Final check
     if [ -z "$IUPF1_IP" ] || [ -z "$PSAUPF1_IP" ] || [ -z "$PSAUPF2_IP" ]; then
       echo "[wrapper] WARNING: Some UPF IPs not resolved, using placeholder"
       [ -z "$IUPF1_IP" ] && IUPF1_IP="IUPF1_SERVICE_NAME"
@@ -226,10 +147,10 @@ data:
     echo "[wrapper] PSAUPF1 Pod IP: $PSAUPF1_IP"
     echo "[wrapper] PSAUPF2 Pod IP: $PSAUPF2_IP"
 
-    # Replace UPF Service Name placeholders with resolved Pod IPs
     sed -i "s/IUPF1_SERVICE_NAME/$IUPF1_IP/g" /tmp/smfcfg.yaml
     sed -i "s/PSAUPF1_SERVICE_NAME/$PSAUPF1_IP/g" /tmp/smfcfg.yaml
     sed -i "s/PSAUPF2_SERVICE_NAME/$PSAUPF2_IP/g" /tmp/smfcfg.yaml
+{{- end }}
 
     echo "[wrapper] Configuration files prepared in /tmp"
     echo "[wrapper] SMF PFCP config:"
@@ -237,7 +158,6 @@ data:
     echo "[wrapper] UPF nodeIDs:"
     cat /tmp/smfcfg.yaml | grep "nodeID:"
 
-    # Execute SMF with dynamic configuration
     exec ./smf -c /tmp/smfcfg.yaml -u /tmp/uerouting.yaml
 
 {{- end }}
