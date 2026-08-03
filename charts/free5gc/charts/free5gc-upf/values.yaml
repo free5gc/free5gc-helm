@@ -165,7 +165,13 @@ upf:
     dnnList: # The DNN list supported by UPF
       - dnn: internet # Data Network Name
         cidr: 10.60.0.0/16 # Full UE subnet for single UPF mode
-        # natifname: n6
+        # natifname takes precedence when both interface selectors are set.
+        natifname: ""
+        # Resolve the egress interface from the Calico address visible in the UPF Pod.
+        natIfCIDR: 192.168.0.0/16
+        ipForwardEnable: true
+        # Zero uses --clamp-mss-to-pmtu; set a value such as 1400 to force a fixed MSS.
+        tcpMss: 0
 
     logger: # log output setting
       enable: true # true or false
