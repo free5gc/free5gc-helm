@@ -1,0 +1,96 @@
+---
+# CNTi Test Suite configuration for the free5GC chart in this repository.
+# Mirrors example-cnfs/free5gc/cnti-testsuite.yaml in lfn-cnti/testsuite.
+config_version: "v2"
+common:
+  hardcoded_ip_exceptions:
+    - ip: 8.8.8.8
+  container_names:
+    # v4.2.3 / v4.2.2 are the retained tags whose images ship /sbin/tini,
+    # matching the chart entrypoint; used by the rolling and rollback tests.
+    - name: amf
+      rolling_update_test_tag: "v4.2.3"
+      rolling_downgrade_test_tag: "v4.2.2"
+      rolling_version_change_test_tag: "v4.2.3"
+      rollback_from_tag: "v4.2.3"
+    - name: ausf
+      rolling_update_test_tag: "v4.2.3"
+      rolling_downgrade_test_tag: "v4.2.2"
+      rolling_version_change_test_tag: "v4.2.3"
+      rollback_from_tag: "v4.2.3"
+    - name: chf
+      rolling_update_test_tag: "v4.2.3"
+      rolling_downgrade_test_tag: "v4.2.2"
+      rolling_version_change_test_tag: "v4.2.3"
+      rollback_from_tag: "v4.2.3"
+    - name: dbpython
+      rolling_update_test_tag: "v3.3.0"
+      rolling_downgrade_test_tag: "v3.3.0"
+      rolling_version_change_test_tag: "v3.3.0"
+      rollback_from_tag: "v3.3.0"
+    - name: nef
+      rolling_update_test_tag: "v4.2.3"
+      rolling_downgrade_test_tag: "v4.2.2"
+      rolling_version_change_test_tag: "v4.2.3"
+      rollback_from_tag: "v4.2.3"
+    - name: nrf
+      rolling_update_test_tag: "v4.2.3"
+      rolling_downgrade_test_tag: "v4.2.2"
+      rolling_version_change_test_tag: "v4.2.3"
+      rollback_from_tag: "v4.2.3"
+    - name: nssf
+      rolling_update_test_tag: "v4.2.3"
+      rolling_downgrade_test_tag: "v4.2.2"
+      rolling_version_change_test_tag: "v4.2.3"
+      rollback_from_tag: "v4.2.3"
+    - name: pcf
+      rolling_update_test_tag: "v4.2.3"
+      rolling_downgrade_test_tag: "v4.2.2"
+      rolling_version_change_test_tag: "v4.2.3"
+      rollback_from_tag: "v4.2.3"
+    - name: smf
+      rolling_update_test_tag: "v4.2.3"
+      rolling_downgrade_test_tag: "v4.2.2"
+      rolling_version_change_test_tag: "v4.2.3"
+      rollback_from_tag: "v4.2.3"
+    - name: udm
+      rolling_update_test_tag: "v4.2.3"
+      rolling_downgrade_test_tag: "v4.2.2"
+      rolling_version_change_test_tag: "v4.2.3"
+      rollback_from_tag: "v4.2.3"
+    - name: udr
+      rolling_update_test_tag: "v4.2.3"
+      rolling_downgrade_test_tag: "v4.2.2"
+      rolling_version_change_test_tag: "v4.2.3"
+      rollback_from_tag: "v4.2.3"
+    - name: iupf1
+      rolling_update_test_tag: "v4.2.3"
+      rolling_downgrade_test_tag: "v4.2.2"
+      rolling_version_change_test_tag: "v4.2.3"
+      rollback_from_tag: "v4.2.3"
+    - name: psaupf1
+      rolling_update_test_tag: "v4.2.3"
+      rolling_downgrade_test_tag: "v4.2.2"
+      rolling_version_change_test_tag: "v4.2.3"
+      rollback_from_tag: "v4.2.3"
+    - name: psaupf2
+      rolling_update_test_tag: "v4.2.3"
+      rolling_downgrade_test_tag: "v4.2.2"
+      rolling_version_change_test_tag: "v4.2.3"
+      rollback_from_tag: "v4.2.3"
+    - name: webui
+      rolling_update_test_tag: "v4.2.3"
+      rolling_downgrade_test_tag: "v4.2.2"
+      rolling_version_change_test_tag: "v4.2.3"
+      rollback_from_tag: "v4.2.3"
+    - name: mongodb
+      rolling_update_test_tag: "7.0.9-debian-12-r4"
+      rolling_downgrade_test_tag: "7.0.9-debian-12-r3"
+      rolling_version_change_test_tag: "7.0.9-debian-12-r4"
+      rollback_from_tag: "7.0.9-debian-12-r3"
+deployments:
+  helm_dirs:
+    - name: free5gc
+      helm_directory: charts/free5gc
+      namespace: free5gc
+      helm_values: --set mongodb.persistence.enabled=false --set mongodb.extraDeploy=null
