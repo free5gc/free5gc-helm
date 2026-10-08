@@ -335,7 +335,8 @@ Keep application SBI on **HTTP**: Istio provides transport encryption with
 mTLS. Application-level HTTPS hides HTTP methods/paths from Envoy, so enabling
 it with this L7 policy is rejected. Use Service DNS addresses, not arbitrary
 direct pod-IP connections. Do not add `DISABLE` DestinationRules or port-level
-plaintext exemptions. Multus interfaces are excluded from sidecar capture;
+plaintext exemptions. Multus interfaces and the UPF's `upfgtp` tunnel interface
+are excluded from sidecar capture to preserve forwarded user-plane traffic;
 UDP/SCTP N2/N3/N4 are **not** encrypted by Istio mTLS.
 
 On an existing release, use a maintenance window for the coordinated injection
