@@ -44,8 +44,10 @@ spec:
           {{- end }}
 {{- end }}
 {{- end }}
-{{- if or .Values.global.smf.multus.enabled .Values.global.upf.multus.enabled }}
-{{- if not (and .Values.deploySmf .Values.deployUpf .Values.global.smf.multus.enabled .Values.global.upf.multus.enabled .Values.global.smf.multus.n4network.enabled .Values.global.upf.multus.n4network.enabled) }}
+{{- $smfN4 := and .Values.deploySmf .Values.global.smf.multus.enabled .Values.global.smf.multus.n4network.enabled }}
+{{- $upfN4 := and .Values.deployUpf .Values.global.upf.multus.enabled .Values.global.upf.multus.n4network.enabled }}
+{{- if or $smfN4 $upfN4 }}
+{{- if not (and $smfN4 $upfN4) }}
 {{- fail "Multus N4 policies require both deployed SMF and UPF with their Multus N4 networks enabled" }}
 {{- end }}
 {{- $upfs := list "upf" }}
