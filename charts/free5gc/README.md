@@ -140,6 +140,244 @@ To enable a **single UPF**, replace the following files in `charts/free5gc/chart
 2. `templates/smf-configmap.yaml`: Replace with `smf-configmap-single-upf.yml`.
 3. `charts/free5gc/values.yaml`, set `global.userPlaneArchitecture` to `single`.
 
+### Network isolation on MicroK8s
+
+Security is layered: Calico protects the primary pod interface (`eth0`),
+MultiNetworkPolicy protects Multus interfaces, and Istio protects mesh TCP
+traffic and authorizes NRF HTTP requests. None of these layers replaces the
+others. The policy switches below belong to the **umbrella free5gc chart**;
+standalone NF installations must supply their own policies and mesh identities.
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `networkPolicy.enabled` | `false` | Isolate NF ingress and egress on the primary CNI |
+| `mongodb.networkPolicy.allowExternal` | `false` | Only release-specific database clients can reach MongoDB |
+| `multusNetworkPolicy.enabled` | `false` | RAN-only N2/N3 and SMF/UPF-only N4 |
+| `global.istio.enabled` | `false` | Inject all core workloads, enforce strict mTLS, authorize NRF SBI |
+
+MongoDB isolation is enabled by default, independently of the NF policy switch.
+NRF, UDR, PCF, CHF, WebUI and dbpython carry the release-specific
+`free5gc.io/mongodb-client` label admitted by MongoDB's policy. The unrestricted
+Bitnami external-client label is disabled. When upgrading, roll out these
+clients before enforcing the MongoDB policy to avoid interrupting old pods.
+MongoDB authentication remains a separate concern; this policy is not a
+substitute for credentials.
+
+#### 1. Primary interface: Calico
+
+MicroK8s normally uses Calico. Check that it is running and that no alternative
+CNI has replaced it:
+
+```console
+microk8s kubectl -n kube-system get daemonset calico-node
+```
+
+Enable `networkPolicy.enabled: true`. NF pods are selected by the Helm release
+label and the presence of the `nf` label, not by namespace alone. They can
+communicate with other NFs in the **same release and namespace**, reach MongoDB
+on TCP/27017, and resolve DNS through the selected kube-system DNS pods.
+MongoDB's separate ingress policy still restricts callers to database clients.
+Unrelated pods, including other free5GC releases, are not admitted.
+
+Adapt `networkPolicy.dnsNamespaceSelector` and `dnsPodSelector` if your DNS
+deployment does not use `k8s-app: kube-dns`. If NodeLocal DNS is in use, add its
+actual IP and TCP/UDP port 53 to `extraEgress`.
+
+Without Multus, explicitly permit the RAN using `networkPolicy.ranPeers`.
+For example, an independently installed UERANSIM release in the same namespace:
+
+```yaml
+networkPolicy:
+  enabled: true
+  ranPeers:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: ueransim
+          app.kubernetes.io/instance: ran
+```
+
+This admits only N2 SCTP/38412 on AMF and N3 UDP/2152 on UPF, not SBI or MongoDB.
+For another namespace, put `namespaceSelector` and `podSelector` in the **same
+peer**. For an external RAN, use its actual source `ipBlock.cidr`, preferably
+`/32`; account for any NodePort SNAT. Validate the source address observed by
+Calico rather than allowing all node or pod subnets.
+
+Monitoring, WebUI ingress, external databases and non-Multus N6 access are
+denied unless explicitly added through `extraIngress`/`extraEgress` (complete
+NetworkPolicy rule lists). Specify both peers and ports. Do not use empty
+rules, empty selectors or `0.0.0.0/0` to work around denied traffic. For example,
+allow your monitoring chart's exact namespace/pod labels and only the enabled
+metrics ports. N6 data-network egress should allow only the required destination
+CIDRs, excluding cluster/service/node CIDRs.
+
+Kubernetes policies are additive: another permissive policy selecting these
+pods can reopen access. Policies do not isolate traffic from the local node,
+privileged/host-network workloads, or users who can create pods with trusted
+labels or ServiceAccounts. Use RBAC and workload admission controls as well.
+
+#### 2. Multus: RAN-only N2/N3 and SMF/UPF-only N4
+
+Calico NetworkPolicy does **not** protect Multus attachments. Install the
+MultiNetworkPolicy CRD and an enforcing agent on every relevant node, following
+the [openshift/multus-networkpolicy guide](https://github.com/openshift/multus-networkpolicy/blob/main/README.md).
+Creating the CRD alone does not enforce anything.
+
+For the current nftables implementation:
+
+- Load `nf_tables` on each node.
+- Configure the agent to accept the chart's `ipvlan` networks (the documented
+  plugin default is `macvlan`; include every plugin actually used).
+- Configure its CRI endpoint for MicroK8s, normally
+  `/var/snap/microk8s/common/run/containerd.sock`, including the required host
+  socket mounts.
+- Use a reviewed, pinned production image/manifest. Do not apply an upstream
+  development/e2e manifest containing localhost images, a CRI-O socket or
+  unconditional custom allow rules.
+- Confirm your chosen implementation enforces **SCTP** as well as UDP. The
+  current nftables implementation supports SCTP; do not assume this of older
+  iptables implementations. Leave blanket ICMP bypass flags disabled unless
+  you intentionally need them.
+
+After enabling the AMF/SMF/UPF Multus settings described above:
+
+```yaml
+multusNetworkPolicy:
+  enabled: true
+  ranCIDRs:
+    - 10.100.50.235/32 # Replace with the actual gNB N2/N3 interface addresses
+```
+
+List every trusted RAN secondary address (including N3IWF if used); do not list
+the entire N2/N3 subnet. Empty RAN lists fail rendering when N2/N3 policies are
+needed. N2 admits SCTP to the configured NGAP port and SCTP back to the RAN
+(its source port may be ephemeral); N3 admits UDP/2152 in both directions.
+
+N4 admits UDP/8805 **only** between the configured SMF N4 `/32` and the active
+UPF N4 `/32` addresses: `upf` in single mode, or `iupf1`, `psaupf1`, `psaupf2`
+in ULCL mode. Both SMF and UPF must have Multus N4 enabled. Each policy's
+`policy-for` annotation refers to the chart's actual, release-qualified NAD.
+Exact IP peers avoid relying on pod-selector resolution across the separate
+SMF and UPF NADs. Update addresses together with the network configuration;
+these are L3 allowlists, not authenticated identities or anti-spoofing.
+
+N6 and N9 are deliberately outside these policies: N9 must retain ULCL
+UPF-to-UPF traffic, and N6 requires a deployment-specific data-network policy.
+The chart does not install policies on the RAN's separate NADs. Enforce
+corresponding RAN-side policies if you also need to isolate the RAN itself.
+
+#### 3. Istio: strict mTLS and NRF SBI authorization
+
+MicroK8s exposes Istio through its community addon:
+
+```console
+microk8s enable community
+microk8s enable istio
+microk8s kubectl -n istio-system get pods
+```
+
+**Check the installed Istio version before enabling chart mesh settings.**
+Some community-addon revisions still install Istio **1.18.2**, which is
+unsupported and lacks the native-sidecar support required here. Do not use
+that version for this configuration. If your addon is outdated, disable it
+and install a supported, pinned upstream version instead, following the
+[Istio Helm installation guide](https://istio.io/latest/docs/setup/install/helm/)
+and its Kubernetes compatibility matrix. Do not install two control planes
+over the same namespace.
+
+This configuration requires Kubernetes native sidecars (enabled by default
+from Kubernetes 1.29) and a compatible Istio injector that supports
+`sidecar.istio.io/nativeSidecar`. Check **all worker versions**, not just the
+API server. The restartable `istio-proxy` init container must start **before**
+`wait-nrf`/`wait-mongo`: a conventional sidecar starts too late and these
+startup checks deadlock against strict mTLS. `holdApplicationUntilProxyStarts`
+alone does not solve init-container ordering.
+
+Enable both primary-interface policies and mesh integration:
+
+```yaml
+networkPolicy:
+  enabled: true
+  istiodNamespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: istio-system
+  istiodPodSelector:
+    matchLabels:
+      app: istiod
+global:
+  sbi:
+    scheme: http
+  istio:
+    enabled: true
+```
+
+Adjust the istiod selectors to the actual addon installation. Explicit
+TCP/15012 and TCP/15017 egress permits proxy configuration/certificate
+bootstrap, including the otherwise egress-isolated MongoDB pod. Ensure any
+policies on istiod itself also admit these clients.
+
+The chart requests injection on every NF, all active UPFs, WebUI, dbpython and
+MongoDB. It creates separate NF ServiceAccounts, applies release-scoped
+`PeerAuthentication` in `STRICT` mode, and relies on Istio auto-mTLS for
+service-to-service traffic. No namespace-wide policy affects unrelated pods.
+If MongoDB is external, mesh and configure that server separately; the chart
+cannot secure an external database automatically.
+
+NRF's `AuthorizationPolicy` admits only the deployed control-plane NF
+ServiceAccount principals in this release/namespace, the configured SBI port,
+and the HTTP methods/paths in `istio.nrfAuthorization`. WebUI, dbpython, UPF
+and arbitrary/default ServiceAccounts cannot call NRF SBI. `GET /` remains
+allowed for existing NF startup checks; management/discovery v1 paths and the
+OAuth token endpoint are allowed by default. Non-SBI NRF ports remain governed
+by mTLS and the primary-interface policy, not this HTTP API allowlist.
+Set `istio.trustDomain` if your mesh does not use `cluster.local`.
+
+Keep application SBI on **HTTP**: Istio provides transport encryption with
+mTLS. Application-level HTTPS hides HTTP methods/paths from Envoy, so enabling
+it with this L7 policy is rejected. Use Service DNS addresses, not arbitrary
+direct pod-IP connections. Do not add `DISABLE` DestinationRules or port-level
+plaintext exemptions. Only the UPF's forwarding interfaces (including
+`upfgtp`) are excluded from sidecar capture to preserve user-plane traffic.
+Control-plane interfaces must not be excluded: SBI listeners bind all
+addresses, and an interface-wide bypass would expose plaintext SBI on Multus.
+UDP/SCTP N2/N3/N4 are **not** encrypted by Istio mTLS.
+
+On an existing release, use a maintenance window for the coordinated injection
+and strict-policy rollout; old non-meshed pods cannot reach strict destinations.
+Wait for every Deployment and the MongoDB StatefulSet to finish rolling out.
+Inspect admitted pods to confirm `istio-proxy` is a restartable init container
+and injection has not been skipped. Merely creating PeerAuthentication without
+an injected proxy does not enforce mTLS.
+
+#### 4. Verify enforcement (not just rendered resources)
+
+```console
+microk8s kubectl -n <namespace> get networkpolicy
+microk8s kubectl -n <namespace> get multinetworkpolicy
+microk8s kubectl -n <namespace> get peerauthentication,authorizationpolicy
+microk8s kubectl -n <namespace> get pods --show-labels
+```
+
+Verify these positive and negative cases on the target cluster:
+
+- All NFs complete startup, resolve DNS and register/discover through NRF;
+  the six database clients can reach MongoDB.
+- An unrelated pod in both the same and another namespace cannot reach SBI,
+  PFCP or MongoDB through the primary interface.
+- The allowed gNB establishes NGAP and GTP-U; an unlisted secondary IP cannot.
+  Only SMF/active UPF N4 pairs establish PFCP. Use real SCTP/PFCP/GTP-U sessions
+  and inspect agent rules/counters; UDP `nc` alone cannot prove enforcement.
+- From an authorized meshed NF identity, permitted NRF requests succeed and a
+  request outside the configured method/path allowlist returns Envoy HTTP 403.
+  A meshed but unauthorized identity admitted by the L3 test policy also gets
+  403. Remove any temporary test policy immediately afterward.
+- A plaintext client cannot communicate with a strict-mTLS core TCP endpoint.
+  Use Istio proxy configuration/telemetry to confirm successful NF and
+  database traffic uses mTLS; an L3 timeout alone does not prove mesh rejection.
+
+Helm lint/template checks cannot verify Calico, secondary-interface firewall
+rules, admission-webhook ordering or mesh encryption; these cluster checks
+are required before treating the deployment as isolated.
+
 ### Enable the Prometheus and Grafana
 To start Prometheus and Grafana, run the following commands to install Prometheus and Grafana using the kube-prometheus-stack chart.
 ```

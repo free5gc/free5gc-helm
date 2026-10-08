@@ -26,6 +26,8 @@ global:
       nodePort: "30800"
   sbi:
     scheme: http
+  istio:
+    enabled: false
   
   # AMF Multus CNI Configuration
   amf:
@@ -157,6 +159,40 @@ deployUpf: true
 deployWebui: true
 deployDbPython: false
 
+# Policies for the primary CNI (eth0). Additional peers must be explicitly allowed.
+networkPolicy:
+  enabled: false
+  dnsNamespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: kube-system
+  dnsPodSelector:
+    matchLabels:
+      k8s-app: kube-dns
+  # NetworkPolicy peers: podSelector/namespaceSelector or ipBlock.
+  ranPeers: []
+  # Complete Kubernetes NetworkPolicy rules for monitoring, WebUI, N6, etc.
+  extraIngress: []
+  extraEgress: []
+  # Required with Istio: set to the actual istiod namespace and pod labels.
+  istiodNamespaceSelector:
+    matchLabels:
+      kubernetes.io/metadata.name: istio-system
+  istiodPodSelector:
+    matchLabels:
+      app: istiod
+
+multusNetworkPolicy:
+  enabled: false
+  # Explicit RAN secondary-interface addresses, preferably individual /32 CIDRs.
+  ranCIDRs: []
+
+istio:
+  trustDomain: cluster.local
+  # NRF supports these SBI APIs; GET / is used by the NF startup checks.
+  nrfAuthorization:
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"]
+    paths: ["/", "/nnrf-nfm/v1/*", "/nnrf-disc/v1/*", "/oauth2/token"]
+
 # Disable the deployment of mongodb as an NRF subchart
 free5gc-nrf:
   db:
@@ -168,6 +204,19 @@ mongodb:
   useStatefulSet: true
   auth:
     enabled: false
+  networkPolicy:
+    enabled: true
+    allowExternal: false
+    allowExternalEgress: false
+    addExternalClientAccess: false
+    ingressPodMatchLabels:
+      free5gc.io/mongodb-client: '{{ .Release.Name }}'
+  podLabels:
+    sidecar.istio.io/inject: '{{ .Values.global.istio.enabled }}'
+    free5gc.io/mesh: '{{ if .Values.global.istio.enabled }}{{ .Release.Name }}{{ else }}disabled{{ end }}'
+  podAnnotations:
+    sidecar.istio.io/nativeSidecar: '{{ .Values.global.istio.enabled }}'
+    proxy.istio.io/config: '{"holdApplicationUntilProxyStarts":true}'
   persistence:
     size: 6Gi
     mountPath: /bitnami/mongodb/data/db/

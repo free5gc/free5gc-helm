@@ -1,0 +1,102 @@
+{{- if .Values.multusNetworkPolicy.enabled }}
+{{- $ranCIDRs := .Values.multusNetworkPolicy.ranCIDRs }}
+{{- range $nf := list "amf" "upf" }}
+{{- $deployed := index $.Values (printf "deploy%s" (title $nf)) }}
+{{- $multus := index $.Values.global $nf "multus" }}
+{{- $network := ternary "n2network" "n3network" (eq $nf "amf") }}
+{{- if and $deployed $multus.enabled (index $multus $network "enabled") }}
+{{- if not $ranCIDRs }}
+{{- fail "multusNetworkPolicy.ranCIDRs must explicitly list the RAN secondary-interface CIDRs" }}
+{{- end }}
+---
+apiVersion: k8s.cni.cncf.io/v1beta1
+kind: MultiNetworkPolicy
+metadata:
+  name: {{ $.Release.Name }}-{{ $nf }}-ran
+  namespace: {{ $.Release.Namespace }}
+  annotations:
+    k8s.v1.cni.cncf.io/policy-for: {{ printf "%s-%s" (index $multus $network "name") (include (printf "free5gc-%s.fullname" $nf) (index $.Subcharts (printf "free5gc-%s" $nf))) | quote }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ $.Release.Name | quote }}
+      app.kubernetes.io/name: {{ include (printf "free5gc-%s.name" $nf) (index $.Subcharts (printf "free5gc-%s" $nf)) | quote }}
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        {{- range $ranCIDRs }}
+        - ipBlock:
+            cidr: {{ . | quote }}
+        {{- end }}
+      ports:
+        - protocol: {{ if eq $nf "amf" }}SCTP{{ else }}UDP{{ end }}
+          port: {{ if eq $nf "amf" }}{{ $.Values.global.amf.service.ngap.port }}{{ else }}2152{{ end }}
+  egress:
+    - to:
+        {{- range $ranCIDRs }}
+        - ipBlock:
+            cidr: {{ . | quote }}
+        {{- end }}
+      ports:
+        - protocol: {{ if eq $nf "amf" }}SCTP{{ else }}UDP{{ end }}
+          {{- if eq $nf "upf" }}
+          port: 2152
+          {{- end }}
+{{- end }}
+{{- end }}
+{{- $smfN4 := and .Values.deploySmf .Values.global.smf.multus.enabled .Values.global.smf.multus.n4network.enabled }}
+{{- $upfN4 := and .Values.deployUpf .Values.global.upf.multus.enabled .Values.global.upf.multus.n4network.enabled }}
+{{- if or $smfN4 $upfN4 }}
+{{- if not (and $smfN4 $upfN4) }}
+{{- fail "Multus N4 policies require both deployed SMF and UPF with their Multus N4 networks enabled" }}
+{{- end }}
+{{- $upfs := list "upf" }}
+{{- if eq .Values.global.userPlaneArchitecture "ulcl" }}
+{{- $upfs = list "psaupf1" "psaupf2" "iupf1" }}
+{{- end }}
+{{- range $nf := list "smf" "upf" }}
+---
+apiVersion: k8s.cni.cncf.io/v1beta1
+kind: MultiNetworkPolicy
+metadata:
+  name: {{ $.Release.Name }}-{{ $nf }}-n4
+  namespace: {{ $.Release.Namespace }}
+  annotations:
+    k8s.v1.cni.cncf.io/policy-for: {{ printf "%s-%s" (index $.Values.global $nf "multus" "n4network" "name") (include (printf "free5gc-%s.fullname" $nf) (index $.Subcharts (printf "free5gc-%s" $nf))) | quote }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ $.Release.Name | quote }}
+      app.kubernetes.io/name: {{ include (printf "free5gc-%s.name" $nf) (index $.Subcharts (printf "free5gc-%s" $nf)) | quote }}
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        {{- if eq $nf "upf" }}
+        - ipBlock:
+            cidr: {{ printf "%s/32" $.Values.global.smf.multus.n4if.ipAddress | quote }}
+        {{- else }}
+        {{- range $upfs }}
+        - ipBlock:
+            cidr: {{ printf "%s/32" (index $.Values.global.upf.multus . "n4if" "ipAddress") | quote }}
+        {{- end }}
+        {{- end }}
+      ports:
+        - protocol: UDP
+          port: 8805
+  egress:
+    - to:
+        {{- if eq $nf "upf" }}
+        - ipBlock:
+            cidr: {{ printf "%s/32" $.Values.global.smf.multus.n4if.ipAddress | quote }}
+        {{- else }}
+        {{- range $upfs }}
+        - ipBlock:
+            cidr: {{ printf "%s/32" (index $.Values.global.upf.multus . "n4if" "ipAddress") | quote }}
+        {{- end }}
+        {{- end }}
+      ports:
+        - protocol: UDP
+          port: 8805
+{{- end }}
+{{- end }}
+{{- end }}

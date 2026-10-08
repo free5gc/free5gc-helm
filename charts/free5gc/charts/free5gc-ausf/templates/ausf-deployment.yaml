@@ -31,6 +31,10 @@ spec:
   template:
     metadata:
       annotations:
+        {{- if dig "istio" "enabled" false $.Values.global }}
+        sidecar.istio.io/nativeSidecar: "true"
+        proxy.istio.io/config: '{"holdApplicationUntilProxyStarts":true}'
+        {{- end }}
         {{- include "free5gc-ausf.ausfAnnotations" $ | nindent 8 }}
         {{- if $.Values.ausf.configuration.metrics.enable }}
         prometheus.io/scrape: "true"
@@ -39,10 +43,17 @@ spec:
         {{- end }}
         checksum/config: {{ include (print $.Template.BasePath "/ausf-configmap.yaml") $ | sha256sum }}
       labels:
+        {{- if dig "istio" "enabled" false $.Values.global }}
+        sidecar.istio.io/inject: "true"
+        free5gc.io/mesh: {{ $.Release.Name | quote }}
+        {{- end }}
         {{- include "free5gc-ausf.selectorLabels" $ | nindent 8 }}
         project: {{ $.Values.global.projectName }}
         nf: {{ .name }}
     spec:
+      {{- if dig "istio" "enabled" false $.Values.global }}
+      serviceAccountName: {{ printf "%s-%s" $.Chart.Name $.Release.Name | trunc 63 | trimSuffix "-" }}
+      {{- end }}
       imagePullSecrets:
         {{- toYaml .imagePullSecrets | nindent 8 }}
       securityContext:
