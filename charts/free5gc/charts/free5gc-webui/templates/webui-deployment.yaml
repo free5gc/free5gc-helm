@@ -34,6 +34,7 @@ spec:
         {{- include "free5gc-webui.webuiAnnotations" $ | nindent 8 }}
         checksum/config: {{ include (print $.Template.BasePath "/webui-configmap.yaml") $ | sha256sum }}    
       labels:
+        free5gc.io/mongodb-client: {{ $.Release.Name | quote }}
         {{- include "free5gc-webui.selectorLabels" $ | nindent 8 }}
         project: {{ $.Values.global.projectName }}
         nf: {{ .name }}

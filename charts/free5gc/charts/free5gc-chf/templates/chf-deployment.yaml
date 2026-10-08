@@ -30,6 +30,7 @@ spec:
         {{- end }}
         checksum/config: {{ include (print $.Template.BasePath "/chf-configmap.yaml") $ | sha256sum }}
       labels:
+        free5gc.io/mongodb-client: {{ $.Release.Name | quote }}
         {{- include "free5gc-chf.selectorLabels" $ | nindent 8 }}
         project: {{ $.Values.global.projectName }}
         nf: {{ .name }}
