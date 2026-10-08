@@ -34,7 +34,6 @@ spec:
         {{- if dig "istio" "enabled" false $.Values.global }}
         sidecar.istio.io/nativeSidecar: "true"
         proxy.istio.io/config: '{"holdApplicationUntilProxyStarts":true}'
-        traffic.sidecar.istio.io/excludeInterfaces: "n2,n3,n4,n6,n9,ike"
         {{- end }}
         {{- include "free5gc-udr.udrAnnotations" $ | nindent 8 }}
         {{- if $.Values.udr.configuration.metrics.enable }}
