@@ -211,6 +211,12 @@ mongodb:
     addExternalClientAccess: false
     ingressPodMatchLabels:
       free5gc.io/mongodb-client: '{{ .Release.Name }}'
+  podLabels:
+    sidecar.istio.io/inject: '{{ .Values.global.istio.enabled }}'
+    free5gc.io/mesh: '{{ if .Values.global.istio.enabled }}{{ .Release.Name }}{{ else }}disabled{{ end }}'
+  podAnnotations:
+    sidecar.istio.io/nativeSidecar: '{{ .Values.global.istio.enabled }}'
+    proxy.istio.io/config: '{"holdApplicationUntilProxyStarts":true}'
   persistence:
     size: 6Gi
     mountPath: /bitnami/mongodb/data/db/

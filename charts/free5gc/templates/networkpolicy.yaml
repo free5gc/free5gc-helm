@@ -49,6 +49,9 @@ spec:
           port: 53
         - protocol: TCP
           port: 53
+  {{- with .Values.networkPolicy.extraEgress }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   {{- if .Values.global.istio.enabled }}
     - to:
         - namespaceSelector:
@@ -61,11 +64,9 @@ spec:
         - protocol: TCP
           port: 15017
   {{- end }}
-  {{- with .Values.networkPolicy.extraEgress }}
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
 {{- if .Values.networkPolicy.ranPeers }}
 {{- range $nf := list "amf" "upf" }}
+{{- if index $.Values (printf "deploy%s" (title $nf)) }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -76,7 +77,7 @@ spec:
   podSelector:
     matchLabels:
       app.kubernetes.io/instance: {{ $.Release.Name | quote }}
-      app.kubernetes.io/name: {{ include (printf "free5gc-%s.name" $nf) (dict "Chart" (dict "Name" (printf "free5gc-%s" $nf)) "Values" (index $.Values (printf "free5gc-%s" $nf))) | quote }}
+      app.kubernetes.io/name: {{ include (printf "free5gc-%s.name" $nf) (index $.Subcharts (printf "free5gc-%s" $nf)) | quote }}
   policyTypes: [Ingress, Egress]
   ingress:
     - from:
@@ -90,6 +91,7 @@ spec:
       ports:
         - protocol: {{ if eq $nf "amf" }}SCTP{{ else }}UDP{{ end }}
           port: {{ if eq $nf "amf" }}{{ $.Values.global.amf.service.ngap.port }}{{ else }}2152{{ end }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
