@@ -1,0 +1,88 @@
+name: CNTi essential
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * *"
+  # Pull requests and merges that change what the run installs or how.
+  pull_request:
+    paths: &essential-paths
+      - charts/free5gc/**
+      - cnti-testsuite.yaml
+      - ci/kind-cnti.yaml
+      - .github/workflows/cnti.yml
+  push:
+    branches:
+      - main
+    paths: *essential-paths
+
+permissions:
+  contents: read
+
+# One run per branch or pull request at a time. A new commit on a pull request
+# cancels the run for the previous one; runs on main queue instead, so every
+# merge gets its verdict.
+concurrency:
+  group: cnti-essential-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  # Runs on main (nightly, after a merge, or by hand): the only runs that
+  # publish the badge, and the only ones with a write token. Forks that enable
+  # scheduled workflows do not run either job.
+  essential:
+    if: github.repository == 'free5gc/free5gc-helm' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    # An essential-tests run takes about 22 minutes on ubuntu-latest (4 vCPU) with
+    # suite v2.2.0; this leaves room for a slow day without
+    # letting a stuck run hold the runner for hours.
+    timeout-minutes: 120
+    permissions:
+      # Publishes the badge to the orphan branch `badges`.
+      contents: write
+    env: &essential-env
+      # Fifteen functions share the runner's four cores: scaling and
+      # rollouts take longer than the suite's 60-second default.
+      CNTI_TESTSUITE_GENERIC_OPERATION_TIMEOUT: "180"
+    steps: &essential-steps
+      - uses: actions/checkout@v4
+        with:
+          # The suite doesn't need the job's write token; the action passes it
+          # to the badge publisher on its own.
+          persist-credentials: false
+
+      # The UPF forwards through the gtp5g kernel module. kind nodes share the
+      # host kernel, so building the out-of-tree module on the runner is enough.
+      - name: Build and load the gtp5g kernel module
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential "linux-headers-$(uname -r)"
+          git clone --depth 1 https://github.com/free5gc/gtp5g.git /tmp/gtp5g
+          make -C /tmp/gtp5g -j"$(nproc)"
+          sudo make -C /tmp/gtp5g install
+          sudo modprobe gtp5g
+          lsmod | grep -q '^gtp5g' && echo "gtp5g loaded on kernel $(uname -r)"
+
+      - uses: lfn-cnti/testsuite-action@v1
+        with:
+          # Pinned so a run is reproducible and a suite release is adopted on
+          # purpose; bump it after checking the release notes.
+          version: v2.2.0
+          cnf_config: cnti-testsuite.yaml
+          kind_config: ci/kind-cnti.yaml
+          install_timeout: 1800
+          tests: cert
+          badge_branch: badges
+
+  # Pull requests that change the chart or the job, and manual runs on other
+  # branches: the same steps with a read-only token. The action publishes the
+  # badge only from the default branch, so nothing is published here.
+  essential-pr:
+    if: github.repository == 'free5gc/free5gc-helm' && (github.event_name == 'pull_request' || github.ref != 'refs/heads/main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: read
+    env: *essential-env
+    steps: *essential-steps
