@@ -1,0 +1,27 @@
+# kind cluster for the CNTi run: three nodes, and the unsafe sysctls the UPF
+# pods set (net.ipv4.ip_forward) allowed on every kubelet, otherwise the
+# UPF pods are rejected at admission.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    kubeadmConfigPatches:
+      - |
+        kind: KubeletConfiguration
+        allowedUnsafeSysctls:
+          - "net.ipv4.ip_forward"
+          - "net.ipv4.conf.all.forwarding"
+  - role: worker
+    kubeadmConfigPatches:
+      - |
+        kind: KubeletConfiguration
+        allowedUnsafeSysctls:
+          - "net.ipv4.ip_forward"
+          - "net.ipv4.conf.all.forwarding"
+  - role: worker
+    kubeadmConfigPatches:
+      - |
+        kind: KubeletConfiguration
+        allowedUnsafeSysctls:
+          - "net.ipv4.ip_forward"
+          - "net.ipv4.conf.all.forwarding"

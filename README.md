@@ -1,6 +1,7 @@
 # free5GC-helm
 
 [![Helm charts linting](https://github.com/free5gc/free5gc-helm/actions/workflows/helm-charts-testing.yml/badge.svg)](https://github.com/free5gc/free5gc-helm/actions/workflows/helm-charts-testing.yml)
+[![CNTi essential](https://github.com/free5gc/free5gc-helm/raw/badges/cnti-badge.svg)](https://github.com/free5gc/free5gc-helm/actions/workflows/cnti.yml)
 
 ***free5gc-helm*** is an open-source project implemented to provide helm charts in order to deploy on one click a 5G system (RAN+SA 5G core) on top of Kubernetes. It currently relies on free5GC for the core network and free-ran-ue or UERANSIM to simulate Radio Access Network.
 
