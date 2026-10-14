@@ -1,0 +1,40 @@
+{{- with .Values.scp }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "free5gc-scp.fullname" $ }}-configmap
+  labels:
+    {{- include "free5gc-scp.labels" $ | nindent 4 }}
+data:
+  scpcfg.yaml: |
+    info:
+      version: 1.0.1
+      description: SCP initial local configuration
+    configuration:
+      sbi:
+        scheme: {{ $.Values.global.sbi.scheme }}
+        registerIPv4: {{ include "free5gc-scp.fullname" $ }}-service
+        bindingIPv4: 0.0.0.0
+        port: {{ .service.port }}
+        tls:
+          pem: cert/scp.pem
+          key: cert/scp.key
+      nrfUri: {{ $.Values.global.sbi.scheme }}://{{ $.Values.global.nrf.service.name }}:{{ $.Values.global.nrf.service.port }}
+      nrfCertPem: cert/nrf.pem
+      serviceList:
+        {{- range .configuration.serviceList }}
+        - serviceName: {{ . }}
+        {{- end }}
+      amfUri: {{ .configuration.nfUris.amf }}
+      ausfUri: {{ .configuration.nfUris.ausf }}
+      chfUri: {{ .configuration.nfUris.chf }}
+      nefUri: {{ .configuration.nfUris.nef }}
+      nssfUri: {{ .configuration.nfUris.nssf }}
+      pcfUri: {{ .configuration.nfUris.pcf }}
+      smfUri: {{ .configuration.nfUris.smf }}
+      udmUri: {{ .configuration.nfUris.udm }}
+      udrUri: {{ .configuration.nfUris.udr }}
+      upfUri: {{ .configuration.nfUris.upf }}
+    logger:
+      {{- toYaml .configuration.logger | nindent 6 }}
+{{- end }}

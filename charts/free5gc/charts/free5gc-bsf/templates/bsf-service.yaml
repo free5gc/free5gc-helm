@@ -1,0 +1,17 @@
+{{- with .Values.bsf }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "free5gc-bsf.fullname" $ }}-service
+  labels:
+    {{- include "free5gc-bsf.labels" $ | nindent 4 }}
+spec:
+  type: {{ .service.type }}
+  ports:
+    - name: http
+      port: {{ .service.port }}
+      targetPort: sbi
+      protocol: TCP
+  selector:
+    {{- include "free5gc-bsf.selectorLabels" $ | nindent 4 }}
+{{- end }}

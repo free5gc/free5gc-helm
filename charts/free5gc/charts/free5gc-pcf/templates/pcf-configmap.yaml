@@ -54,6 +54,9 @@ data:
       nrfUri: {{ $.Values.global.sbi.scheme }}://{{ $.Values.global.nrf.service.name }}:{{ $.Values.global.nrf.service.port }}
       nrfCertPem: cert/nrf.pem
 
+      bsf:
+        enable: {{ .configuration.bsf.enable }}
+
       {{- .configuration.configuration | nindent 6 }}
 
     logger:

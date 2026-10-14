@@ -13,7 +13,7 @@
 apiVersion: v2
 name: free5gc
 description: A Helm chart to deploy Free5gc
-version: 1.1.7
+version: 1.2.0
 appVersion: latest
 dependencies:
 - name: mongodb
@@ -22,6 +22,8 @@ dependencies:
   condition: deployAmf
 - name: free5gc-ausf
   condition: deployAusf
+- name: free5gc-bsf
+  condition: deployBsf
 - name: free5gc-chf
   condition: deployChf
 - name: free5gc-n3iwf
@@ -36,6 +38,8 @@ dependencies:
   condition: deployPcf
 - name: free5gc-smf
   condition: deploySmf
+- name: free5gc-scp
+  condition: deployScp
 - name: free5gc-udm
   condition: deployUdm
 - name: free5gc-udr

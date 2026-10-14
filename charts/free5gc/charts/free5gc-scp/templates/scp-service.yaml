@@ -1,0 +1,17 @@
+{{- with .Values.scp }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "free5gc-scp.fullname" $ }}-service
+  labels:
+    {{- include "free5gc-scp.labels" $ | nindent 4 }}
+spec:
+  type: {{ .service.type }}
+  ports:
+    - name: http
+      port: {{ .service.port }}
+      targetPort: sbi
+      protocol: TCP
+  selector:
+    {{- include "free5gc-scp.selectorLabels" $ | nindent 4 }}
+{{- end }}

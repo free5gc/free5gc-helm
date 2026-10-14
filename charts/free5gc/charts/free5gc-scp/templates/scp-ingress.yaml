@@ -1,0 +1,37 @@
+{{- with .Values.scp }}
+{{- if .ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "free5gc-scp.fullname" $ }}
+  labels:
+    {{- include "free5gc-scp.labels" $ | nindent 4 }}
+  {{- with .ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .ingress.className }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  rules:
+    {{- range .ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                name: {{ include "free5gc-scp.fullname" $ }}-service
+                port:
+                  number: {{ $.Values.scp.service.port }}
+          {{- end }}
+    {{- end }}
+  {{- with .ingress.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
+{{- end }}

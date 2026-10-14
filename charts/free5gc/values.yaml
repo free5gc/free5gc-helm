@@ -144,6 +144,7 @@ global:
 deployMongoDb: true
 deployAmf: true
 deployAusf: true
+deployBsf: true
 deployChf: true
 deployN3iwf: false
 deployNef: true
@@ -151,6 +152,7 @@ deployNrf: true
 deployNssf: true
 deployPcf: true
 deploySmf: true
+deployScp: true
 deployUdm: true
 deployUdr: true
 deployUpf: true

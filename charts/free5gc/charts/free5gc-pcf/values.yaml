@@ -126,6 +126,8 @@ pcf:
     #    hosts:
     #      - chart-example.local
   configuration:
+    bsf:
+      enable: false
     serviceList: |-
         - serviceName: npcf-am-policy-control
         - serviceName: npcf-smpolicycontrol
