@@ -18,6 +18,12 @@ common:
       rolling_downgrade_test_tag: "v4.2.2"
       rolling_version_change_test_tag: "v4.2.3"
       rollback_from_tag: "v4.2.3"
+    # BSF and SCP currently have no published older version tags.
+    - name: bsf
+      rolling_update_test_tag: "v4.3.0"
+      rolling_downgrade_test_tag: "v4.3.0"
+      rolling_version_change_test_tag: "v4.3.0"
+      rollback_from_tag: "v4.3.0"
     - name: chf
       rolling_update_test_tag: "v4.2.3"
       rolling_downgrade_test_tag: "v4.2.2"
@@ -48,6 +54,11 @@ common:
       rolling_downgrade_test_tag: "v4.2.2"
       rolling_version_change_test_tag: "v4.2.3"
       rollback_from_tag: "v4.2.3"
+    - name: scp
+      rolling_update_test_tag: "v4.3.0"
+      rolling_downgrade_test_tag: "v4.3.0"
+      rolling_version_change_test_tag: "v4.3.0"
+      rollback_from_tag: "v4.3.0"
     - name: smf
       rolling_update_test_tag: "v4.2.3"
       rolling_downgrade_test_tag: "v4.2.2"
