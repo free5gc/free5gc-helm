@@ -1,0 +1,39 @@
+{{- with .Values.bsf }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "free5gc-bsf.fullname" $ }}-configmap
+  labels:
+    {{- include "free5gc-bsf.labels" $ | nindent 4 }}
+data:
+  bsfcfg.yaml: |
+    info:
+      version: 1.0.0
+      description: BSF initial local configuration
+    configuration:
+      bsfName: {{ .configuration.bsfName }}
+      sbi:
+        scheme: {{ $.Values.global.sbi.scheme }}
+        registerIPv4: {{ include "free5gc-bsf.fullname" $ }}-service
+        bindingIPv4: 0.0.0.0
+        port: {{ .service.port }}
+        tls:
+          pem: cert/bsf.pem
+          key: cert/bsf.key
+      nrfUri: {{ $.Values.global.sbi.scheme }}://{{ $.Values.global.nrf.service.name }}:{{ $.Values.global.nrf.service.port }}
+      nrfCertPem: cert/nrf.pem
+      mongodb:
+        name: free5gc
+        url: mongodb://{{ $.Values.mongodb.service.name }}:{{ $.Values.mongodb.service.port }}
+      metrics:
+        enable: {{ .configuration.metrics.enable }}
+        scheme: {{ .configuration.metrics.scheme }}
+        bindingIPv4: 0.0.0.0
+        port: {{ .configuration.metrics.port }}
+        namespace: {{ .configuration.metrics.namespace }}
+        tls:
+          pem: cert/bsf.pem
+          key: cert/bsf.key
+    logger:
+      {{- toYaml .configuration.logger | nindent 6 }}
+{{- end }}

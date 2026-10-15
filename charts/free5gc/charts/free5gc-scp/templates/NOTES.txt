@@ -1,0 +1,1 @@
+SCP service: {{ include "free5gc-scp.fullname" . }}-service:{{ .Values.scp.service.port }}

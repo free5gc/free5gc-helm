@@ -1,0 +1,105 @@
+nameOverride: ""
+fullnameOverride: ""
+
+global:
+  projectName: free5gc
+  sbi:
+    scheme: http
+  nrf:
+    service:
+      name: nrf-nnrf
+      port: "8000"
+
+initcontainers:
+  curl:
+    registry: curlimages
+    image: curl
+    tag: "8.7.1"
+
+scp:
+  name: scp
+  replicaCount: 1
+  image:
+    name: free5gc/scp
+    tag: v4.3.0
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8000
+  volume:
+    mount: /free5gc/config/
+  podAnnotations: {}
+  imagePullSecrets: []
+  podSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    runAsNonRoot: true
+    fsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 1
+    timeoutSeconds: 1
+    failureThreshold: 40
+    successThreshold: 1
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 50
+    periodSeconds: 10
+    timeoutSeconds: 10
+    failureThreshold: 3
+    successThreshold: 1
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts:
+      - host: chart-example.local
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+  configuration:
+    serviceList:
+      - nausf-auth
+      - nudm-ueau
+      - nudm-sdm
+      - nudr-dr
+    nfUris:
+      amf: http://free5gc-free5gc-amf-service:8000
+      ausf: http://free5gc-free5gc-ausf-service:8000
+      chf: http://free5gc-free5gc-chf-service:8000
+      nef: http://free5gc-free5gc-nef-service:8000
+      nssf: http://free5gc-free5gc-nssf-service:8000
+      pcf: http://free5gc-free5gc-pcf-service:8080
+      smf: http://free5gc-free5gc-smf-service:8000
+      udm: http://free5gc-free5gc-udm-service:8000
+      udr: http://free5gc-free5gc-udr-service:8000
+      upf: http://free5gc-free5gc-upf-service:8000
+    logger:
+      enable: true
+      level: info
+      reportCaller: false

@@ -1,0 +1,103 @@
+nameOverride: ""
+fullnameOverride: ""
+
+global:
+  projectName: free5gc
+  sbi:
+    scheme: http
+  nrf:
+    service:
+      name: nrf-nnrf
+      port: "8000"
+
+initcontainers:
+  curl:
+    registry: curlimages
+    image: curl
+    tag: "8.7.1"
+  busybox:
+    image: busybox
+    tag: "1.32.0"
+
+mongodb:
+  service:
+    name: mongodb
+    port: 27017
+
+bsf:
+  name: bsf
+  replicaCount: 1
+  image:
+    name: free5gc/bsf
+    tag: v4.3.0
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8000
+  volume:
+    mount: /free5gc/config/
+  podAnnotations: {}
+  imagePullSecrets: []
+  podSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    runAsNonRoot: true
+    fsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 1
+    timeoutSeconds: 1
+    failureThreshold: 40
+    successThreshold: 1
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 50
+    periodSeconds: 10
+    timeoutSeconds: 10
+    failureThreshold: 3
+    successThreshold: 1
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts:
+      - host: chart-example.local
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+  configuration:
+    bsfName: BSF
+    metrics:
+      enable: false
+      scheme: http
+      port: 9091
+      namespace: free5gc
+    logger:
+      enable: true
+      level: info
+      reportCaller: false

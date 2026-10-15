@@ -1,0 +1,1 @@
+BSF service: {{ include "free5gc-bsf.fullname" . }}-service:{{ .Values.bsf.service.port }}

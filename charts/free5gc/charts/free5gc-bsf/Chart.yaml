@@ -1,0 +1,6 @@
+apiVersion: v2
+name: free5gc-bsf
+description: A Helm chart to deploy the free5GC BSF
+type: application
+version: 0.1.0
+appVersion: "v4.3.0"
