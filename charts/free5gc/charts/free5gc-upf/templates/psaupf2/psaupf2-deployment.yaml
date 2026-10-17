@@ -32,6 +32,11 @@ spec:
   template:
     metadata:
       annotations:
+        {{- if dig "istio" "enabled" false $.Values.global }}
+        sidecar.istio.io/nativeSidecar: "true"
+        proxy.istio.io/config: '{"holdApplicationUntilProxyStarts":true}'
+        traffic.sidecar.istio.io/excludeInterfaces: "n2,n3,n4,n6,n9,ike,upfgtp"
+        {{- end }}
         {{- include "free5gc-upf.psaupf2Annotations" $ | nindent 8 }}
         {{- if $.Values.global.upf.multus.enabled }}
         k8s.v1.cni.cncf.io/networks: '[
@@ -54,10 +59,17 @@ spec:
         {{- end }}
         checksum/config: {{ include (print $.Template.BasePath "/psaupf2/psaupf2-configmap.yaml") $ | sha256sum }}
       labels:
+        {{- if dig "istio" "enabled" false $.Values.global }}
+        sidecar.istio.io/inject: "true"
+        free5gc.io/mesh: {{ $.Release.Name | quote }}
+        {{- end }}
         {{- include "free5gc-upf.selectorLabels" $ | nindent 8 }}
         project: {{ $.Values.global.projectName }}
         nf: {{ .name }}
     spec:
+      {{- if dig "istio" "enabled" false $.Values.global }}
+      serviceAccountName: {{ printf "%s-%s" $.Chart.Name $.Release.Name | trunc 63 | trimSuffix "-" }}
+      {{- end }}
       imagePullSecrets:
         {{- toYaml .imagePullSecrets | nindent 8 }}
       securityContext:
