@@ -50,9 +50,9 @@ This chart allows you to customize its installation. The table below shows the p
 | `global.nrf.service.type` | The type of the NRF SBI service. | `ClusterIP` |
 | `global.amf.service.ngap.enabled` | If `true` then a Kubernetes service will be used to expose the AMF NGAP service Instead of using an additional network interface. | `true` |
 | `global.amf.service.ngap.name` | The name of the AMF NGAP service. | `amf-n2` |
-| `global.amf.service.ngap.type` | The type of the AMF NGAP service. Use `NodePort` for an external RAN. | `ClusterIP` |
+| `global.amf.service.ngap.type` | The type of the AMF NGAP service. | `ClusterIP` |
 | `global.amf.service.ngap.port` | The AMF NGAP port number. | `38412` |
-| `global.amf.service.ngap.nodeport` | Node port used only for `NodePort` or `LoadBalancer`; set `0` for automatic allocation. | `31412` |
+| `global.amf.service.ngap.nodeport` | The nodePort number to access the AMF NGAP service from outside of cluster. Used only for `NodePort` or `LoadBalancer`; set `0` for automatic allocation. | `31412` |
 | `global.amf.service.ngap.protocol` | The protocol used for this service. | `SCTP` |
 
 ### N2 Network parameters

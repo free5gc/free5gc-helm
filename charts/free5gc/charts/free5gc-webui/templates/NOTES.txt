@@ -28,7 +28,7 @@
   export SERVICE_IP=$(kubectl get svc --namespace {{ $.Release.Namespace }} {{ .service.name }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
   echo http://$SERVICE_IP:{{ .service.port }}
 {{- else if contains "ClusterIP" .service.type }}
-  echo "Visit http://127.0.0.1:5000 to use the WebUI"
-  kubectl --namespace {{ $.Release.Namespace }} port-forward svc/{{ .service.name }} 5000:{{ .service.port }}
+  echo "Visit http://127.0.0.1:8080 to use your application"
+  kubectl --namespace {{ $.Release.Namespace }} port-forward svc/{{ .service.name }} 8080:{{ .service.port }}
 {{- end }}
 {{- end }}
