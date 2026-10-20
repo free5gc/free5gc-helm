@@ -171,6 +171,16 @@ Following Free5GC documentation:
 	mongodb-0
   ```
   * Acccess to Free5GC webUI
+    The WebUI uses a `ClusterIP` service by default. To access it locally, run:
+
+    ```console
+    kubectl -n free5gc port-forward svc/webui-service 5000:5000
+    ```
+
+    Open http://127.0.0.1:5000 while port-forward is running.
+
+    If you prefer NodePort access, add `--set free5gc-webui.webui.service.type=NodePort` to the free5gc Helm install or upgrade command. The default node port is `30500`. Then follow the original instructions below:
+
     WebUI is available through a nodeport, accessible from the host using the external @IP address from the KinD cluster.
     * Identification of the nodeport with external port (here 30500)
       ```
