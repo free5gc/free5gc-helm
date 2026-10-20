@@ -46,7 +46,9 @@ spec:
   ports:
     - name: n2
       port: {{ $.Values.global.amf.service.ngap.port }}
+      {{- if and (or (eq $.Values.global.amf.service.ngap.type "NodePort") (eq $.Values.global.amf.service.ngap.type "LoadBalancer")) $.Values.global.amf.service.ngap.nodeport }}
       nodePort: {{ $.Values.global.amf.service.ngap.nodeport }}
+      {{- end }}
       protocol: {{ $.Values.global.amf.service.ngap.protocol }}
   selector:
     project: {{ $.Values.global.projectName }}

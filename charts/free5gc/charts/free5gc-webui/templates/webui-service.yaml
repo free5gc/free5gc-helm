@@ -24,7 +24,9 @@ spec:
   ports:
     - port: {{ .service.port }}
       targetPort: {{ .service.port }}
+      {{- if and (or (eq .service.type "NodePort") (eq .service.type "LoadBalancer")) .service.nodePort }}
       nodePort: {{ .service.nodePort }}
+      {{- end }}
       protocol: TCP
       name: http
   selector:

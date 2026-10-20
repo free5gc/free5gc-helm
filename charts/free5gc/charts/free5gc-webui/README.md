@@ -60,9 +60,9 @@ This chart allows you to customize its installation. The table below shows the p
 | `webui.image.name` | The WEBUI Docker image name. | `towards5gs/free5gc-webui` |
 | `webui.image.tag` | The WEBUI Docker image tag. | `defaults to chart AppVersion` |
 | `webui.service.name` | The name of the service used to expose the WEBUI. | `webui-service` |
-| `webui.service.type` | The type of the service used to expose the WEBUI. | `NodePort` |
+| `webui.service.type` | The type of the service used to expose the WEBUI. | `ClusterIP` |
 | `webui.service.port` | The WEBUI port number. | `5000` |
-| `webui.service.nodePort` | The nodePort number of the service used to expose the WEBUI. | `30500` |
+| `webui.service.nodePort` | Node port used only for `NodePort` or `LoadBalancer`; set `0` for automatic allocation. | `30500` |
 | `webui.configmap.name` | The name of the configmap to be used to import the configuration to the WEBUI POD. | `webui-configmap` |
 | `webui.volume.name` | The name of the volume to be mounted to the WEBUI POD. | `webui-volume` |
 | `webui.volume.mount` | The name of the volume to be mounted to the WEBUI POD. | `webui-volume` |

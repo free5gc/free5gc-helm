@@ -44,12 +44,13 @@ global:
         excludeIP: 10.100.50.254
     service:
       ngap:
-        enabled: true  # Enable NGAP service for external access
+        enabled: true  # Enable the NGAP service for RAN access
         name: amf-n2
         port: 38412
+        # Used only with NodePort or LoadBalancer; set 0 for automatic allocation.
         nodeport: 31412
         protocol: SCTP
-        type: NodePort
+        type: ClusterIP
   
   # SMF Multus CNI Configuration
   smf:
