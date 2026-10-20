@@ -62,7 +62,7 @@ This chart allows you to customize its installation. The table below shows the p
 | `webui.service.name` | The name of the service used to expose the WEBUI. | `webui-service` |
 | `webui.service.type` | The type of the service used to expose the WEBUI. | `ClusterIP` |
 | `webui.service.port` | The WEBUI port number. | `5000` |
-| `webui.service.nodePort` | Node port used only for `NodePort` or `LoadBalancer`; set `0` for automatic allocation. | `30500` |
+| `webui.service.nodePort` | The nodePort number of the service used to expose the WEBUI. Used only for `NodePort` or `LoadBalancer`; set `0` for automatic allocation. | `30500` |
 | `webui.configmap.name` | The name of the configmap to be used to import the configuration to the WEBUI POD. | `webui-configmap` |
 | `webui.volume.name` | The name of the volume to be mounted to the WEBUI POD. | `webui-volume` |
 | `webui.volume.mount` | The name of the volume to be mounted to the WEBUI POD. | `webui-volume` |
