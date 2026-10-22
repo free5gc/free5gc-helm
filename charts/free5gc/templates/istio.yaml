@@ -1,0 +1,74 @@
+{{- if .Values.global.istio.enabled }}
+{{- if not (semverCompare ">=1.29-0" .Capabilities.KubeVersion.Version) }}
+{{- fail "Istio integration requires Kubernetes >=1.29 with native sidecars enabled" }}
+{{- end }}
+{{- if ne .Values.global.sbi.scheme "http" }}
+{{- fail "Istio NRF L7 authorization requires global.sbi.scheme=http; Istio encrypts transport with mTLS" }}
+{{- end }}
+{{- if not (and .Values.istio.trustDomain .Values.istio.nrfAuthorization.methods .Values.istio.nrfAuthorization.paths) }}
+{{- fail "Istio requires a trustDomain and non-empty NRF authorization methods and paths" }}
+{{- end }}
+{{- range concat .Values.istio.nrfAuthorization.methods .Values.istio.nrfAuthorization.paths }}
+{{- if not . }}
+{{- fail "NRF authorization methods and paths must not contain empty entries" }}
+{{- end }}
+{{- end }}
+{{- $accounts := list }}
+{{- range $nf := list "amf" "ausf" "chf" "n3iwf" "nef" "nrf" "nssf" "pcf" "smf" "udm" "udr" "upf" "webui" "dbPython" }}
+{{- if index $.Values (printf "deploy%s" (title $nf)) }}
+{{- $chart := printf "free5gc-%s" (lower $nf) }}
+{{- $account := include "free5gc.security.serviceAccountName" (index $.Subcharts $chart) }}
+{{- if has $nf (list "amf" "ausf" "chf" "n3iwf" "nef" "nrf" "nssf" "pcf" "smf" "udm" "udr") }}
+{{- $accounts = append $accounts (printf "%s/ns/%s/sa/%s" $.Values.istio.trustDomain $.Release.Namespace $account) }}
+{{- end }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ $account }}
+  namespace: {{ $.Release.Namespace }}
+automountServiceAccountToken: false
+{{- end }}
+{{- end }}
+---
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: {{ .Release.Name }}-mtls
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      free5gc.io/mesh: {{ .Release.Name | quote }}
+  mtls:
+    mode: STRICT
+{{- if .Values.deployNrf }}
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: {{ .Release.Name }}-nrf-sbi
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      free5gc.io/mesh: {{ .Release.Name | quote }}
+      app.kubernetes.io/name: {{ include "free5gc-nrf.name" (index .Subcharts "free5gc-nrf") | quote }}
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            principals:
+              {{- toYaml $accounts | nindent 14 }}
+      to:
+        - operation:
+            ports: [{{ .Values.global.nrf.service.port | quote }}]
+            methods:
+              {{- toYaml .Values.istio.nrfAuthorization.methods | nindent 14 }}
+            paths:
+              {{- toYaml .Values.istio.nrfAuthorization.paths | nindent 14 }}
+    - to:
+        - operation:
+            notPorts: [{{ .Values.global.nrf.service.port | quote }}]
+{{- end }}
+{{- end }}
