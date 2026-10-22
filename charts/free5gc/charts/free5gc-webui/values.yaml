@@ -66,8 +66,9 @@ webui:
     pullPolicy: IfNotPresent
   service:
     name: webui-service
-    type: NodePort
+    type: ClusterIP
     port: 5000
+    # Used only with NodePort or LoadBalancer; set 0 for automatic allocation.
     nodePort: 30500
   configmap:
     name: webui-configmap

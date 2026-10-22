@@ -104,6 +104,17 @@ helm -n <namespace> install <release-name> ./free5gc-n3iwf/
 ```
 
 ### Add user information
+The WebUI uses a `ClusterIP` service by default. Using the kubectl context for the second cluster, run:
+
+```console
+kubectl -n <namespace> port-forward svc/webui-service 5000:5000
+```
+
+Open http://127.0.0.1:5000 while port-forward is running.
+
+If you prefer NodePort access, add `--set webui.service.type=NodePort` to the WebUI subchart Helm install or upgrade command on the second cluster.
+The default node port is `30500`. Then follow the original instructions below:
+
 The WEBUI can be accessed at the second cluster with `nodePort=30500`. So you can access it by using this url `{replace by the IP of one of your second cluster nodes}:30500`.
 
 **Note:** the simulated UE will accept `OP` instead of `OPC` so please make sure setting that in the WEBUI graphical interface.
