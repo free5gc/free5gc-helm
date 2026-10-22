@@ -32,7 +32,7 @@ jobs:
   # scheduled workflows do not run either job.
   essential:
     if: github.repository == 'free5gc/free5gc-helm' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     # An essential-tests run takes about 22 minutes on ubuntu-latest (4 vCPU) with
     # suite v2.2.0; this leaves room for a slow day without
     # letting a stuck run hold the runner for hours.
@@ -41,7 +41,7 @@ jobs:
       # Publishes the badge to the orphan branch `badges`.
       contents: write
     env: &essential-env
-      # Fifteen functions share the runner's four cores: scaling and
+      # Fifteen functions share the runner: scaling and
       # rollouts take longer than the suite's 60-second default.
       CNTI_TESTSUITE_GENERIC_OPERATION_TIMEOUT: "180"
     steps: &essential-steps
@@ -58,9 +58,11 @@ jobs:
           set -euo pipefail
           sudo apt-get update -qq
           sudo apt-get install -y -qq build-essential "linux-headers-$(uname -r)"
-          git clone --depth 1 https://github.com/free5gc/gtp5g.git /tmp/gtp5g
-          make -C /tmp/gtp5g -j"$(nproc)"
-          sudo make -C /tmp/gtp5g install
+          gtp5g_dir="$(mktemp -d)"
+          trap 'rm -rf -- "$gtp5g_dir"' EXIT
+          git clone --depth 1 https://github.com/free5gc/gtp5g.git "$gtp5g_dir"
+          make -C "$gtp5g_dir" -j"$(nproc)"
+          sudo make -C "$gtp5g_dir" install
           sudo modprobe gtp5g
           lsmod | grep -q '^gtp5g' && echo "gtp5g loaded on kernel $(uname -r)"
 
@@ -80,7 +82,7 @@ jobs:
   # badge only from the default branch, so nothing is published here.
   essential-pr:
     if: github.repository == 'free5gc/free5gc-helm' && (github.event_name == 'pull_request' || github.ref != 'refs/heads/main')
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     timeout-minutes: 120
     permissions:
       contents: read
