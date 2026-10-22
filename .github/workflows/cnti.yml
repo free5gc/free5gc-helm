@@ -51,20 +51,16 @@ jobs:
           # to the badge publisher on its own.
           persist-credentials: false
 
-      # The UPF forwards through the gtp5g kernel module. kind nodes share the
-      # host kernel, so building the out-of-tree module on the runner is enough.
-      - name: Build and load the gtp5g kernel module
+      # kind nodes share the host kernel. The self-hosted runner must have
+      # the gtp5g module installed and loaded before running the UPF.
+      - name: Check that the gtp5g kernel module is loaded
         run: |
           set -euo pipefail
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq build-essential "linux-headers-$(uname -r)"
-          gtp5g_dir="$(mktemp -d)"
-          trap 'rm -rf -- "$gtp5g_dir"' EXIT
-          git clone --depth 1 https://github.com/free5gc/gtp5g.git "$gtp5g_dir"
-          make -C "$gtp5g_dir" -j"$(nproc)"
-          sudo make -C "$gtp5g_dir" install
-          sudo modprobe gtp5g
-          lsmod | grep -q '^gtp5g' && echo "gtp5g loaded on kernel $(uname -r)"
+          if [ ! -d /sys/module/gtp5g ]; then
+            echo "::error::The self-hosted runner must have gtp5g installed and loaded."
+            exit 1
+          fi
+          echo "gtp5g loaded on kernel $(uname -r)"
 
       - uses: lfn-cnti/testsuite-action@v1
         with:
