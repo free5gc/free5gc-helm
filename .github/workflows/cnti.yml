@@ -32,7 +32,7 @@ jobs:
   # scheduled workflows do not run either job.
   essential:
     if: github.repository == 'free5gc/free5gc-helm' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     # An essential-tests run takes about 22 minutes on ubuntu-latest (4 vCPU) with
     # suite v2.2.0; this leaves room for a slow day without
     # letting a stuck run hold the runner for hours.
@@ -41,7 +41,7 @@ jobs:
       # Publishes the badge to the orphan branch `badges`.
       contents: write
     env: &essential-env
-      # Fifteen functions share the runner's four cores: scaling and
+      # Fifteen functions share the runner: scaling and
       # rollouts take longer than the suite's 60-second default.
       CNTI_TESTSUITE_GENERIC_OPERATION_TIMEOUT: "180"
     steps: &essential-steps
@@ -51,18 +51,24 @@ jobs:
           # to the badge publisher on its own.
           persist-credentials: false
 
-      # The UPF forwards through the gtp5g kernel module. kind nodes share the
-      # host kernel, so building the out-of-tree module on the runner is enough.
-      - name: Build and load the gtp5g kernel module
+      # kind nodes share the host kernel. The self-hosted runner must have
+      # the gtp5g module installed and loaded before running the UPF.
+      - name: Check that the gtp5g kernel module is loaded
         run: |
           set -euo pipefail
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq build-essential "linux-headers-$(uname -r)"
-          git clone --depth 1 https://github.com/free5gc/gtp5g.git /tmp/gtp5g
-          make -C /tmp/gtp5g -j"$(nproc)"
-          sudo make -C /tmp/gtp5g install
-          sudo modprobe gtp5g
-          lsmod | grep -q '^gtp5g' && echo "gtp5g loaded on kernel $(uname -r)"
+          if [ ! -d /sys/module/gtp5g ]; then
+            echo "The self-hosted runner must have gtp5g installed and loaded."
+            exit 1
+          fi
+          echo "gtp5g loaded on kernel $(uname -r)"
+
+      # The existing binary cache stores ../../../.cnti-testsuite relative to
+      # the workspace. On this runner that differs from $HOME/.cnti-testsuite.
+      - name: Add the restored CNTi cache directory to PATH
+        run: |
+          set -euo pipefail
+          cnti_cache_dir="$(realpath -m "$GITHUB_WORKSPACE/../../../.cnti-testsuite")"
+          echo "$cnti_cache_dir" >> "$GITHUB_PATH"
 
       - uses: lfn-cnti/testsuite-action@v1
         with:
@@ -80,7 +86,7 @@ jobs:
   # badge only from the default branch, so nothing is published here.
   essential-pr:
     if: github.repository == 'free5gc/free5gc-helm' && (github.event_name == 'pull_request' || github.ref != 'refs/heads/main')
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     timeout-minutes: 120
     permissions:
       contents: read
