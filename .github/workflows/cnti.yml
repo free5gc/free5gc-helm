@@ -57,7 +57,7 @@ jobs:
         run: |
           set -euo pipefail
           if [ ! -d /sys/module/gtp5g ]; then
-            echo "::error::The self-hosted runner must have gtp5g installed and loaded."
+            echo "The self-hosted runner must have gtp5g installed and loaded."
             exit 1
           fi
           echo "gtp5g loaded on kernel $(uname -r)"
