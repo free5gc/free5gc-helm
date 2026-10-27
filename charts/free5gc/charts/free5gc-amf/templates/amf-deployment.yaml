@@ -51,6 +51,8 @@ spec:
         project: {{ $.Values.global.projectName }}
         nf: {{ .name }}
     spec:
+      serviceAccountName: {{ printf "%s-%s" $.Chart.Name $.Release.Name | trunc 63 | trimSuffix "-" }}
+      automountServiceAccountToken: false
       imagePullSecrets:
         {{- toYaml .imagePullSecrets | nindent 8 }}
       securityContext:
