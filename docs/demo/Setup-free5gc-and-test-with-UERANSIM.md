@@ -81,6 +81,17 @@ kubectl -n <namespace> get pods -l "project=free5gc"
 ```
 
 #### Add user information
+The WebUI uses a `ClusterIP` service by default. To access it locally, run:
+
+```console
+kubectl -n <namespace> port-forward svc/webui-service 5000:5000
+```
+
+Open http://127.0.0.1:5000 while port-forward is running.
+
+If you prefer NodePort access, set `free5gc-webui.webui.service.type=NodePort` when installing or upgrading the free5gc umbrella chart (for example, add `--set free5gc-webui.webui.service.type=NodePort` to the Helm command).
+The default node port is `30500`. Then follow the original instructions below:
+
 The WEBUI can is exposed with a Kubernetes service with `nodePort=30500`. So you can access it by using this url `{replace-by-the-IP-of-one-of-your-cluster-nodes}:30500`.
 
 For adding a new subscriber, please refer to the [Free5GC documentation](https://github.com/free5gc/free5gc/wiki/New-Subscriber-via-webconsole#4-use-browser-to-connect-to-webconsole).

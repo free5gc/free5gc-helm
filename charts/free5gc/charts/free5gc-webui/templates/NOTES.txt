@@ -28,9 +28,7 @@
   export SERVICE_IP=$(kubectl get svc --namespace {{ $.Release.Namespace }} {{ .service.name }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
   echo http://$SERVICE_IP:{{ .service.port }}
 {{- else if contains "ClusterIP" .service.type }}
-  export POD_NAME=$(kubectl get pods --namespace {{ $.Release.Namespace }} -l "app.kubernetes.io/name={{ include "free5gc-webui.name" $ }},app.kubernetes.io/instance={{ $.Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
-  export CONTAINER_PORT=$(kubectl get pod --namespace {{ $.Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
   echo "Visit http://127.0.0.1:8080 to use your application"
-  kubectl --namespace {{ $.Release.Namespace }} port-forward $POD_NAME 8080:$CONTAINER_PORT
+  kubectl --namespace {{ $.Release.Namespace }} port-forward svc/{{ .service.name }} 8080:{{ .service.port }}
 {{- end }}
 {{- end }}

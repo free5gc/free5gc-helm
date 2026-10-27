@@ -77,6 +77,51 @@ helm -n <namespace> install <release-name> ./free5gc/
 kubectl -n <namespace> get pods -l "project=free5gc"
 ```
 
+### Access the WebUI
+
+#### Option 1: ClusterIP (default)
+
+The WebUI service uses `ClusterIP` by default. Install the free5gc chart without overriding the service type:
+
+```console
+helm -n <namespace> install <release-name> ./free5gc/
+```
+
+If an existing release uses `NodePort`, switch it back to `ClusterIP` while retaining its other values:
+
+```console
+helm -n <namespace> upgrade <release-name> ./free5gc/ \
+  --reuse-values \
+  --set free5gc-webui.webui.service.type=ClusterIP
+```
+
+To access the WebUI locally, start port-forwarding in a separate terminal:
+
+```console
+kubectl -n <namespace> port-forward svc/webui-service 5000:5000
+```
+
+Open http://127.0.0.1:5000 while port-forward is running.
+
+#### Option 2: NodePort
+
+To access the WebUI through a Kubernetes node's IP address, enable `NodePort` when installing the free5gc chart:
+
+```console
+helm -n <namespace> install <release-name> ./free5gc/ \
+  --set free5gc-webui.webui.service.type=NodePort
+```
+
+For an existing release, upgrade it while retaining its current values:
+
+```console
+helm -n <namespace> upgrade <release-name> ./free5gc/ \
+  --reuse-values \
+  --set free5gc-webui.webui.service.type=NodePort
+```
+
+Open `http://<node-ip>:30500`, replacing `<node-ip>` with a reachable IP address of one of your Kubernetes nodes. The default node port is `30500`; make sure it is reachable from your browser. Port-forwarding is not required for this option.
+
 ### Uninstall free5gc
 ```console
 helm -n <namespace> delete <release-name>
@@ -87,6 +132,41 @@ helm -n <namespace> uninstall <release-name>
 ```
 
 ## Configuration
+
+### Service exposure with ClusterIP
+
+The WebUI and AMF N2 (NGAP) services use `ClusterIP` by default.
+
+Install the free5gc chart without overriding the service types:
+
+```console
+helm -n <namespace> install <release-name> ./free5gc/
+```
+
+If an existing release uses `NodePort`, switch both services back to `ClusterIP` while retaining its other values:
+
+```console
+helm -n <namespace> upgrade <release-name> ./free5gc/ \
+  --reuse-values \
+  --set free5gc-webui.webui.service.type=ClusterIP \
+  --set global.amf.service.ngap.type=ClusterIP
+```
+
+### Service exposure with NodePort
+
+To expose either service through a node port, add the corresponding option to your Helm install or upgrade command for the free5gc chart:
+
+- WebUI: `--set free5gc-webui.webui.service.type=NodePort`
+  Then access `http://<node-ip>:30500`.
+- AMF N2: `--set global.amf.service.ngap.type=NodePort`
+  Then configure your external gNB to connect to `<node-ip>:31412` using SCTP.
+
+The configured node ports default to `30500` for WebUI and `31412` for AMF N2. They are rendered only for `NodePort` or `LoadBalancer` services when the configured value is nonzero. Set the corresponding value to `0` to let Kubernetes allocate the node port automatically:
+
+- WebUI: `free5gc-webui.webui.service.nodePort`
+- AMF N2: `global.amf.service.ngap.nodeport`
+
+For an existing `NodePort` service, Kubernetes may retain its allocated node port when the configured value is set to `0`; this does not force a new allocation. Use `kubectl -n <namespace> get svc` to check the actual assigned ports.
 
 ### Connection for UERANSIM (Without Multus CNI)
 
@@ -199,11 +279,11 @@ Please check this [link](https://helm.sh/docs/chart_template_guide/subcharts_and
 | `global.nrf.service.port` | The NRF SBI service nodePort number. | `30800` |
 | `global.smf.n4if.ipAddress` | The IP address of the SMF’s N4 interface. | `10.100.50.249` |
 | `global.amf.n2if.ipAddress` | The IP address of the AMF’s N2 interface. | `10.100.50.249` |
-| `global.amf.service.ngap.enabled` | If `true` then a Kubernetes service will be used to expose the AMF NGAP service. | `false` |
+| `global.amf.service.ngap.enabled` | If `true` then a Kubernetes service will be used to expose the AMF NGAP service. | `true` |
 | `global.amf.service.ngap.name` | The name of the AMF NGAP service. | `amf-n2` |
-| `global.amf.service.ngap.type` | The type of the AMF NGAP service. | `NodePort` |
+| `global.amf.service.ngap.type` | The type of the AMF NGAP service. | `ClusterIP` |
 | `global.amf.service.ngap.port` | The AMF NGAP port number. | `38412` |
-| `global.amf.service.ngap.nodeport` | The nodePort number to access the AMF NGAP service from outside of cluster. | `31412` |
+| `global.amf.service.ngap.nodeport` | The nodePort number to access the AMF NGAP service from outside the cluster. Used only for `NodePort` or `LoadBalancer`; set `0` for automatic allocation. | `31412` |
 | `global.amf.service.ngap.protocol` | The protocol used for this service. | `SCTP` |
 
 ### N2 Network parameters

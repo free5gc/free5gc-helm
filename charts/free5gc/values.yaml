@@ -47,9 +47,10 @@ global:
         enabled: true  # Enable NGAP service for external access
         name: amf-n2
         port: 38412
+        # Used only with NodePort or LoadBalancer; set 0 for automatic allocation.
         nodeport: 31412
         protocol: SCTP
-        type: NodePort
+        type: ClusterIP
   
   # SMF Multus CNI Configuration
   smf:
