@@ -68,7 +68,8 @@ This chart allows you to customize its installation. The table below shows the p
 | `udr.volume.mount` | The path to the folder where configuration files should be mounted. | `/free5gc/config/`|
 | `udr.podAnnotations` | Pod annotations. | `{}`|
 | `udr.imagePullSecrets` | Image pull secrets. | `[]`|
-| `udr.podSecurityContext` | Pod secutity context. | `[]`|
+| `udr.podSecurityContext` | Pod security context. | `see values.yaml`|
+| `udr.podSecurityContext.seccompProfile.type` | Pod seccomp profile. | `RuntimeDefault`|
 | `udr.resources` | CPU and memory requests and limits. | `see values.yaml`|
 | `udr.readinessProbe` | Readiness probe (not used for instance). | `see values.yaml`|
 | `udr.livenessProbe` | Liveness probe (not used for instance). | `see values.yaml`|

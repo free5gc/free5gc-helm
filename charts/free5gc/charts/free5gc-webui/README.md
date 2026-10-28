@@ -69,7 +69,8 @@ This chart allows you to customize its installation. The table below shows the p
 | `webui.volume.mount` | The path to the folder where configuration files should be mounted. | `/free5gc/config/`|
 | `webui.podAnnotations` | Pod annotations. | `{}`|
 | `webui.imagePullSecrets` | Image pull secrets. | `[]`|
-| `webui.podSecurityContext` | Pod secutity context. | `[]`|
+| `webui.podSecurityContext` | Pod security context. | `see values.yaml`|
+| `webui.podSecurityContext.seccompProfile.type` | Pod seccomp profile. | `RuntimeDefault`|
 | `webui.resources` | CPU and memory requests and limits. | `see values.yaml`|
 | `webui.readinessProbe` | Readiness probe (not used for instance). | `see values.yaml`|
 | `webui.livenessProbe` | Liveness probe (not used for instance). | `see values.yaml`|

@@ -114,7 +114,7 @@ These parameters if `global.userPlaneArchitecture` is set to `ulcl`.
 | `global.n9network.gatewayIP` | N9 network gateway IP address (The IP address to go to the Data Network). | `10.100.50.230` |
 
 ### UPF parameters
-These parameters if `global.userPlaneArchitecture` is set to `signle`.
+These parameters apply if `global.userPlaneArchitecture` is set to `single`.
 
 | Parameter | Description | Default value |
 | --- | --- | --- |
@@ -126,6 +126,7 @@ These parameters if `global.userPlaneArchitecture` is set to `signle`.
 | `upf.n3if.ipAddress` | The IP address of the UPF’s N3 interface. | `10.100.50.233` |
 | `upf.n4if.ipAddress` | The IP address of the UPF’s N4 interface. | `10.100.50.241` |
 | `upf.n6if.ipAddress` | The IP address of the UPF’s N6 interface. | `10.100.100.12` |
+| `upf.podSecurityContext.seccompProfile.type` | Pod seccomp profile. | `RuntimeDefault` |
 
 ### psaupf1 parameters
 These parameters if `global.userPlaneArchitecture` is set to `ulcl`.
@@ -140,6 +141,7 @@ These parameters if `global.userPlaneArchitecture` is set to `ulcl`.
 | `psaupf1.n4if.ipAddress` | The IP address of the psaupf1 N4 interface. | `10.100.50.242` |
 | `psaupf1.n6if.ipAddress` | The IP address of the psaupf1 N6 interface. | `10.100.100.13` |
 | `psaupf1.n9if.ipAddress` | The IP address of the psaupf1 N9 interface. | `10.100.50.226` |
+| `psaupf1.podSecurityContext.seccompProfile.type` | Pod seccomp profile. | `RuntimeDefault` |
 
 ### psaupf2 parameters
 These parameters if `global.userPlaneArchitecture` is set to `ulcl`.
@@ -154,6 +156,7 @@ These parameters if `global.userPlaneArchitecture` is set to `ulcl`.
 | `psaupf2.n4if.ipAddress` | The IP address of the psaupf2’s N4 interface. | `10.100.50.243` |
 | `psaupf2.n6if.ipAddress` | The IP address of the psaupf2’s N6 interface. | `10.100.100.14` |
 | `psaupf2.n9if.ipAddress` | The IP address of the psaupf2’s N9 interface. | `10.100.50.227` |
+| `psaupf2.podSecurityContext.seccompProfile.type` | Pod seccomp profile. | `RuntimeDefault` |
 
 ### iupf1 parameters
 These parameters if `global.userPlaneArchitecture` is set to `ulcl`.
@@ -169,6 +172,7 @@ These parameters if `global.userPlaneArchitecture` is set to `ulcl`.
 | `iupf1.n4if.ipAddress` | The IP address of the iupf1’s N4 interface. | `10.100.50.241` |
 | `iupf1.n6if.ipAddress` | The IP address of the iupf1’s N6 interface. | `10.100.100.12` |
 | `iupf1.n9if.ipAddress` | The IP address of the iupf1’s N9 interface. | `10.100.50.225` |
+| `iupf1.podSecurityContext.seccompProfile.type` | Pod seccomp profile. | `RuntimeDefault` |
 
 ## Known limitations
 Currently, this Helm chart uses the [MACVLAN plugin](https://www.cni.dev/plugins/main/macvlan/) for all network attachment definition. However, the use of a Userspace CNI plugin like [SR-IOV] is necessary for user plane traffic (N3 and N6 interfaces). Using this CNI plugin may be possible in next versions.

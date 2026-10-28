@@ -64,7 +64,8 @@ This chart allows you to customize its installation. The table below shows the p
 | `pcf.volume.mount` | The path to the folder where configuration files should be mounted. | `/free5gc/config/`|
 | `pcf.podAnnotations` | Pod annotations. | `{}`|
 | `pcf.imagePullSecrets` | Image pull secrets. | `[]`|
-| `pcf.podSecurityContext` | Pod secutity context. | `[]`|
+| `pcf.podSecurityContext` | Pod security context. | `see values.yaml`|
+| `pcf.podSecurityContext.seccompProfile.type` | Pod seccomp profile. | `RuntimeDefault`|
 | `pcf.resources` | CPU and memory requests and limits. | `see values.yaml`|
 | `pcf.readinessProbe` | Readiness probe (not used for instance). | `see values.yaml`|
 | `pcf.livenessProbe` | Liveness probe (not used for instance). | `see values.yaml`|
