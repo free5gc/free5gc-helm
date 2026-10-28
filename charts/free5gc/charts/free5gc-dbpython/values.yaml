@@ -46,7 +46,9 @@ dbpython:
   podAnnotations: {}
     # additional annotations
   imagePullSecrets: []
-  podSecurityContext: {}
+  podSecurityContext:
+    seccompProfile:
+      type: RuntimeDefault
   securityContext: {}
   resources:
     limits:

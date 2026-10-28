@@ -66,6 +66,8 @@ chf:
     runAsGroup: 1000
     runAsNonRoot: true
     fsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
   securityContext:
     allowPrivilegeEscalation: false
   resources:

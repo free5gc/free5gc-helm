@@ -13,6 +13,13 @@ This is a Helm chart for deploying the [free5GC](https://github.com/free5gc/free
  - [free5gc-upf](./charts/free5gc-upf)
  - [free5gc-webui](./charts/free5gc-webui)
 
+## Pod seccomp profile
+
+The network function charts set `podSecurityContext.seccompProfile.type` to
+`RuntimeDefault` by default. This applies to their init containers and main
+containers. Each chart can override the value through its `podSecurityContext`;
+the UPF chart has separate values for `upf`, `iupf1`, `psaupf1`, and `psaupf2`.
+
 ## Prerequisites
  - A Kubernetes cluster ready to use with all worker nodes using kernel `5.0.0-23-generic` and they should contain gtp5g kernel module.
  - The AMF NGAP service relies on SCTP which is supported by default in Kubernetes from version [1.20](https://kubernetes.io/docs/setup/release/notes/#feature) onwards. If you are using an older version of Kubernetes please refer to this [link](https://v1-19.docs.kubernetes.io/docs/concepts/services-networking/service/#sctp) to enbale SCTP support.

@@ -114,6 +114,8 @@ upf:
     # additional annotations
   imagePullSecrets: []
   podSecurityContext:
+    seccompProfile:
+      type: RuntimeDefault
     sysctls:
       - name: net.ipv4.ip_forward
         value: "1"
@@ -197,6 +199,8 @@ psaupf1:
     # additional annotations
   imagePullSecrets: []
   podSecurityContext:
+    seccompProfile:
+      type: RuntimeDefault
     sysctls:
       - name: net.ipv4.ip_forward
         value: "1"
@@ -279,6 +283,8 @@ psaupf2:
     # additional annotations
   imagePullSecrets: []
   podSecurityContext:
+    seccompProfile:
+      type: RuntimeDefault
     sysctls:
       - name: net.ipv4.ip_forward
         value: "1"
@@ -361,6 +367,8 @@ iupf1:
     # additional annotations
   imagePullSecrets: []
   podSecurityContext:
+    seccompProfile:
+      type: RuntimeDefault
     sysctls:
       - name: net.ipv4.ip_forward
         value: "1"
