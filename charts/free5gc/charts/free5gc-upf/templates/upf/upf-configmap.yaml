@@ -97,10 +97,6 @@ data:
       sleep 1
     done
 
-    # Setup iptables for NAT (single interface mode - eth0)
-    iptables -A FORWARD -j ACCEPT
-    iptables -t nat -A POSTROUTING -s {{ $.Values.global.uesubnet }} -o eth0 -j MASQUERADE
-
     {{- if $.Values.upf.configmap.wrapperAdditionalCommands }}
     {{- $.Values.upf.configmap.wrapperAdditionalCommands | nindent 4 }}
     {{- end }}

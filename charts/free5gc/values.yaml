@@ -16,7 +16,8 @@
 
 global:
   name: free5gc
-  userPlaneArchitecture: ulcl  # possible values are "single" and "ulcl"
+  # Selects the SMF and UPF topology; no chart files need to be copied.
+  userPlaneArchitecture: ulcl  # supported values: "single" and "ulcl"
   uesubnet: 10.60.0.0/16  # UE IP address pool
   nrf:
     service:
