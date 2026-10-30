@@ -81,7 +81,8 @@ This chart allows you to customize its installation. The table below shows the p
 | `smf.volume.mount` | The path to the folder where configuration files should be mounted. | `/free5gc/config/`|
 | `smf.podAnnotations` | Pod annotations. | `{}`|
 | `smf.imagePullSecrets` | Image pull secrets. | `[]`|
-| `smf.podSecurityContext` | Pod secutity context. | `[]`|
+| `smf.podSecurityContext` | Pod security context. | `see values.yaml`|
+| `smf.podSecurityContext.seccompProfile.type` | Pod seccomp profile. | `RuntimeDefault`|
 | `smf.resources` | CPU and memory requests and limits. | `see values.yaml`|
 | `smf.readinessProbe` | Readiness probe (not used for instance). | `see values.yaml`|
 | `smf.livenessProbe` | Liveness probe (not used for instance). | `see values.yaml`|

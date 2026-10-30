@@ -88,7 +88,8 @@ These parameters apply only if `global.amf.service.ngap.enabled` is set to `fals
 | `amf.volume.mount` | The path to the folder where configuration files should be mounted. | `/free5gc/config/`|
 | `amf.podAnnotations` | Pod annotations. | `{}`|
 | `amf.imagePullSecrets` | Image pull secrets. | `[]`|
-| `amf.podSecurityContext` | Pod secutity context. | `[]`|
+| `amf.podSecurityContext` | Pod security context. | `see values.yaml`|
+| `amf.podSecurityContext.seccompProfile.type` | Pod seccomp profile. | `RuntimeDefault`|
 | `amf.resources` | CPU and memory requests and limits. | `see values.yaml`|
 | `amf.readinessProbe` | Readiness probe (not used for instance). | `see values.yaml`|
 | `amf.livenessProbe` | Liveness probe (not used for instance). | `see values.yaml`|
