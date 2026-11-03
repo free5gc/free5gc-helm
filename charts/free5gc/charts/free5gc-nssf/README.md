@@ -64,7 +64,8 @@ This chart allows you to customize its installation. The table below shows the p
 | `nssf.volume.mount` | The path to the folder where configuration files should be mounted. | `/free5gc/config/`|
 | `nssf.podAnnotations` | Pod annotations. | `{}`|
 | `nssf.imagePullSecrets` | Image pull secrets. | `[]`|
-| `nssf.podSecurityContext` | Pod secutity context. | `[]`|
+| `nssf.podSecurityContext` | Pod security context. | `see values.yaml`|
+| `nssf.podSecurityContext.seccompProfile.type` | Pod seccomp profile. | `RuntimeDefault`|
 | `nssf.resources` | CPU and memory requests and limits. | `see values.yaml`|
 | `nssf.readinessProbe` | Readiness probe (not used for instance). | `see values.yaml`|
 | `nssf.livenessProbe` | Liveness probe (not used for instance). | `see values.yaml`|

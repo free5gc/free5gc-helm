@@ -107,7 +107,8 @@ These parameters apply only if `global.amf.service.ngap.enabled` is set to `fals
 | `n3iwf.volume.mount` | The path to the folder where configuration files should be mounted. | `/free5gc/config/`|
 | `n3iwf.podAnnotations` | Pod annotations. | `{}`|
 | `n3iwf.imagePullSecrets` | Image pull secrets. | `[]`|
-| `n3iwf.podSecurityContext` | Pod secutity context. | `[]`|
+| `n3iwf.podSecurityContext` | Pod security context. | `see values.yaml`|
+| `n3iwf.podSecurityContext.seccompProfile.type` | Pod seccomp profile. | `RuntimeDefault`|
 | `n3iwf.securityContext` | Secutity context. | `NET_ADMIN` capability given to the N3IWF Pod. `See values.yaml`|
 | `n3iwf.resources` | CPU and memory requests and limits. | `see values.yaml`|
 | `n3iwf.readinessProbe` | Readiness probe (not used for instance). | `see values.yaml`|

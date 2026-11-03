@@ -66,7 +66,8 @@ This chart allows you to customize its installation. The table below shows the p
 | `nrf.volume.mount` | The path to the folder where configuration files should be mounted. | `/free5gc/config/`|
 | `nrf.podAnnotations` | Pod annotations. | `{}`|
 | `nrf.imagePullSecrets` | Image pull secrets. | `[]`|
-| `nrf.podSecurityContext` | Pod secutity context. | `[]`|
+| `nrf.podSecurityContext` | Pod security context. | `see values.yaml`|
+| `nrf.podSecurityContext.seccompProfile.type` | Pod seccomp profile. | `RuntimeDefault`|
 | `nrf.resources` | CPU and memory requests and limits. | `see values.yaml`|
 | `nrf.readinessProbe` | Readiness probe. | `see values.yaml`|
 | `nrf.livenessProbe` | Liveness probe. | `see values.yaml`|

@@ -64,7 +64,8 @@ This chart allows you to customize its installation. The table below shows the p
 | `ausf.volume.mount` | The path to the folder where configuration files should be mounted. | `/free5gc/config/`|
 | `ausf.podAnnotations` | Pod annotations. | `{}`|
 | `ausf.imagePullSecrets` | Image pull secrets. | `[]`|
-| `ausf.podSecurityContext` | Pod secutity context. | `[]`|
+| `ausf.podSecurityContext` | Pod security context. | `see values.yaml`|
+| `ausf.podSecurityContext.seccompProfile.type` | Pod seccomp profile. | `RuntimeDefault`|
 | `ausf.resources` | CPU and memory requests and limits. | `see values.yaml`|
 | `ausf.readinessProbe` | Readiness probe (not used for instance). | `see values.yaml`|
 | `ausf.livenessProbe` | Liveness probe (not used for instance). | `see values.yaml`|
