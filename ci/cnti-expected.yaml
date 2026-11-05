@@ -1,0 +1,10 @@
+# The essential tests' results this repository knows and accepts, for the
+# CNTi job (.github/workflows/cnti.yml, expected_results). A test not listed
+# is expected to pass. When a result changes, the job says so in its summary
+# and as a warning; the badge doesn't change. Update this file in the pull
+# request that changes the result.
+- test: non_root_containers
+  status: failed
+  reason: >-
+    The UPFs run as root to set up the GTP-U device and routes with NET_ADMIN,
+    and MongoDB's install-tini init container runs apt-get as root
