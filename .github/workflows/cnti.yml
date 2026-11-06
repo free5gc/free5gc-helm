@@ -10,6 +10,7 @@ on:
       - charts/free5gc/**
       - cnti-testsuite.yaml
       - ci/kind-cnti.yaml
+      - ci/cnti-expected.yaml
       - .github/workflows/cnti.yml
   push:
     branches:
@@ -70,16 +71,20 @@ jobs:
           cnti_cache_dir="$(realpath -m "$GITHUB_WORKSPACE/../../../.cnti-testsuite")"
           echo "$cnti_cache_dir" >> "$GITHUB_PATH"
 
-      - uses: lfn-cnti/testsuite-action@v1
+      # The action and the suite are both pinned to a release, so a run is
+      # reproducible and a new release is adopted on purpose: bump them after
+      # checking the release notes.
+      - uses: lfn-cnti/testsuite-action@3c0e163cbbdde302cdd9abb9dbe8c2cbd6a72c71 # v1.4.0
         with:
-          # Pinned so a run is reproducible and a suite release is adopted on
-          # purpose; bump it after checking the release notes.
-          version: v2.2.0
+          version: v2.4.1
           cnf_config: cnti-testsuite.yaml
           kind_config: ci/kind-cnti.yaml
           install_timeout: 1800
           tests: cert
           badge_branch: badges
+          # Known results (ci/cnti-expected.yaml): a test whose result changes
+          # is reported in the job summary and as a warning.
+          expected_results: ci/cnti-expected.yaml
 
   # Pull requests that change the chart or the job, and manual runs on other
   # branches: the same steps with a read-only token. The action publishes the
