@@ -719,15 +719,30 @@ customStartupProbe: {}
 ##         containerPort: 1234
 ##
 initContainers:
+  # tini, the init process MongoDB runs under (command above): the static
+  # release binary, checksum-verified, fetched as a non-root user.
   - name: install-tini
-    image: debian:12-slim
+    image: curlimages/curl:8.17.0
+    securityContext:
+      runAsUser: 1001
+      runAsGroup: 1001
+      runAsNonRoot: true
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
     command:
       - sh
       - -c
       - |
-        apt-get update && apt-get install -y tini
-        cp /usr/bin/tini /tmp/tini
-        chmod +x /tmp/tini
+        set -e
+        case "$(uname -m)" in
+          x86_64)  arch=amd64; sum=c5b0666b4cb676901f90dfcb37106783c5fe2077b04590973b885950611b30ee ;;
+          aarch64) arch=arm64; sum=eae1d3aa50c48fb23b8cbdf4e369d0910dfc538566bfd09df89a774aa84a48b9 ;;
+          *) echo "no tini-static for $(uname -m)"; exit 1 ;;
+        esac
+        curl -fsSL -o /tmp/tini "https://github.com/krallin/tini/releases/download/v0.19.0/tini-static-$arch"
+        echo "$sum  /tmp/tini" | sha256sum -c -
+        chmod 755 /tmp/tini
     volumeMounts:
       - name: tini-volume
         mountPath: /tmp
