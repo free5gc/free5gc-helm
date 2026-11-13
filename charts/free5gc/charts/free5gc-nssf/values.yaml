@@ -120,6 +120,9 @@ nssf:
     #    hosts:
     #      - chart-example.local
   configuration:
+    sbi:
+      tls:
+        verify: false # Verify outgoing SBI HTTPS certificates
     serviceNameList: |-
       - nnssf-nsselection
       - nnssf-nssaiavailability

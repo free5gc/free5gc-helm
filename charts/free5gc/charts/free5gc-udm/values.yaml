@@ -120,6 +120,9 @@ udm:
     #    hosts:
     #      - chart-example.local
   configuration:
+    sbi:
+      tls:
+        verify: false # Verify outgoing SBI HTTPS certificates
     serviceNameList: |-
         - nudm-sdm
         - nudm-uecm

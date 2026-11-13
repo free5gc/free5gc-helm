@@ -115,6 +115,9 @@ nef:
     #    hosts:
     #      - chart-example.local
   configuration:
+    sbi:
+      tls:
+        verify: false # Verify outgoing SBI HTTPS certificates
     serviceList: |-
         - serviceName: nnef-pfdmanagement # Nnef_PFDManagement Service
         - serviceName: nnef-oam # OAM service

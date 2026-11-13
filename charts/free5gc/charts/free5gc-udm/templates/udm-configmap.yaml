@@ -33,6 +33,7 @@ data:
         bindingIPv4: 0.0.0.0  # IP used to bind the service
         port: {{ .service.port }}
         tls:
+          verify: {{ .configuration.sbi.tls.verify }}
           key: ./cert/udm.key
           pem: ./cert/udm.pem
 {{- if $.Values.udm.configuration.metrics.enable }}
