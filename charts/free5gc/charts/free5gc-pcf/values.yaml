@@ -50,8 +50,8 @@ pcf:
   replicaCount: 1
   image:
     name: free5gc/pcf
-    tag: v4.3.0
-    pullPolicy: IfNotPresent
+    tag: latest
+    pullPolicy: Always
   service:
     type: ClusterIP
     port: &Port 8080

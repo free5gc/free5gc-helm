@@ -50,8 +50,8 @@ n3iwf:
   replicaCount: 1
   image:
     name: free5gc/n3iwf
-    tag: v4.3.0
-    pullPolicy: IfNotPresent
+    tag: latest
+    pullPolicy: Always
   configmap:
     name: n3iwf-configmap
   volume:

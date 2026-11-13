@@ -42,8 +42,8 @@ ausf:
   replicaCount: 1
   image:
     name: free5gc/ausf
-    tag: v4.3.0
-    pullPolicy: IfNotPresent
+    tag: latest
+    pullPolicy: Always
   service:
     type: ClusterIP
     port: &Port 8080
