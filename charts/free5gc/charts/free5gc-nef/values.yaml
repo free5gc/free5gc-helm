@@ -37,8 +37,8 @@ nef:
   replicaCount: 1
   image:
     name: free5gc/nef
-    tag: v4.3.0
-    pullPolicy: IfNotPresent
+    tag: latest
+    pullPolicy: Always
   service:
     type: ClusterIP
     port: &Port 8080
@@ -115,6 +115,9 @@ nef:
     #    hosts:
     #      - chart-example.local
   configuration:
+    sbi:
+      tls:
+        verify: false # Verify outgoing SBI HTTPS certificates
     serviceList: |-
         - serviceName: nnef-pfdmanagement # Nnef_PFDManagement Service
         - serviceName: nnef-oam # OAM service

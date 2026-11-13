@@ -52,8 +52,8 @@ udr:
   replicaCount: 1
   image:
     name: free5gc/udr
-    tag: v4.3.0
-    pullPolicy: IfNotPresent
+    tag: latest
+    pullPolicy: Always
   service:
     type: ClusterIP
     port: &Port 8080
@@ -130,6 +130,9 @@ udr:
     #    hosts:
     #      - chart-example.local
   configuration:
+    sbi:
+      tls:
+        verify: false # Verify outgoing SBI HTTPS certificates
     serviceNameList: |-
 
 

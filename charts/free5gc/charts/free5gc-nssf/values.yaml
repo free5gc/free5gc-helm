@@ -42,8 +42,8 @@ nssf:
   replicaCount: 1
   image:
     name: free5gc/nssf
-    tag: v4.3.0
-    pullPolicy: IfNotPresent
+    tag: latest
+    pullPolicy: Always
   service:
     type: ClusterIP
     port: &Port 8080
@@ -120,6 +120,9 @@ nssf:
     #    hosts:
     #      - chart-example.local
   configuration:
+    sbi:
+      tls:
+        verify: false # Verify outgoing SBI HTTPS certificates
     serviceNameList: |-
       - nnssf-nsselection
       - nnssf-nssaiavailability

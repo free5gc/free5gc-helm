@@ -60,8 +60,8 @@ smf:
   replicaCount: 1
   image:
     name: free5gc/smf
-    tag: v4.3.0
-    pullPolicy: IfNotPresent 
+    tag: latest
+    pullPolicy: Always
   service:
     type: ClusterIP
     port: &Port 8080
@@ -138,6 +138,9 @@ smf:
     #    hosts:
     #      - chart-example.local
   configuration:
+    sbi:
+      tls:
+        verify: false # Verify outgoing SBI HTTPS certificates
     serviceNameList: |-
         - nsmf-pdusession
         - nsmf-event-exposure

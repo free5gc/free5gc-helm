@@ -67,8 +67,8 @@ amf:
   replicaCount: 1
   image:
     name: free5gc/amf
-    tag: v4.3.0
-    pullPolicy: IfNotPresent
+    tag: latest
+    pullPolicy: Always
   service:
     type: ClusterIP
     port: &Port 8080
@@ -145,6 +145,9 @@ amf:
     #    hosts:
     #      - chart-example.local
   configuration:
+    sbi:
+      tls:
+        verify: false # Verify outgoing SBI HTTPS certificates
     serviceNameList: |-
         - namf-comm
         - namf-evts

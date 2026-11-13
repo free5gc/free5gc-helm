@@ -22,6 +22,7 @@ data:
         bindingIPv4: 0.0.0.0 # IP used to bind the service
         port: {{ .service.port }} # port used to bind the service
         tls: # the local path of TLS key
+          verify: {{ .configuration.sbi.tls.verify }}
           pem: ./cert/chf.pem # CHF TLS Certificate
           key: ./cert/chf.key # CHF TLS Private key
 {{- if $.Values.chf.configuration.metrics.enable }}

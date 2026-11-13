@@ -40,6 +40,7 @@ data:
         bindingIPv4: 0.0.0.0  # IP used to bind the service
         port: {{ .service.port }}
         tls:
+          verify: {{ .configuration.sbi.tls.verify }}
           key: ./cert/amf.key
           pem: ./cert/amf.pem
 {{- if $.Values.amf.configuration.metrics.enable }}

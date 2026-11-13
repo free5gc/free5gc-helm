@@ -21,8 +21,8 @@ scp:
   replicaCount: 1
   image:
     name: free5gc/scp
-    tag: v4.3.0
-    pullPolicy: IfNotPresent
+    tag: latest
+    pullPolicy: Always
   service:
     type: ClusterIP
     port: 8000
@@ -83,6 +83,9 @@ scp:
             pathType: Prefix
     tls: []
   configuration:
+    sbi:
+      tls:
+        verify: false # Verify outgoing SBI HTTPS certificates
     serviceList:
       - nausf-auth
       - nudm-ueau
