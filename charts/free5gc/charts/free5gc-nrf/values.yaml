@@ -59,8 +59,8 @@ nrf:
   replicaCount: 1
   image:
     name: free5gc/nrf
-    tag: latest
-    pullPolicy: Always
+    tag: v4.3.0
+    pullPolicy: IfNotPresent
   volume:
     mount: /free5gc/config/
     tlsmount: /free5gc/config/TLS

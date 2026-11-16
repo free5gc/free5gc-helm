@@ -29,8 +29,8 @@ bsf:
   replicaCount: 1
   image:
     name: free5gc/bsf
-    tag: latest
-    pullPolicy: Always
+    tag: v4.3.0
+    pullPolicy: IfNotPresent
   service:
     type: ClusterIP
     port: 8000

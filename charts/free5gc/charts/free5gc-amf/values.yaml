@@ -67,8 +67,8 @@ amf:
   replicaCount: 1
   image:
     name: free5gc/amf
-    tag: latest
-    pullPolicy: Always
+    tag: v4.3.0
+    pullPolicy: IfNotPresent
   service:
     type: ClusterIP
     port: &Port 8080
