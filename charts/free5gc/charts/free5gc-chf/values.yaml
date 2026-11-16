@@ -127,6 +127,9 @@ chf:
     #    hosts:
     #      - chart-example.local
   configuration: 
+    sbi:
+      tls:
+        verify: false # Verify outgoing SBI HTTPS certificates
     serviceNameList: |-
       - nchf-convergedcharging # Nchf_AMPolicyControl service
     

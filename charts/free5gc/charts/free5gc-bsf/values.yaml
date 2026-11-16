@@ -91,6 +91,9 @@ bsf:
             pathType: Prefix
     tls: []
   configuration:
+    sbi:
+      tls:
+        verify: false # Verify outgoing SBI HTTPS certificates
     bsfName: BSF
     metrics:
       enable: false

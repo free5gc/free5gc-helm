@@ -83,6 +83,9 @@ scp:
             pathType: Prefix
     tls: []
   configuration:
+    sbi:
+      tls:
+        verify: false # Verify outgoing SBI HTTPS certificates
     serviceList:
       - nausf-auth
       - nudm-ueau

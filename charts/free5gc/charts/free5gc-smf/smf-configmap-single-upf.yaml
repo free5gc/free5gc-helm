@@ -33,6 +33,7 @@ data:
         bindingIPv4: 0.0.0.0  # IP used to bind the service
         port: {{ .service.port }}
         tls:
+          verify: {{ .configuration.sbi.tls.verify }}
           key: ./cert/smf.key
           pem: ./cert/smf.pem
 {{- if $.Values.smf.configuration.metrics.enable }}

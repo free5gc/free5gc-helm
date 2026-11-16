@@ -119,6 +119,9 @@ nrf:
     #    hosts:
     #      - chart-example.local
   configuration:
+    sbi:
+      cert:
+        verify: false # Verify outgoing SBI HTTPS certificates
     serviceNameList: |-
       - nnrf-nfm
       - nnrf-disc

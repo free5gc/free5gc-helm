@@ -36,6 +36,7 @@ data:
         bindingIPv4: 0.0.0.0  # IP used to bind the service
         port: {{ $.Values.global.nrf.service.port }}
         cert:
+          verify: {{ .configuration.sbi.cert.verify }}
           key: ./cert/nrf.key
           pem: ./cert/nrf.pem
         rootcert: # the local path of root CA certs

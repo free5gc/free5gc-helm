@@ -17,6 +17,7 @@ data:
         bindingIPv4: 0.0.0.0
         port: {{ .service.port }}
         tls:
+          verify: {{ .configuration.sbi.tls.verify }}
           pem: cert/scp.pem
           key: cert/scp.key
       nrfUri: {{ $.Values.global.sbi.scheme }}://{{ $.Values.global.nrf.service.name }}:{{ $.Values.global.nrf.service.port }}
