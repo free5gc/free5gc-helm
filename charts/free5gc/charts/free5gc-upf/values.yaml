@@ -119,8 +119,13 @@ upf:
     sysctls:
       - name: net.ipv4.ip_forward
         value: "1"
+  # Not root: the image gives the upf and iptables binaries CAP_NET_ADMIN as
+  # file capabilities, which take effect only when privilege escalation is
+  # allowed (no_new_privs off); the container's capabilities stay NET_ADMIN.
   securityContext:
-    allowPrivilegeEscalation: false
+    runAsUser: 1000
+    runAsGroup: 1000
+    runAsNonRoot: true
     capabilities:
       add: ["NET_ADMIN"]
   resources:
@@ -210,8 +215,13 @@ psaupf1:
     sysctls:
       - name: net.ipv4.ip_forward
         value: "1"
+  # Not root: the image gives the upf and iptables binaries CAP_NET_ADMIN as
+  # file capabilities, which take effect only when privilege escalation is
+  # allowed (no_new_privs off); the container's capabilities stay NET_ADMIN.
   securityContext:
-    allowPrivilegeEscalation: false
+    runAsUser: 1000
+    runAsGroup: 1000
+    runAsNonRoot: true
     capabilities:
       add: ["NET_ADMIN"]
   resources:
@@ -294,8 +304,13 @@ psaupf2:
     sysctls:
       - name: net.ipv4.ip_forward
         value: "1"
+  # Not root: the image gives the upf and iptables binaries CAP_NET_ADMIN as
+  # file capabilities, which take effect only when privilege escalation is
+  # allowed (no_new_privs off); the container's capabilities stay NET_ADMIN.
   securityContext:
-    allowPrivilegeEscalation: false
+    runAsUser: 1000
+    runAsGroup: 1000
+    runAsNonRoot: true
     capabilities:
       add: ["NET_ADMIN"]
   resources:
@@ -378,8 +393,13 @@ iupf1:
     sysctls:
       - name: net.ipv4.ip_forward
         value: "1"
+  # Not root: the image gives the upf and iptables binaries CAP_NET_ADMIN as
+  # file capabilities, which take effect only when privilege escalation is
+  # allowed (no_new_privs off); the container's capabilities stay NET_ADMIN.
   securityContext:
-    allowPrivilegeEscalation: false
+    runAsUser: 1000
+    runAsGroup: 1000
+    runAsNonRoot: true
     capabilities:
       add: ["NET_ADMIN"]
   resources:
