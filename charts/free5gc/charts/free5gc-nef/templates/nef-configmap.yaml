@@ -17,7 +17,7 @@ data:
     configuration:
       sbi:
         scheme: {{ $.Values.global.sbi.scheme }} # The protocol for sbi (http or https)
-        registerIPv4: {{ include "free5gc-nef.fullname" $ }}-service # IP used to register to NRF
+        registerIPv4: {{ include "free5gc-nef.fullname" $ }}-service.{{ $.Release.Namespace }}.svc.{{ $.Values.global.clusterDomain | default "cluster.local" }} # FQDN used to register to NRF (TS 29.571 Fqdn)
         bindingIPv4: 0.0.0.0 # IP used to bind the service
         port: {{ .service.port }} # port used to bind the service
         tls: # the local path of TLS key

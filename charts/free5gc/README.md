@@ -280,6 +280,7 @@ Please check this [link](https://helm.sh/docs/chart_template_guide/subcharts_and
 | `global.projectName` | The name of the project. | `free5gc` |
 | `global.userPlaneArchitecture` | User plane topology. Possible values are `single` and `ulcl` | `single` |
 | `global.sbi.scheme` | The SBI scheme for all control plane NFs. Possible values are `http` and `https` | `http` |
+| `global.clusterDomain` | Kubernetes cluster domain. Each NF registers `<service>.<namespace>.svc.<clusterDomain>` to the NRF as its FQDN. | `cluster.local` |
 | `global.nrf.service.name` | The name of the service used to expose the NRF SBI interface. | `nrf-nnrf` |
 | `global.nrf.service.type` | The type of the NRF SBI service. | `NodePort` |
 | `global.nrf.service.port` | The NRF SBI port number. | `8000` |
