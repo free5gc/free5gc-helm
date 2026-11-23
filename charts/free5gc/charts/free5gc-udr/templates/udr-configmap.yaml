@@ -26,7 +26,7 @@ data:
     configuration:
       sbi:
         scheme: {{ $.Values.global.sbi.scheme }}
-        registerIPv4: {{ include "free5gc-udr.fullname" $ }}-service # IP used to register to NRF
+        registerIPv4: {{ include "free5gc-udr.fullname" $ }}-service.{{ $.Release.Namespace }}.svc.{{ $.Values.global.clusterDomain | default "cluster.local" }} # FQDN used to register to NRF (TS 29.571 Fqdn)
         bindingIPv4: 0.0.0.0  # IP used to bind the service
         port: {{ .service.port }}
         tls:
